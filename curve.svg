@@ -1,0 +1,159 @@
+<!-- http://www.petercollingridge.co.uk/svg-tutorial -->
+
+<svg version="1.1"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     width="500" height="240"
+     onload="init(evt)"
+     onmousemove="drag(evt)"
+     onmouseup="deselect()">
+    
+        <style>
+        text{
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .variable{
+            font-weight: bold;
+        }
+        .background{
+            fill: none;
+            stroke: #444;
+            stroke-width: 1;
+            stroke-dasharray: 5, 5;
+        }
+        .control_line{
+            stroke: #28f;
+            stroke-width: 0.5;
+        }
+        .point1{
+            fill: #28A86B;
+        }
+        .point2{
+            fill: #6495ED;
+        }
+        .point3{
+            fill: #FF7878;
+        }
+        .point4{
+            fill: #8D5FD3;
+        }
+        #example_shape{
+            fill: none;
+            stroke: #111;
+            stroke-width: 0.8;
+        }
+        .control_point{
+            fill: #FFF;
+            opacity: 0;
+            stroke: #888;
+            stroke-width: 2;
+            cursor: pointer;
+        }
+        .control_point:hover{
+            opacity: 0.5;
+        }
+        .invisible{
+            pointer-events: none;
+        }
+    </style>
+    
+    <script type="text/ecmascript"><![CDATA[
+        var svgDoc;
+        var selectedPoint = 0;
+        var dx = 0;
+        var dy = 0;
+        
+        var example_shape;
+        var text_variables;
+        var control_lines;
+        var coords = [0, 0, 100, 100, 150, 20, 180, 150, 280, 100];
+    
+        function init(evt) {
+            if ( window.svgDocument == null ) {
+                svgDoc = evt.target.ownerDocument;
+            }  
+            example_shape = svgDoc.getElementById('example_shape');
+            controls_lines = [svgDoc.getElementById('control_line1'),
+                              svgDoc.getElementById('control_line2')] ;
+            text_variables = [];
+            for (var i=1; i<=4; i++){
+                text_variables.push(svgDoc.getElementById('variable'+i));
+            }
+        };
+        
+        function selectElement(evt, point){
+            selectedPoint = point;
+            control_point = evt.target.parentNode;
+            dx = coords[selectedPoint*2] - evt.clientX;
+            dy = coords[selectedPoint*2 + 1] - evt.clientY;
+        };
+        
+        function drag(evt){
+            if (selectedPoint === 0) { return; }
+            
+            var x = evt.clientX + dx;
+            var y = evt.clientY + dy;
+            coords[selectedPoint*2] = x;
+            coords[selectedPoint*2 + 1] = y;
+            
+            var d = "M";
+            for (var i=2; i<coords.length; i+=2){
+                if (i === 4) { d += "C"; }
+                d += " " + coords[i] + " " + coords[i+1];
+            }
+            example_shape.setAttributeNS(null, "d", d);
+            control_point.setAttributeNS(null, "transform", "translate(" + x + "," + y + ")");
+            text_variables[selectedPoint-1].firstChild.data = x + "," + y;
+            
+            // Control lines
+            var n = Math.floor(selectedPoint/3);
+            var i = (selectedPoint % 2) + 1;
+            controls_lines[n].setAttributeNS(null, "x"+i, x);
+            controls_lines[n].setAttributeNS(null, "y"+i, y);
+            
+        };
+        
+        function deselect(){
+            selectedPoint = 0;
+        }
+    
+    ]]> </script>
+    
+    <g class="invisible">
+        <rect class="background" x="0.5" y="0.5" width="499" height="239" />
+        <path id="example_shape" d="M100 100 C150 20 180 150 280 100 " />
+        <line class="control_line" id="control_line1" x1="150" y1="20" x2="100" y2="100" />
+        <line class="control_line" id="control_line2" x1="280" y1="100" x2="180" y2="150" />
+    </g>
+    
+    <g transform="translate(100,100)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 1)" />
+        <circle class="point1 invisible" cx="0" cy="0" r="3" />
+    </g>
+
+    <g transform="translate(150,20)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 2)" />
+        <circle class="point2 invisible" cx="0" cy="0" r="3" />
+    </g>
+
+    <g transform="translate(180,150)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 3)" />
+        <circle class="point3 invisible" cx="0" cy="0" r="3" />
+    </g>
+    
+   <g transform="translate(280,100)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 4)" />
+        <circle class="point4 invisible" cx="0" cy="0" r="3" />
+    </g>
+    
+    <text x="40" y="230">
+        <tspan>&lt;path</tspan>
+        <tspan>d="</tspan><tspan class="point1 variable">M<tspan id="variable1">100,100</tspan></tspan>
+                         C<tspan class="point2 variable" id="variable2">150,20</tspan>
+                          <tspan class="point3 variable" id="variable3">200,180</tspan>
+                          <tspan class="point4 variable" id="variable4">280,140</tspan>
+       <tspan>" /&gt;</tspan>
+    </text>
+    
+</svg>
