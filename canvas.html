@@ -12,6 +12,10 @@ https://eloquentjavascript.net/15_event.html
 export default class FormSubscriber extends EventSubscriber {
 Bla bla
 
+
+mousedown
+enter
+
 <script>
 	console.log('script');
 	
@@ -26,22 +30,42 @@ Bla bla
 		console.log(e);
 	}
 	
-	
 	class TcSvgEdit {
 		constructor() {
 			console.log('construct');
 			document.addEventListener("click", function(event){
-				console.log('onClickAnno');
-				console.log(event);
-				TcSvgEdit.onClickTc(event);
+				TcSvgEdit.onClick(event);
 			});
 		}
 		
-		static onClickTc(event) {
-			console.log('onClickTc');
+		static onClick(event) {
+			console.log('TcSvgEdit.onClick');
 			console.log(event);
+			TcSvgEdit.svgOnClick(event);
 		}
 		
+
+		static svgOnClick(event) {
+			let svg = event.target.closest('svg.tc_edit');
+			if (null === svg) { return; }
+			console.log(svg);
+			TcSvgEdit.svgAddNode(svg, event.clientX, event.clientY);
+		}
+		
+		static svgAddNode(svg, x, y) {
+			console.log('svgAddNode('+x+', '+y+')');
+			//let c = document.createElement("circle");
+			let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			c.setAttribute('cx', x);
+			c.setAttribute('cy', y);
+			c.setAttribute('r', 40);
+			c.setAttribute('stroke', 'black');
+			c.setAttribute('fill', 'red');
+			svg.append(c);
+			console.log(c);
+			
+			
+		}
 	}
 
 	new TcSvgEdit();
@@ -68,27 +92,9 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
 	class="tc_edit"
-    
-   
-    <g transform="translate(100,100)" >
-        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 1)" />
-        <circle class="point1 invisible" cx="0" cy="0" r="3" />
-    </g>
+	id="svg1"
+>    
 
-    <g transform="translate(150,20)" >
-        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 2)" />
-        <circle class="point2 invisible" cx="0" cy="0" r="3" />
-    </g>
-
-    <g transform="translate(180,150)" >
-        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 3)" />
-        <circle class="point3 invisible" cx="0" cy="0" r="3" />
-    </g>
-    
-   <g transform="translate(280,100)" >
-        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 4)" />
-        <circle class="point4 invisible" cx="0" cy="0" r="3" />
-    </g>
     
 </svg>
 
@@ -97,10 +103,24 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns:svg="http://www.w3.org/2000/svg"
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
-	class="tc_edit"
+	class="not_tc_edit"
+	id="svg2"
 >
    <g transform="translate(280,100)" >
-        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 4)" />
+        <circle class="control_point" cx="0" cy="0" r="10"  />
+        <circle class="point4 invisible" cx="0" cy="0" r="3" />
+    </g>
+</svg>
+
+<svg version="1.1"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     width="500" height="240"
+	class="tc_edit"
+	id="svg3"
+>
+   <g transform="translate(280,100)" >
+        <circle class="control_point" cx="0" cy="0" r="10" />
         <circle class="point4 invisible" cx="0" cy="0" r="3" />
     </g>
 </svg>
