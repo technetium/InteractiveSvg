@@ -1,64 +1,4 @@
 <!-- http://www.petercollingridge.co.uk/svg-tutorial -->
-Hier is meer
-<svg version="1.1"
-     xmlns:svg="http://www.w3.org/2000/svg"
-     xmlns="http://www.w3.org/2000/svg"
-     width="500" height="240"
-     onload="init(evt)"
-     onmousemove="drag(evt)"
-     onmouseup="deselect()"
-     onmousedown="canvasmousedown(evt)">
-	
-        <style>
-        text{
-            font-size: 12px;
-            font-family: monospace;
-        }
-        .variable{
-            font-weight: bold;
-        }
-        .background{
-            fill: none;
-            stroke: #444;
-            stroke-width: 1;
-            stroke-dasharray: 5, 5;
-        }
-        .control_line{
-            stroke: #28f;
-            stroke-width: 0.5;
-        }
-        .point1{
-            fill: #28A86B;
-        }
-        .point2{
-            fill: #6495ED;
-        }
-        .point3{
-            fill: #FF7878;
-        }
-        .point4{
-            fill: #8D5FD3;
-        }
-        #example_shape{
-            fill: none;
-            stroke: #111;
-            stroke-width: 0.8;
-        }
-        .control_point{
-            fill: #FFF;
-            opacity: 0;
-            stroke: #888;
-            stroke-width: 2;
-            cursor: pointer;
-        }
-        .control_point:hover{
-            opacity: 0.5;
-        }
-        .invisible{
-            pointer-events: none;
-        }
-    </style>
-    
     <script type="text/ecmascript"><![CDATA[
         var svgDoc;
         var selectedPoint = 0;
@@ -137,6 +77,68 @@ Hier is meer
         }
     
     ]]> </script>
+
+
+Hier is meer
+<svg version="1.1"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     width="500" height="240"
+     onload="init(evt)"
+     onmousemove="drag(evt)"
+     onmouseup="deselect()"
+     onmousedown="canvasmousedown(evt)">
+	
+        <style>
+        text{
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .variable{
+            font-weight: bold;
+        }
+        .background{
+            fill: none;
+            stroke: #444;
+            stroke-width: 1;
+            stroke-dasharray: 5, 5;
+        }
+        .control_line{
+            stroke: #28f;
+            stroke-width: 0.5;
+        }
+        .point1{
+            fill: #28A86B;
+        }
+        .point2{
+            fill: #6495ED;
+        }
+        .point3{
+            fill: #FF7878;
+        }
+        .point4{
+            fill: #8D5FD3;
+        }
+        #example_shape{
+            fill: none;
+            stroke: #111;
+            stroke-width: 0.8;
+        }
+        .control_point{
+            fill: #FFF;
+            opacity: 0;
+            stroke: #888;
+            stroke-width: 2;
+            cursor: pointer;
+        }
+        .control_point:hover{
+            opacity: 0.5;
+        }
+        .invisible{
+            pointer-events: none;
+        }
+    </style>
+    
     
     <g class="invisible">
         <rect class="background" x="0.5" y="0.5" width="499" height="239" />
