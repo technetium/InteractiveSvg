@@ -1,0 +1,64 @@
+<!-- http://www.petercollingridge.co.uk/svg-tutorial -->
+
+<svg version="1.1"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     width="500" height="240"
+    <style>
+        .background{
+            fill: none;
+            stroke: #444;
+            stroke-width: 1;
+            stroke-dasharray: 5, 5;
+        }
+		</style>
+    
+    <script type="text/ecmascript"><![CDATA[
+        var svgDoc;
+        var selectedPoint = 0;
+        var dx = 0;
+        var dy = 0;
+        
+        var example_shape;
+        var text_variables;
+        var control_lines;
+        var coords = [0, 0, 100, 100, 150, 20, 180, 150, 280, 100];
+    ]]> </script>
+    
+    <g class="invisible">
+        <rect class="background" x="0.5" y="0.5" width="499" height="239" />
+        <path id="example_shape" d="M100 100 C150 20 180 150 280 100 " />
+        <line class="control_line" id="control_line1" x1="150" y1="20" x2="100" y2="100" />
+        <line class="control_line" id="control_line2" x1="280" y1="100" x2="180" y2="150" />
+    </g>
+    
+    <g transform="translate(100,100)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 1)" />
+        <circle class="point1 invisible" cx="0" cy="0" r="3" />
+    </g>
+
+    <g transform="translate(150,20)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 2)" />
+        <circle class="point2 invisible" cx="0" cy="0" r="3" />
+    </g>
+
+    <g transform="translate(180,150)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 3)" />
+        <circle class="point3 invisible" cx="0" cy="0" r="3" />
+    </g>
+    
+   <g transform="translate(280,100)" >
+        <circle class="control_point" cx="0" cy="0" r="10" onmousedown="selectElement(evt, 4)" />
+        <circle class="point4 invisible" cx="0" cy="0" r="3" />
+    </g>
+    
+    <text x="40" y="230">
+        <tspan>&lt;path</tspan>
+        <tspan>d="</tspan><tspan class="point1 variable">M<tspan id="variable1">100,100</tspan></tspan>
+                         C<tspan class="point2 variable" id="variable2">150,20</tspan>
+                          <tspan class="point3 variable" id="variable3">200,180</tspan>
+                          <tspan class="point4 variable" id="variable4">280,140</tspan>
+       <tspan>" /&gt;</tspan>
+    </text>
+    
+</svg>
