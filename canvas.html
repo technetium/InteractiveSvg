@@ -16,6 +16,20 @@ Bla bla
 mousedown
 enter
 
+
+@see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
+
+var pt = svg.createSVGPoint();  // Created once for document
+
+function alert_coords(evt) {
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+
+    // The cursor point, translated into svg coordinates
+    var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
+    console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+}
+
 <script>
 	console.log('script');
 	
@@ -31,8 +45,11 @@ enter
 	}
 	
 	class TcSvgEdit {
-		constructor() {
+
+		constructor(prefix) {
 			console.log('construct');
+			this.prefix = ("undefined" !== typeof prefix) ? prefix : 'tc_';
+			console.log(this.prefix);
 			document.addEventListener("click", function(event){
 				TcSvgEdit.onClick(event);
 			});
@@ -49,7 +66,9 @@ enter
 			let svg = event.target.closest('svg.tc_edit');
 			if (null === svg) { return; }
 			console.log(svg);
-			TcSvgEdit.svgAddNode(svg, event.clientX, event.clientY);
+			let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
+			console.log(pos);
+			TcSvgEdit.svgAddNode(svg, pos.x, pos.y);
 		}
 		
 		static svgAddNode(svg, x, y) {
@@ -58,23 +77,25 @@ enter
 			let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 			c.setAttribute('cx', x);
 			c.setAttribute('cy', y);
-			c.setAttribute('r', 40);
+			c.setAttribute('r', 20);
 			c.setAttribute('stroke', 'black');
 			c.setAttribute('fill', 'red');
 			svg.append(c);
 			console.log(c);
 		}
 		
-		static utilGetAbsolutePosition(element) {
-			let r = { x: element.offsetLeft, y: element.offsetTop };
-			if (element.offsetParent) {
-				let tmp = TcSvgEdit.utilGetAbsolutePosition(element.offsetParent);
-				r.x += tmp.x;
-				r.y += tmp.y;
-			}
-			return r;
-		}
+		static utilGetSvgCoordinates(svg, event) {
+			console.log('utilGetSvgCoordinates()');
+			// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
+			let pt = svg.createSVGPoint();
+			pt.x = event.clientX;
+			pt.y = event.clientY;
 
+			// The cursor point, translated into svg coordinates
+			let cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
+			console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+			return cursorpt;
+		}		
 	}
 
 	new TcSvgEdit();
