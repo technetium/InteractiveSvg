@@ -14,7 +14,18 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 mousedown
 enter
 <style>
-  svg.tc_svg_edit circle.node { fill: blue; }
+	svg.tc_svg_edit circle.node { 
+		fill: #CCF;
+		opacity: 0.1;
+		r: 10;
+		stroke: #00F;
+	}
+	svg.tc_svg_edit:hover circle.node { 
+		opacity: 0.5;
+	}
+	svg.tc_svg_edit:hover circle.node:hover { 
+		opacity: 1;
+    }
 </style>
 <script>
 	console.log('script');
@@ -36,8 +47,12 @@ enter
 
 		constructor(prefix) {
 			console.log('construct');
-			this.prefix = ("undefined" !== typeof prefix) ? prefix : 'tc_svg_edit_';
-			console.log(this.prefix);
+			
+			TcSvgEdit.node_radius = 5;
+			TcSvgEdit.prefix = "tc_svg_edit_";
+			TcSvgEdit.svg_namespace = "http://www.w3.org/2000/svg";
+			
+			if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
 			document.addEventListener("click", function(event){
 				TcSvgEdit.onClick(event);
 			});
@@ -62,16 +77,20 @@ enter
 		static svgAddNode(svg, x, y) {
 			console.log('svgAddNode('+x+', '+y+')');
 			//let c = document.createElement("circle");
-			let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			let c = TcSvgEdit.createSvgElement("circle");
 			c.classList.add("node");
+			console.log(this);
 
 			c.setAttribute('cx', x);
 			c.setAttribute('cy', y);
-			c.setAttribute('r', 20);
-		//	c.setAttribute('stroke', 'black');
-		//	c.setAttribute('fill', 'red');
+			c.setAttribute('r', TcSvgEdit.node_radius);
 			svg.append(c);
 			console.log(c);
+		}
+
+		// Because I'm to lazy to type the namespace
+		static createSvgElement(name) {
+			return document.createElementNS(TcSvgEdit.svg_namespace, name);
 		}
 		
 		static utilGetSvgCoordinates(svg, event) {
