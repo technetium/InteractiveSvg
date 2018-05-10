@@ -7,32 +7,20 @@
 <body>
 
 https://eloquentjavascript.net/15_event.html
-
-
-export default class FormSubscriber extends EventSubscriber {
-Bla bla
-
+http://tutorials.jenkov.com/svg/svg-and-css.html
+https://help.github.com/articles/what-is-github-pages/
+https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 
 mousedown
 enter
-
-
-@see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
-
-var pt = svg.createSVGPoint();  // Created once for document
-
-function alert_coords(evt) {
-    pt.x = evt.clientX;
-    pt.y = evt.clientY;
-
-    // The cursor point, translated into svg coordinates
-    var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
-    console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
-}
-
+<style>
+  svg.tc_svg_edit circle.node { fill: blue; }
+</style>
 <script>
 	console.log('script');
 	
+	//document.getElementById("MyElement").classList.add('MyClass');
+    //document.getElementById("MyElement").classList.remove('MyClass');
 	//document.addEventListener("click", onClick);
 	
 	function onClick(e) {
@@ -48,7 +36,7 @@ function alert_coords(evt) {
 
 		constructor(prefix) {
 			console.log('construct');
-			this.prefix = ("undefined" !== typeof prefix) ? prefix : 'tc_';
+			this.prefix = ("undefined" !== typeof prefix) ? prefix : 'tc_svg_edit_';
 			console.log(this.prefix);
 			document.addEventListener("click", function(event){
 				TcSvgEdit.onClick(event);
@@ -63,7 +51,7 @@ function alert_coords(evt) {
 		
 
 		static svgOnClick(event) {
-			let svg = event.target.closest('svg.tc_edit');
+			let svg = event.target.closest('svg.tc_svg_edit');
 			if (null === svg) { return; }
 			console.log(svg);
 			let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
@@ -75,11 +63,13 @@ function alert_coords(evt) {
 			console.log('svgAddNode('+x+', '+y+')');
 			//let c = document.createElement("circle");
 			let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			c.classList.add("node");
+
 			c.setAttribute('cx', x);
 			c.setAttribute('cy', y);
 			c.setAttribute('r', 20);
-			c.setAttribute('stroke', 'black');
-			c.setAttribute('fill', 'red');
+		//	c.setAttribute('stroke', 'black');
+		//	c.setAttribute('fill', 'red');
 			svg.append(c);
 			console.log(c);
 		}
@@ -98,7 +88,7 @@ function alert_coords(evt) {
 		}		
 	}
 
-	new TcSvgEdit();
+	new TcSvgEdit('someprefix');
 </script>
 
 
@@ -121,7 +111,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns:svg="http://www.w3.org/2000/svg"
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
-	class="tc_edit"
+	class="tc_svg_edit"
 	id="svg1"
 >    
 
@@ -133,7 +123,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns:svg="http://www.w3.org/2000/svg"
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
-	class="not_tc_edit"
+	class="not_tc_svg_edit"
 	id="svg2"
 >
    <g transform="translate(280,100)" >
@@ -146,7 +136,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns:svg="http://www.w3.org/2000/svg"
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
-	class="tc_edit"
+	class="tc_svg_edit"
 	id="svg3"
 >
    <g transform="translate(280,100)" >
