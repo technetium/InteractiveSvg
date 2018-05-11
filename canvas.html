@@ -67,6 +67,10 @@ enter
 			});
 		}
 		
+		//
+		// Event Listeners
+		//
+		
 		static onMouseDown(event) {
 			console.log("TcSvgEdit.onMouseDown");
 			console.log(event);
@@ -85,6 +89,19 @@ enter
 			TcSvgEdit.svgOnMouseUp(event);
 		}
 
+		//
+		// node
+		//
+		
+		static nodeOnMouseDrag(node, event) {
+			console.log("nodeOnMouseDrag");
+			console.log(event);
+		}
+		
+		//
+		// svg
+		//
+		
 		static svgOnMouseDown(event) {
 			let svg = event.target.closest("svg.tc_svg_edit");
 			if (null === svg) { return; }
@@ -107,12 +124,13 @@ enter
 		static svgOnMouseMove(event) {
 			let svg = event.target.closest("svg.tc_svg_edit");
 			if (null === svg) { return; }
-			console.log("svgOnMouseMove");
 			if (!svg.hasAttribute(TcSvgEdit.prefix + "_selected")) {
 				return;
 			}
-			console.log("svgOnMouseDrag");
-			console.log(svg.getAttribute(TcSvgEdit.prefix + "_selected"));
+			TcSvgEdit.nodeOnMouseDrag(
+				svg.getAttribute(TcSvgEdit.prefix + "_selected"),
+				event
+			);
 		}
 
 		static svgOnMouseUp(event) {
