@@ -25,29 +25,30 @@ enter
 		opacity: 0.5;
 	}
 	svg.tc_svg_edit:hover g.node:hover { 
+		cursor: move;
 		opacity: 1;
-    }
+	}
 </style>
 <script>
-	console.log('script');
+	console.log("script");
 	
-	//document.getElementById("MyElement").classList.add('MyClass');
-    //document.getElementById("MyElement").classList.remove('MyClass');
+	//document.getElementById("MyElement").classList.add("MyClass");
+    //document.getElementById("MyElement").classList.remove("MyClass");
 	//document.addEventListener("click", onClick);
 	
 	function onClick(e) {
-		console.log('onClickMain');
+		console.log("onClickMain");
 		console.log(e);
 	}
 	function onButtonClick(e) {
-		console.log('onButtonClick');
+		console.log("onButtonClick");
 		console.log(e);
 	}
 	
 	class TcSvgEdit {
 
 	constructor(prefix) {
-			console.log('construct');
+			console.log("construct");
 			
 			TcSvgEdit.node_circle_radius = 5;
 			TcSvgEdit.node_cross_radius = 11;
@@ -55,70 +56,116 @@ enter
 			TcSvgEdit.svg_namespace = "http://www.w3.org/2000/svg";
 			
 			if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
-			document.addEventListener("click", function(event){
-				TcSvgEdit.onClick(event);
+			document.addEventListener("mousedown", function(event){
+				TcSvgEdit.onMouseDown(event);
+			});
+			document.addEventListener("mousemove", function(event){
+				TcSvgEdit.onMouseMove(event);
+			});
+			document.addEventListener("mouseup", function(event){
+				TcSvgEdit.onMouseUp(event);
 			});
 		}
 		
-		static onClick(event) {
-			console.log('TcSvgEdit.onClick');
+		static onMouseDown(event) {
+			console.log("TcSvgEdit.onMouseDown");
 			console.log(event);
-			TcSvgEdit.svgOnClick(event);
+			TcSvgEdit.svgOnMouseDown(event);
+		}
+		
+		static onMouseMove(event) {
+			///console.log("TcSvgEdit.onMouseMove");
+			///console.log(event);
+			TcSvgEdit.svgOnMouseMove(event);
 		}
 
-		static svgOnClick(event) {
-			let svg = event.target.closest('svg.tc_svg_edit');
+		static onMouseUp(event) {
+			console.log("TcSvgEdit.onMouseUp");
+			console.log(event);
+			TcSvgEdit.svgOnMouseUp(event);
+		}
+
+		static svgOnMouseDown(event) {
+			let svg = event.target.closest("svg.tc_svg_edit");
 			if (null === svg) { return; }
+			
+			let node = event.target.closest(".node");
+			if (null !== node) {
+				console.log(node);
+				svg.setAttribute(TcSvgEdit.prefix + "_selected", node);
+				console.log("selected");
+				console.log(svg.getAttribute(TcSvgEdit.prefix + "_selected"));
+				return;
+			}
+			
 			console.log(svg);
 			let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
 			console.log(pos);
 			TcSvgEdit.svgAddNode(svg, pos.x, pos.y);
 		}
+
+		static svgOnMouseMove(event) {
+			let svg = event.target.closest("svg.tc_svg_edit");
+			if (null === svg) { return; }
+			console.log("svgOnMouseMove");
+			if (!svg.hasAttribute(TcSvgEdit.prefix + "_selected")) {
+				return;
+			}
+			console.log("svgOnMouseDrag");
+			console.log(svg.getAttribute(TcSvgEdit.prefix + "_selected"));
+		}
+
+		static svgOnMouseUp(event) {
+			let svg = event.target.closest("svg.tc_svg_edit");
+			if (null === svg) { return; }
+			svg.removeAttribute(TcSvgEdit.prefix + "_selected");
+		}
 		
+
 		static svgAddNode(svg, x, y) {
-			console.log('svgAddNode('+x+', '+y+')');
-			//let c = document.createElement("circle");
+			console.log("svgAddNode("+x+", "+y+")");
 			let g = TcSvgEdit.createSvgElement("g");
 			g.classList.add("node");
 	
-			let e = null
+			// inatialise element
+			let e = null; 
 
 			// Circle
-			e =TcSvgEdit.createSvgElement("circle");
-			e.setAttribute('cx', x);
-			e.setAttribute('cy', y);
-			e.setAttribute('r', TcSvgEdit.node_circle_radius);
+			e = TcSvgEdit.createSvgElement("circle");
+			e.setAttribute("cx", x);
+			e.setAttribute("cy", y);
+			e.setAttribute("r", TcSvgEdit.node_circle_radius);
 			g.append(e);
 			
 			// Horizontal cross hair
 			e = TcSvgEdit.createSvgElement("line");
-			e.setAttribute('x1', x - TcSvgEdit.node_cross_radius);
-			e.setAttribute('y1', y);
-			e.setAttribute('x2', x + TcSvgEdit.node_cross_radius);
-			e.setAttribute('y2', y);
-			e.setAttribute('r', TcSvgEdit.node_circle_radius);
+			e.setAttribute("x1", x - TcSvgEdit.node_cross_radius);
+			e.setAttribute("y1", y);
+			e.setAttribute("x2", x + TcSvgEdit.node_cross_radius);
+			e.setAttribute("y2", y);
+			e.setAttribute("r", TcSvgEdit.node_circle_radius);
 			g.append(e);
 
 			// Vertical cross hair
 			e = TcSvgEdit.createSvgElement("line");
-			e.setAttribute('x1', x);
-			e.setAttribute('y1', y - TcSvgEdit.node_cross_radius);
-			e.setAttribute('x2', x);
-			e.setAttribute('y2', y + TcSvgEdit.node_cross_radius);
-			e.setAttribute('r', TcSvgEdit.node_circle_radius);
+			e.setAttribute("x1", x);
+			e.setAttribute("y1", y - TcSvgEdit.node_cross_radius);
+			e.setAttribute("x2", x);
+			e.setAttribute("y2", y + TcSvgEdit.node_cross_radius);
+			e.setAttribute("r", TcSvgEdit.node_circle_radius);
 			g.append(e);
 
 			svg.append(g);
 			console.log(g);
 		}
 
-		// Because I'm to lazy to type the namespace
+		// Because I"m to lazy to type the namespace
 		static createSvgElement(name) {
 			return document.createElementNS(TcSvgEdit.svg_namespace, name);
 		}
 		
 		static utilGetSvgCoordinates(svg, event) {
-			console.log('utilGetSvgCoordinates()');
+			console.log("utilGetSvgCoordinates()");
 			// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
 			let pt = svg.createSVGPoint();
 			pt.x = event.clientX;
@@ -131,7 +178,7 @@ enter
 		}		
 	}
 
-	new TcSvgEdit('someprefix');
+	new TcSvgEdit("someprefix");
 </script>
 
 
