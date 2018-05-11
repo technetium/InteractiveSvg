@@ -11,49 +11,35 @@ http://tutorials.jenkov.com/svg/svg-and-css.html
 https://help.github.com/articles/what-is-github-pages/
 https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 
-mousedown
-enter
 <style>
-	svg.tc_svg_edit g.node { 
+	svg.tc_svg_edit symbol.node { 
 		fill: #CCF;
 		opacity: 0.1;
 		r: 10;
 		stroke: #00F;
 		stroke-width: .5;
 	}
-	svg.tc_svg_edit:hover g.node { 
+	svg.tc_svg_edit:hover symbol.node { 
 		opacity: 0.5;
 	}
-	svg.tc_svg_edit:hover g.node:hover { 
+	svg.tc_svg_edit:hover symbol.node:hover { 
 		cursor: move;
 		opacity: 1;
 	}
 </style>
 <script>
 	console.log("script");
-	
-	//document.getElementById("MyElement").classList.add("MyClass");
-    //document.getElementById("MyElement").classList.remove("MyClass");
-	//document.addEventListener("click", onClick);
-	
-	function onClick(e) {
-		console.log("onClickMain");
-		console.log(e);
-	}
-	function onButtonClick(e) {
-		console.log("onButtonClick");
-		console.log(e);
-	}
-	
-	class TcSvgEdit {
 
-	constructor(prefix) {
+	class TcSvgEdit {
+	
+		constructor(prefix) {
 			console.log("construct");
 			
 			TcSvgEdit.node_circle_radius = 5;
 			TcSvgEdit.node_cross_radius = 11;
 			TcSvgEdit.prefix = "tc_svg_edit_";
-			TcSvgEdit.svg_namespace = "http://www.w3.org/2000/svg";
+			TcSvgEdit.namespace_svg = "http://www.w3.org/2000/svg";
+			TcSvgEdit.namespace_xlink = "http://www.w3.org/1999/xlink";
 			
 			if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
 			document.addEventListener("mousedown", function(event){
@@ -66,14 +52,113 @@ enter
 				TcSvgEdit.onMouseUp(event);
 			});
 		}
+
+		//
+		// Getters
+		//
+		
+		static getDefs(svg) {
+			let defs = svg.querySelector("defs");
+			if (!defs)	{
+				defs = TcSvgEdit.initDefs(svg);
+			}
+			return defs;
+		}
+		
+		static getId(svg) {
+			if (!svg.hasAttribute("id")) {
+				TcSvgEdit.initSvgId(svg);
+			}
+			return svg.getAttribute("id");
+		}
+		
+		static getNode(svg) {
+			console.log("getNode");
+			let node = document.getElementById(TcSvgEdit.idNode(svg));
+			if (!node)	{
+				node = TcSvgEdit.initNode(svg);
+			}
+			console.log(node);
+			return node;
+		}
+
+		//
+		// Id's
+		//
+		static idNode(svg) { return	TcSvgEdit.getId(svg) + '-symbol-node'; }
+		
+
+		//
+		// Initialisers
+		//
+
+		static initDefs(svg) {
+			console.log('initDefs');
+			let defs = TcSvgEdit.createSvgElement("defs");
+			svg.append(defs);
+			return defs;
+		}
+		
+		static initNode(svg) {
+			console.log('initNode');
+			let defs = TcSvgEdit.getDefs(svg);
+			let node = TcSvgEdit.createSvgElement("symbol");
+			node.setAttribute("id", TcSvgEdit.idNode(svg));
+			node.classList.add("node");
+
+			// The size of the node
+			let s = Math.max(
+				TcSvgEdit.node_cross_radius,
+				TcSvgEdit.node_circle_radius
+			);
+	
+			// inatialise element
+			let e = null; 
+
+			// Circle
+			e = TcSvgEdit.createSvgElement("circle");
+			e.setAttribute("cx", s);
+			e.setAttribute("cy", s);
+			e.setAttribute("r", TcSvgEdit.node_circle_radius);
+			node.append(e);
+			
+			// Horizontal cross hair
+			e = TcSvgEdit.createSvgElement("line");
+			e.setAttribute("x1", s - TcSvgEdit.node_cross_radius);
+			e.setAttribute("y1", s);
+			e.setAttribute("x2", s + TcSvgEdit.node_cross_radius);
+			e.setAttribute("y2", s);
+			node.append(e);
+
+			// Vertical cross hair
+			e = TcSvgEdit.createSvgElement("line");
+			e.setAttribute("x1", s);
+			e.setAttribute("y1", s - TcSvgEdit.node_cross_radius);
+			e.setAttribute("x2", s);
+			e.setAttribute("y2", s + TcSvgEdit.node_cross_radius);
+			node.append(e);
+
+			node.setAttribute("transform", "translate(-"+s+", -"+s+")");
+			defs.append(node);
+			return node;
+		}
+		
+		static initSvgId(svg) {
+			svg.setAttribute(
+				"id",
+				TcSvgEdit.prefix + '_id_' +
+				//@see https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+				Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)
+			);
+		}
 		
 		//
 		// Event Listeners
 		//
 		
 		static onMouseDown(event) {
-			console.log("TcSvgEdit.onMouseDown");
-			console.log(event);
+			//console.log("TcSvgEdit.onMouseDown");
+			//console.log(event);
 			TcSvgEdit.svgOnMouseDown(event);
 		}
 		
@@ -84,8 +169,8 @@ enter
 		}
 
 		static onMouseUp(event) {
-			console.log("TcSvgEdit.onMouseUp");
-			console.log(event);
+			//console.log("TcSvgEdit.onMouseUp");
+			//console.log(event);
 			TcSvgEdit.svgOnMouseUp(event);
 		}
 
@@ -142,44 +227,17 @@ enter
 
 		static svgAddNode(svg, x, y) {
 			console.log("svgAddNode("+x+", "+y+")");
-			let g = TcSvgEdit.createSvgElement("g");
-			g.classList.add("node");
-	
-			// inatialise element
-			let e = null; 
-
-			// Circle
-			e = TcSvgEdit.createSvgElement("circle");
-			e.setAttribute("cx", x);
-			e.setAttribute("cy", y);
-			e.setAttribute("r", TcSvgEdit.node_circle_radius);
-			g.append(e);
-			
-			// Horizontal cross hair
-			e = TcSvgEdit.createSvgElement("line");
-			e.setAttribute("x1", x - TcSvgEdit.node_cross_radius);
-			e.setAttribute("y1", y);
-			e.setAttribute("x2", x + TcSvgEdit.node_cross_radius);
-			e.setAttribute("y2", y);
-			e.setAttribute("r", TcSvgEdit.node_circle_radius);
-			g.append(e);
-
-			// Vertical cross hair
-			e = TcSvgEdit.createSvgElement("line");
-			e.setAttribute("x1", x);
-			e.setAttribute("y1", y - TcSvgEdit.node_cross_radius);
-			e.setAttribute("x2", x);
-			e.setAttribute("y2", y + TcSvgEdit.node_cross_radius);
-			e.setAttribute("r", TcSvgEdit.node_circle_radius);
-			g.append(e);
-
-			svg.append(g);
-			console.log(g);
+			let node = TcSvgEdit.getNode(svg);
+			let u = TcSvgEdit.createSvgElement("use");
+			u.setAttributeNS(TcSvgEdit.namespace_xlink, "href", "#" + TcSvgEdit.idNode(svg));
+			u.setAttribute("x", x);
+			u.setAttribute("y", y);
+			svg.append(u);
 		}
 
 		// Because I"m to lazy to type the namespace
 		static createSvgElement(name) {
-			return document.createElementNS(TcSvgEdit.svg_namespace, name);
+			return document.createElementNS(TcSvgEdit.namespace_svg, name);
 		}
 		
 		static utilGetSvgCoordinates(svg, event) {
@@ -209,7 +267,7 @@ addEventListener("click", function(){modifyText("four")}, false);
   let buttons = document.querySelectorAll("button");
 	buttons.forEach(function(button) {
 	///console.log(button);
-	button.addEventListener("click", onButtonClick);
+	///button.addEventListener("click", onButtonClick);
 });
   
   </script>
@@ -220,7 +278,6 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
 	class="tc_svg_edit"
-	id="svg1"
 >    
 
     
@@ -231,7 +288,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
 	class="not_tc_svg_edit"
-	id="svg2"
+	id="svg_foo"
 >
    <g transform="translate(280,100)" >
         <circle class="control_point" cx="0" cy="0" r="10"  />
@@ -244,23 +301,18 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
 	class="tc_svg_edit"
-	id="svg3"
+	id="foo"
 >
-   <g transform="translate(280,100)" >
-        <circle class="control_point" cx="0" cy="0" r="10" />
-        <circle class="point4 invisible" cx="0" cy="0" r="3" />
-    </g>
+   <defs>
+		<symbol id="foo-symbol-node" class="node" transform="translate(-10,-10)">
+			<line x1="0" y1="0" x2="20" y2="20" stroke="red" />
+			<line x1="0" y1="20" x2="20" y2="0" stroke="red" />
+			<circle cx="10" cy="10" r="5" stroke="green" stroke-width="1" />
+		</symbol>
+   </defs>
+        <circle class="control_point" cx="230" cy="120" r="10" />
+        <circle class="point4 invisible" cx="120" cy="120" r="3" />
 </svg>
-
-  function getAbsolutePosition(element) {
-    var r = { x: element.offsetLeft, y: element.offsetTop };
-    if (element.offsetParent) {
-      var tmp = getAbsolutePosition(element.offsetParent);
-      r.x += tmp.x;
-      r.y += tmp.y;
-    }
-    return r;
-  };
 
 </body>
 </html>

@@ -1,0 +1,226 @@
+<svg width="5000" height="5000" xmlns="http://www.w3.org/2000/svg">
+<style type="text/css" >
+    <![CDATA[
+		.puzzle {
+			stroke: purple;
+			stroke-width: 0;
+		}
+		.line {
+			stroke-width: 20;
+			fill: transparent;
+		}
+		.line1 {
+			stroke: red;
+		}
+		.line2 {
+			stroke: green;
+		}
+		.line3 {
+			stroke: blue;
+		}
+	]]>
+</style>
+    <!-- list resourses in a <defs> element -->
+	<defs>
+		<g id="def-halfpuzzle">
+			<path
+				d="
+					M0,0 
+					C1000,200  -250,-300, 500,-300 
+				"
+				fill="transparent"
+			/>
+		</g>
+		<g id="def-puzzle1">
+			<use href="#def-halfpuzzle" />
+			<use href="#def-halfpuzzle" transform="translate(1000 0) scale(-1 1)" />
+		</g>
+		<g id="def-puzzle2">
+			<use href="#def-puzzle1" transform="scale(.5 .5)" />
+			<use href="#def-puzzle1" transform="translate(500 0) scale(.5 -.5)" />
+		</g>
+		<g id="def-puzzle">
+			<use href="#def-puzzle2" transform="scale(1 +1)" />
+		</g>
+		<g id="def-bird">
+			<path
+				d="
+					M0,0 
+					C0,250  500,250, 500,500 
+					C500,-250  1000,-250, 1000,0 
+				"
+				fill="transparent"
+			/>
+		</g>
+		<g id="def-bezier">
+			<path
+				d="
+					M0,0 
+					C0,250  500,250, 500,0 
+					C500,-250  1000,-250, 1000,0 
+				"
+				fill="transparent"
+			/>
+		</g>
+		<g id="def-bezier2">
+			<path
+				d="
+					M0,0 
+					C000,+250  250,+250,  250,0 
+					C250,-250  500,-250,  500,0 
+					C500,+250  750,+250,  750,0 
+					C750,-250 1000,-250, 1000,0 
+				"
+				fill="transparent"
+			/>
+		</g>
+
+		<g id="def-halfbar">
+			<path id="def-half"
+				d="M0 0 h 100 v 100 h 100 v 100 h 100 v -200 h 100 v 100 h 100 v -100 h 500"
+				fill="transparent" />
+			<circle cx="0" cy="0" r="10" stroke="#00C" stroke-width="30" fill="#009" />
+		</g>
+		
+		<g id="def-mirror">
+			<use href="#def-bezier" transform="scale(1, -1)" />
+		</g>
+
+		<g id="def-line-a">
+			<path
+				d="M0 0 L100 100 L700 200"
+			/>
+		</g>
+		<g id="def-line-b">
+			<path
+				d="M0 0 L100 -200 L1000 -400"
+			/>
+		</g>
+		<g id="def-line-c">
+			<path
+				d="M0 0 L200 -100 L1400 +200"
+			/>
+		</g>
+		
+		<g id="def-line1" class="line line1">
+			<use href="#def-line-a" />
+			<use class="puzzle" href="#def-puzzle" />
+		</g>
+		<g id="def-line2" class="line line2">
+			<use href="#def-line-b" />
+			<use class="puzzle" href="#def-puzzle" />
+		</g>
+		<g id="def-line3" class="line line3">
+			<use href="#def-line-c" />
+			<use class="puzzle" href="#def-puzzle" />
+		</g>
+		<g id="def-line2b">
+			<path
+				d="M0 0 h 300 v 200 h 100 v -300 h 100 v 100 h 100 v 100 h 100 v 100 h 100 v -300 h 100 v 100 h 100"
+				fill="transparent" stroke="green" stroke-width="20" />
+			<!-- -->
+		</g>
+		<g id="def-line">
+			<path
+				d="M0 0 h 200 v 100 h 100 v 100 h 100 v 100 h 100 v 200 100 h 100 v -100 h 100 v 100 h 100 v100 h100 v166 h 100"
+				fill="transparent" stroke="purple" stroke-width="20" /> 
+			<path
+				d="M0 0 l 866 1000"
+				fill="transparent" stroke="orange" stroke-width="50" /> 
+		</g>
+		
+	</defs>
+	<defs>
+		<g id="def-hexagon">
+			<polygon
+				points="
+					 1000,    0,
+					  500, -866,
+					 -500, -866,
+					-1000,    0,
+					 -500,  866,
+					  500,  866"
+				style="fill:yellow;stroke:gray;stroke-width:10;fill-opacity:0.2"
+			/>
+			<circle cx="0" cy="0" r="866" stroke="black" stroke-width="3" fill="
+			" fill-opacity="0.01" />
+			<circle cx="0" cy="0" r="1000" stroke="black" stroke-width="3" fill="#C00" fill-opacity="0.01" />
+			<polygon
+				points="
+					  1000,   0,
+					  500, -866,
+					 -500, -866"
+				style="fill:orange;stroke:black;stroke-width:5;fill-opacity:0.1"
+			/>
+			
+<!-- -->			
+			<use href="#def-line1" transform="translate(-500 -866) rotate(0)"/>
+			<use href="#def-line1" transform="translate(-500 -866) rotate(120)"/>
+
+			<use href="#def-line2" transform="translate(1000 0) rotate(240)"/>
+			<use href="#def-line2" transform="translate(1000 0) rotate(120)"/>
+
+			<use href="#def-line3" transform="translate(-500 866) rotate(0)"/>
+			<use href="#def-line3" transform="translate(-500 866) rotate(240)"/>
+			
+		</g>
+
+		<g id="def-hex7">
+			<use href="#def-hexagon" transform="translate(-1500 -0866) rotate(120)"/>
+			<use href="#def-hexagon" transform="translate(-1500 +0866) rotate(240)"/>
+
+			<use href="#def-hexagon" transform="translate( 0000 -1732) rotate(240)"/>
+			<use href="#def-hexagon" transform="translate( 0000  0000) rotate(000)"/>
+			<use href="#def-hexagon" transform="translate( 0000 +1732) rotate(120)"/>
+
+			<use href="#def-hexagon" transform="translate(+1500 -0866) rotate(120)"/>
+			<use href="#def-hexagon" transform="translate(+1500 +0866) rotate(240)"/>
+		</g>
+	</defs>
+
+	
+	
+	
+	
+	<use href="#def-line1" transform="translate(50 100) scale(.2) rotate(000)"/>
+	<use href="#def-line2" transform="translate(50 300) scale(.2) rotate(000)"/>
+	<use href="#def-line3" transform="translate(50 500) scale(.2) rotate(000)"/>
+
+	
+	<use href="#def-hexagon" transform="translate(500 300) scale(.2) rotate(330)"/>
+	
+	<use href="#def-hex7" transform="translate(950 300) scale(.0666) rotate(330)" />
+	
+
+	
+<!--	
+	<use href="#def-hexagon" transform="translate(150 113.4) scale(.1) rotate(120)"/>
+	<use href="#def-hexagon" transform="translate(150 286.6) scale(.1) rotate(240)"/>
+	<use href="#def-hexagon" transform="translate(150 459.8) scale(.1) rotate(000)"/>
+
+    <use href="#def-hexagon" transform="translate(300 200.0) scale(.1) rotate(0)"/>
+    <use href="#def-hexagon" transform="translate(300 373.2) scale(.1) rotate(120)"/>
+    <use href="#def-hexagon" transform="translate(300 546.4) scale(.1) rotate(240)"/>
+
+	<use href="#def-hexagon" transform="translate(450 113.4) scale(.1) rotate(120)"/>
+	<use href="#def-hexagon" transform="translate(450 286.6) scale(.1) rotate(240)"/>
+	<use href="#def-hexagon" transform="translate(450 459.8) scale(.1) rotate(000)"/>
+
+    <use href="#def-hexagon" transform="translate(600 200) scale(.1)"/>
+    <use href="#def-hexagon" transform="translate(600 373.2) scale(.1) rotate(120)"/>
+    <use href="#def-hexagon" transform="translate(600 546.4) scale(.1) rotate(240)"/>
+
+	<use href="#def-hexagon" transform="translate(750 113.4) scale(.1) rotate(120)"/>
+	<use href="#def-hexagon" transform="translate(750 286.6) scale(.1) rotate(240)"/>
+	<use href="#def-hexagon" transform="translate(750 459.8) scale(.1) rotate(000)"/>
+-->
+	</svg>
+<!--
+http://en.tessellations-nicolas.com/method.php#transfo
+http://www.drking.org.uk/hexagons/tess/housholder/index.html
+
+
+https://pomax.github.io/bezierinfo/
+
+https://codepen.io/TomBismuth/pen/BQRjGx
+-->
