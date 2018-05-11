@@ -14,16 +14,17 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 mousedown
 enter
 <style>
-	svg.tc_svg_edit circle.node { 
+	svg.tc_svg_edit g.node { 
 		fill: #CCF;
 		opacity: 0.1;
 		r: 10;
 		stroke: #00F;
+		stroke-width: .5;
 	}
-	svg.tc_svg_edit:hover circle.node { 
+	svg.tc_svg_edit:hover g.node { 
 		opacity: 0.5;
 	}
-	svg.tc_svg_edit:hover circle.node:hover { 
+	svg.tc_svg_edit:hover g.node:hover { 
 		opacity: 1;
     }
 </style>
@@ -45,10 +46,11 @@ enter
 	
 	class TcSvgEdit {
 
-		constructor(prefix) {
+	constructor(prefix) {
 			console.log('construct');
 			
-			TcSvgEdit.node_radius = 5;
+			TcSvgEdit.node_circle_radius = 5;
+			TcSvgEdit.node_cross_radius = 11;
 			TcSvgEdit.prefix = "tc_svg_edit_";
 			TcSvgEdit.svg_namespace = "http://www.w3.org/2000/svg";
 			
@@ -63,7 +65,6 @@ enter
 			console.log(event);
 			TcSvgEdit.svgOnClick(event);
 		}
-		
 
 		static svgOnClick(event) {
 			let svg = event.target.closest('svg.tc_svg_edit');
@@ -77,15 +78,38 @@ enter
 		static svgAddNode(svg, x, y) {
 			console.log('svgAddNode('+x+', '+y+')');
 			//let c = document.createElement("circle");
-			let c = TcSvgEdit.createSvgElement("circle");
-			c.classList.add("node");
-			console.log(this);
+			let g = TcSvgEdit.createSvgElement("g");
+			g.classList.add("node");
+	
+			let e = null
 
-			c.setAttribute('cx', x);
-			c.setAttribute('cy', y);
-			c.setAttribute('r', TcSvgEdit.node_radius);
-			svg.append(c);
-			console.log(c);
+			// Circle
+			e =TcSvgEdit.createSvgElement("circle");
+			e.setAttribute('cx', x);
+			e.setAttribute('cy', y);
+			e.setAttribute('r', TcSvgEdit.node_circle_radius);
+			g.append(e);
+			
+			// Horizontal cross hair
+			e = TcSvgEdit.createSvgElement("line");
+			e.setAttribute('x1', x - TcSvgEdit.node_cross_radius);
+			e.setAttribute('y1', y);
+			e.setAttribute('x2', x + TcSvgEdit.node_cross_radius);
+			e.setAttribute('y2', y);
+			e.setAttribute('r', TcSvgEdit.node_circle_radius);
+			g.append(e);
+
+			// Vertical cross hair
+			e = TcSvgEdit.createSvgElement("line");
+			e.setAttribute('x1', x);
+			e.setAttribute('y1', y - TcSvgEdit.node_cross_radius);
+			e.setAttribute('x2', x);
+			e.setAttribute('y2', y + TcSvgEdit.node_cross_radius);
+			e.setAttribute('r', TcSvgEdit.node_circle_radius);
+			g.append(e);
+
+			svg.append(g);
+			console.log(g);
 		}
 
 		// Because I'm to lazy to type the namespace
@@ -136,7 +160,6 @@ addEventListener("click", function(){modifyText("four")}, false);
 
     
 </svg>
-
 
 <svg version="1.1"
      xmlns:svg="http://www.w3.org/2000/svg"
