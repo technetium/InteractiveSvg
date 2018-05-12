@@ -10,19 +10,17 @@ https://eloquentjavascript.net/15_event.html
 http://tutorials.jenkov.com/svg/svg-and-css.html
 https://help.github.com/articles/what-is-github-pages/
 https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
+https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 
 <style>
-	svg.tc_svg_edit symbol.node { 
-		fill: #CCF;
+	svg.tc_svg_edit .node { 
 		opacity: 0.1;
 		r: 10;
-		stroke: #00F;
-		stroke-width: .5;
 	}
-	svg.tc_svg_edit:hover symbol.node { 
+	svg.tc_svg_edit:hover .node { 
 		opacity: 0.5;
 	}
-	svg.tc_svg_edit:hover symbol.node:hover { 
+	svg.tc_svg_edit:hover .node:hover { 
 		cursor: move;
 		opacity: 1;
 	}
@@ -37,6 +35,9 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 			
 			TcSvgEdit.node_circle_radius = 5;
 			TcSvgEdit.node_cross_radius = 11;
+			TcSvgEdit.node_fill = '#EEF';
+			TcSvgEdit.node_stroke = '#00F';
+			
 			TcSvgEdit.prefix = "tc_svg_edit_";
 			TcSvgEdit.namespace_svg = "http://www.w3.org/2000/svg";
 			TcSvgEdit.namespace_xlink = "http://www.w3.org/1999/xlink";
@@ -86,7 +87,6 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 		// Id's
 		//
 		static idNode(svg) { return	TcSvgEdit.getId(svg) + '-symbol-node'; }
-		
 
 		//
 		// Initialisers
@@ -105,6 +105,9 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 			let node = TcSvgEdit.createSvgElement("symbol");
 			node.setAttribute("id", TcSvgEdit.idNode(svg));
 			node.classList.add("node");
+			node.setAttribute("fill", TcSvgEdit.node_fill);
+			node.setAttribute("stroke", TcSvgEdit.node_stroke);
+			
 
 			// The size of the node
 			let s = Math.max(
@@ -178,9 +181,12 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 		// node
 		//
 		
-		static nodeOnMouseDrag(node, event) {
+		static nodeOnMouseDrag(node, pos) {
 			console.log("nodeOnMouseDrag");
-			console.log(event);
+			console.log(typeof node);
+			console.log(pos);
+			node.setAttribute("x", pos.x); 
+			node.setAttribute("y", pos.y); 
 		}
 		
 		//
@@ -194,9 +200,9 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 			let node = event.target.closest(".node");
 			if (null !== node) {
 				console.log(node);
-				svg.setAttribute(TcSvgEdit.prefix + "_selected", node);
+				svg[TcSvgEdit.prefix + "_selected"] = node;
 				console.log("selected");
-				console.log(svg.getAttribute(TcSvgEdit.prefix + "_selected"));
+				console.log(svg[TcSvgEdit.prefix + "_selected"]);
 				return;
 			}
 			
@@ -209,19 +215,19 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 		static svgOnMouseMove(event) {
 			let svg = event.target.closest("svg.tc_svg_edit");
 			if (null === svg) { return; }
-			if (!svg.hasAttribute(TcSvgEdit.prefix + "_selected")) {
+			if (!svg[TcSvgEdit.prefix + "_selected"]) {
 				return;
 			}
 			TcSvgEdit.nodeOnMouseDrag(
-				svg.getAttribute(TcSvgEdit.prefix + "_selected"),
-				event
+				svg[TcSvgEdit.prefix + "_selected"],
+				TcSvgEdit.utilGetSvgCoordinates(svg, event)
 			);
 		}
 
 		static svgOnMouseUp(event) {
 			let svg = event.target.closest("svg.tc_svg_edit");
 			if (null === svg) { return; }
-			svg.removeAttribute(TcSvgEdit.prefix + "_selected");
+			svg[TcSvgEdit.prefix + "_selected"] = null;
 		}
 		
 
@@ -229,6 +235,7 @@ https://rawgit.com/technetium/InteractiveSvg/master/canvas.html
 			console.log("svgAddNode("+x+", "+y+")");
 			let node = TcSvgEdit.getNode(svg);
 			let u = TcSvgEdit.createSvgElement("use");
+			u.classList.add("node");
 			u.setAttributeNS(TcSvgEdit.namespace_xlink, "href", "#" + TcSvgEdit.idNode(svg));
 			u.setAttribute("x", x);
 			u.setAttribute("y", y);
