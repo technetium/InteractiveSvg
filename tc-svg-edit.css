@@ -1,0 +1,23 @@
+svg.tc_svg_edit .node { 
+	opacity: 0.1;
+}
+svg.tc_svg_edit:hover .node { 
+	opacity: 0.5;
+}
+svg.tc_svg_edit:hover .node:hover { 
+	cursor: move;
+	opacity: 1;
+}
+
+[data-tc-svg-edit-element-type-select] {
+	border: 1px solid green;
+	opacity: 0.5;
+}
+[data-tc-svg-edit-element-type-select]:hover {
+	border: 1px solid blue;
+	opacity: 1;
+}
+[data-tc-svg-edit-element-type-select].selected {
+	border: 1px solid red;
+	opacity: 0.8;
+}
