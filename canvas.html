@@ -37,6 +37,7 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 			TcSvgEdit.node_cross_radius = 11;
 			TcSvgEdit.node_fill = '#EEF';
 			TcSvgEdit.node_stroke = '#00F';
+			TcSvgEdit.node_stroke_width = 0.3;
 			
 			TcSvgEdit.prefix = "tc_svg_edit_";
 			TcSvgEdit.namespace_svg = "http://www.w3.org/2000/svg";
@@ -65,7 +66,15 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 			}
 			return defs;
 		}
-		
+
+		static getDrawing(svg) {
+			let drawing = document.getElementById(TcSvgEdit.idDrawing(svg));
+			if (!drawing)	{
+				drawing = TcSvgEdit.initDrawing(svg);
+			}
+			return drawing;
+		}
+
 		static getId(svg) {
 			if (!svg.hasAttribute("id")) {
 				TcSvgEdit.initSvgId(svg);
@@ -74,7 +83,6 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 		}
 		
 		static getNode(svg) {
-			console.log("getNode");
 			let node = document.getElementById(TcSvgEdit.idNode(svg));
 			if (!node)	{
 				node = TcSvgEdit.initNode(svg);
@@ -86,6 +94,7 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 		//
 		// Id's
 		//
+		static idDrawing(svg) { return	TcSvgEdit.getId(svg) + '-symbol-drawing'; }
 		static idNode(svg) { return	TcSvgEdit.getId(svg) + '-symbol-node'; }
 
 		//
@@ -98,6 +107,20 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 			svg.append(defs);
 			return defs;
 		}
+			
+		static initDrawing(svg) {
+			console.log('initDrawing');
+			let defs = TcSvgEdit.getDefs(svg);
+			let drawing = TcSvgEdit.createSvgElement("symbol");
+			drawing.setAttribute("id", TcSvgEdit.idDrawing(svg));
+			defs.append(drawing);
+			svg.append(
+				TcSvgEdit.createSvgUseElement(
+					"#" + TcSvgEdit.idDrawing(svg)
+				)
+			);
+			return drawing;
+		}
 		
 		static initNode(svg) {
 			console.log('initNode');
@@ -107,6 +130,7 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 			node.classList.add("node");
 			node.setAttribute("fill", TcSvgEdit.node_fill);
 			node.setAttribute("stroke", TcSvgEdit.node_stroke);
+			node.setAttribute("stroke-width", TcSvgEdit.node_stroke_width);
 			
 
 			// The size of the node
@@ -160,8 +184,8 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 		//
 		
 		static onMouseDown(event) {
-			//console.log("TcSvgEdit.onMouseDown");
-			//console.log(event);
+			console.log("TcSvgEdit.onMouseDown");
+			console.log(event);
 			TcSvgEdit.svgOnMouseDown(event);
 		}
 		
@@ -234,17 +258,23 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 		static svgAddNode(svg, x, y) {
 			console.log("svgAddNode("+x+", "+y+")");
 			let node = TcSvgEdit.getNode(svg);
-			let u = TcSvgEdit.createSvgElement("use");
+			let u = TcSvgEdit.createSvgUseElement(
+				"#" + TcSvgEdit.idNode(svg), x, y
+			);
 			u.classList.add("node");
-			u.setAttributeNS(TcSvgEdit.namespace_xlink, "href", "#" + TcSvgEdit.idNode(svg));
-			u.setAttribute("x", x);
-			u.setAttribute("y", y);
 			svg.append(u);
 		}
 
 		// Because I"m to lazy to type the namespace
 		static createSvgElement(name) {
 			return document.createElementNS(TcSvgEdit.namespace_svg, name);
+		}
+		static createSvgUseElement(href, x = 0, y = 0) {
+			let u = TcSvgEdit.createSvgElement("use");
+			u.setAttributeNS(TcSvgEdit.namespace_xlink, "href", href);
+			u.setAttribute("x", x);
+			u.setAttribute("y", y);
+			return u;
 		}
 		
 		static utilGetSvgCoordinates(svg, event) {
@@ -265,7 +295,12 @@ https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 </script>
 
 
-addEventListener("click", function(){modifyText("four")}, false);
+
+
+<button>Line</button>
+
+
+
 
 <button>Click me</button>
 <button>Click me</button>
@@ -285,6 +320,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      xmlns="http://www.w3.org/2000/svg"
      width="500" height="240"
 	class="tc_svg_edit"
+	style="border: 1px solid red"
 >    
 
     
@@ -296,6 +332,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      width="500" height="240"
 	class="not_tc_svg_edit"
 	id="svg_foo"
+	style="border: 1px solid yellow"
 >
    <g transform="translate(280,100)" >
         <circle class="control_point" cx="0" cy="0" r="10"  />
@@ -309,6 +346,7 @@ addEventListener("click", function(){modifyText("four")}, false);
      width="500" height="240"
 	class="tc_svg_edit"
 	id="foo"
+	style = "border: 1px solid green"
 >
    <defs>
 		<symbol id="foo-symbol-node" class="node" transform="translate(-10,-10)">
@@ -317,9 +355,30 @@ addEventListener("click", function(){modifyText("four")}, false);
 			<circle cx="10" cy="10" r="5" stroke="green" stroke-width="1" />
 		</symbol>
    </defs>
+	<g id="foo-circles">
         <circle class="control_point" cx="230" cy="120" r="10" />
         <circle class="point4 invisible" cx="120" cy="120" r="3" />
+		<use xlink:href="#foo-symbol-node" x="100" y="200">
+	</g>
 </svg>
+
+<svg version="1.1"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg"
+     width="500" height="240"
+	class="tc_svg_edit"
+	id="bar"
+	style = "border: 1px solid blue"
+
+>
+        <circle class="control_point" cx="20" cy="220" r="10" />
+        <circle class="point4 invisible" cx="220" cy="120" r="3" />
+		<use xlink:href="#foo-symbol-node" x="100" y="200">
+		<use xlink:href="#foo-circles" x="20" y="20">
+
+</svg>
+
+
 
 </body>
 </html>
