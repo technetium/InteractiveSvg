@@ -21,3 +21,10 @@ svg.tc_svg_edit:hover .node:hover {
 	border: 1px solid red;
 	opacity: 0.8;
 }
+
+[data-tc-svg-edit-position-indicator] {
+	border: 1px solid white;
+	display: inline-block;
+	text-align: right;
+	width: 2em;
+}

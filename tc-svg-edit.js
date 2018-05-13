@@ -177,7 +177,20 @@ class TcSvgEdit {
 		TcSvgEdit.svgOnMouseUp(event);
 	}
 
-
+	//
+	// document
+	//
+	
+	static documentPositionIndicator(dimension, value) {
+		document.querySelectorAll(
+			"[data-tc-svg-edit-position-indicator=\"" + 
+			dimension + "\"]"
+		).forEach(function(elem) {
+			console.log(elem);
+			elem.innerHTML = value;
+		});
+	}
+	
 	//
 	// element
 	//
@@ -219,9 +232,9 @@ class TcSvgEdit {
 	//
 	
 	static nodeOnMouseDrag(node, pos) {
-		console.log("nodeOnMouseDrag");
-		console.log(typeof node);
-		console.log(pos);
+		///console.log("nodeOnMouseDrag");
+		///console.log(typeof node);
+		///console.log(pos);
 		node.setAttribute("x", pos.x); 
 		node.setAttribute("y", pos.y); 
 	}
@@ -242,7 +255,6 @@ class TcSvgEdit {
 			console.log(svg[TcSvgEdit.prefix + "_selected"]);
 			return;
 		}
-		
 		console.log(svg);
 		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
 		console.log(pos);
@@ -252,13 +264,15 @@ class TcSvgEdit {
 	static svgOnMouseMove(event) {
 		let svg = event.target.closest("svg.tc_svg_edit");
 		if (null === svg) { return; }
-		if (!svg[TcSvgEdit.prefix + "_selected"]) {
-			return;
-		}
-		TcSvgEdit.nodeOnMouseDrag(
-			svg[TcSvgEdit.prefix + "_selected"],
-			TcSvgEdit.utilGetSvgCoordinates(svg, event)
-		);
+		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
+		console.log(pos);
+
+		TcSvgEdit.documentPositionIndicator("x", pos.x);
+		TcSvgEdit.documentPositionIndicator("y", pos.y);
+		
+		if (!svg[TcSvgEdit.prefix + "_selected"]) {	return; }
+
+		TcSvgEdit.nodeOnMouseDrag(svg[TcSvgEdit.prefix + "_selected"], pos);
 	}
 
 	static svgOnMouseUp(event) {
@@ -290,7 +304,7 @@ class TcSvgEdit {
 	}
 	
 	static utilGetSvgCoordinates(svg, event) {
-		console.log("utilGetSvgCoordinates()");
+		///console.log("utilGetSvgCoordinates()");
 		// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
 		let pt = svg.createSVGPoint();
 		pt.x = event.clientX;
@@ -298,7 +312,7 @@ class TcSvgEdit {
 
 		// The cursor point, translated into svg coordinates
 		let cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
-		console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+		///console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
 		return cursorpt;
 	}		
 }
