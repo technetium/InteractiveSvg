@@ -10,15 +10,19 @@ svg.tc_svg_edit:hover .node:hover {
 }
 
 [data-tc-svg-edit-element-type-select] {
-	border: 1px solid green;
+	background-color: #009;
+	border-radius: 8px;
+	color: white;
 	opacity: 0.5;
 }
 [data-tc-svg-edit-element-type-select]:hover {
-	border: 1px solid blue;
+	background-color: #00F;
+	color: white;
 	opacity: 1;
 }
 [data-tc-svg-edit-element-type-select].selected {
-	border: 1px solid red;
+	background-color: #00C;
+	color: white;
 	opacity: 0.8;
 }
 
