@@ -10,20 +10,20 @@ svg.tc_svg_edit:hover .node:hover {
 }
 
 [data-tc-svg-edit-element-type-select] {
+	border: 0px;
 	background-color: #009;
-	border-radius: 8px;
+	border-radius: 6px;
+	box-shadow: 1px 4px #999;
 	color: white;
-	opacity: 0.5;
+	margin-bottom: 5px;
 }
 [data-tc-svg-edit-element-type-select]:hover {
 	background-color: #00F;
-	color: white;
-	opacity: 1;
 }
 [data-tc-svg-edit-element-type-select].selected {
 	background-color: #00C;
-	color: white;
-	opacity: 0.8;
+	box-shadow: 0 2px #666;
+	transform: translateY(2px);
 }
 
 [data-tc-svg-edit-position-indicator] {
