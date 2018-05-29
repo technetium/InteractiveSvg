@@ -46,7 +46,6 @@ class TcSvgEdit {
 	// Getters
 	//
 	
-	
 	static getDefs(svg) {
 		let defs = svg.querySelector("defs");
 		if (!defs)	{
@@ -56,7 +55,7 @@ class TcSvgEdit {
 	}
 
 	static getDrawing(svg) {
-		let drawing = document.getElementById(TcSvgEdit.idDrawing(svg));
+		let drawing = document.getElementById(TcSvgEdit.getSvg(svg).idDrawing());
 		if (!drawing)	{
 			drawing = TcSvgEdit.initDrawing(svg);
 		}
@@ -64,19 +63,14 @@ class TcSvgEdit {
 	}
 
 	static getNode(svg) {
-		let node = document.getElementById(TcSvgEdit.idNode(svg));
+		let node = document.getElementById(TcSvgEdit.getSvg(svg).idNode());
 		if (!node)	{
 			node = TcSvgEdit.initNode(svg);
 		} 
-		///console.log(node);
+		////console.log(node);
 		return node;
 	}
 
-	//
-	// Id's
-	//
-	static idDrawing(svg) { return	TcSvgEdit.Svg.getId(svg) + '-symbol-drawing'; }
-	static idNode(svg) { return	TcSvgEdit.Svg.getId(svg) + '-symbol-node'; }
 
 	//
 	// Initialisers
@@ -93,11 +87,11 @@ class TcSvgEdit {
 		console.log('initDrawing');
 		let defs = TcSvgEdit.getDefs(svg);
 		let drawing = TcSvgEdit.createSvgElement("symbol");
-		drawing.setAttribute("id", TcSvgEdit.idDrawing(svg));
+		drawing.setAttribute("id", TcSvgEdit.getSvg(svg).idDrawing());
 		defs.append(drawing);
 		svg.append(
 			TcSvgEdit.createSvgUseElement(
-				"#" + TcSvgEdit.idDrawing(svg)
+				"#" + TcSvgEdit.getSvg(svg).idDrawing()
 			)
 		);
 		return drawing;
@@ -107,7 +101,7 @@ class TcSvgEdit {
 		console.log('initNode');
 		let defs = TcSvgEdit.getDefs(svg);
 		let node = TcSvgEdit.createSvgElement("symbol");
-		node.setAttribute("id", TcSvgEdit.idNode(svg));
+		node.setAttribute("id", TcSvgEdit.getSvg(svg).idNode());
 		node.classList.add("node");
 		node.setAttribute("fill", TcSvgEdit.node_fill);
 		node.setAttribute("stroke", TcSvgEdit.node_stroke);
@@ -331,11 +325,20 @@ TcSvgEdit.Svg = class {
 		);
 	}
 
+	//
+	// Id's
+	//
+	id()	{ return this._svg.getAttribute("id"); }
+	idDrawing()	{ return	this.id() + '-symbol-drawing'; }
+	idNode()	{ return	this.id() + '-symbol-node'; }
+
+	
+	
 	addNode(x, y) {
 		console.log("Svg.addNode("+x+", "+y+")");
 		let node = TcSvgEdit.getNode(this._svg);
 		let u = TcSvgEdit.createSvgUseElement(
-			"#" + TcSvgEdit.idNode(this._svg), x, y
+			"#" + this.idNode(), x, y
 		);
 		u.classList.add("node");
 		this._svg.append(u);
