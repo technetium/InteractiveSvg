@@ -42,109 +42,6 @@ class TcSvgEdit {
 		return TcSvgEdit._svgs[id];
 	}
 
-	//
-	// Getters
-	//
-	
-	static getDefs(svg) {
-		let defs = svg.querySelector("defs");
-		if (!defs)	{
-			defs = TcSvgEdit.initDefs(svg);
-		}
-		return defs;
-	}
-
-	static getDrawing(svg) {
-		let drawing = document.getElementById(TcSvgEdit.getSvg(svg).idDrawing());
-		if (!drawing)	{
-			drawing = TcSvgEdit.initDrawing(svg);
-		}
-		return drawing;
-	}
-
-	static getNode(svg) {
-		let node = document.getElementById(TcSvgEdit.getSvg(svg).idNode());
-		if (!node)	{
-			node = TcSvgEdit.initNode(svg);
-		} 
-		////console.log(node);
-		return node;
-	}
-
-
-	//
-	// Initialisers
-	//
-
-	static initDefs(svg) {
-		console.log('initDefs');
-		let defs = TcSvgEdit.createSvgElement("defs");
-		svg.append(defs);
-		return defs;
-	}
-		
-	static initDrawing(svg) {
-		console.log('initDrawing');
-		let defs = TcSvgEdit.getDefs(svg);
-		let drawing = TcSvgEdit.createSvgElement("symbol");
-		drawing.setAttribute("id", TcSvgEdit.getSvg(svg).idDrawing());
-		defs.append(drawing);
-		svg.append(
-			TcSvgEdit.createSvgUseElement(
-				"#" + TcSvgEdit.getSvg(svg).idDrawing()
-			)
-		);
-		return drawing;
-	}
-	
-	static initNode(svg) {
-		console.log('initNode');
-		let defs = TcSvgEdit.getDefs(svg);
-		let node = TcSvgEdit.createSvgElement("symbol");
-		node.setAttribute("id", TcSvgEdit.getSvg(svg).idNode());
-		node.classList.add("node");
-		node.setAttribute("fill", TcSvgEdit.node_fill);
-		node.setAttribute("stroke", TcSvgEdit.node_stroke);
-		node.setAttribute("stroke-width", TcSvgEdit.node_stroke_width);
-		
-
-		// The size of the node
-		let s = Math.max(
-			TcSvgEdit.node_cross_radius,
-			TcSvgEdit.node_circle_radius
-		);
-
-		// inatialise element
-		let e = null; 
-
-		// Circle
-		e = TcSvgEdit.createSvgElement("circle");
-		e.setAttribute("cx", s);
-		e.setAttribute("cy", s);
-		e.setAttribute("r", TcSvgEdit.node_circle_radius);
-		node.append(e);
-		
-		// Horizontal cross hair
-		e = TcSvgEdit.createSvgElement("line");
-		e.setAttribute("x1", s - TcSvgEdit.node_cross_radius);
-		e.setAttribute("y1", s);
-		e.setAttribute("x2", s + TcSvgEdit.node_cross_radius);
-		e.setAttribute("y2", s);
-		node.append(e);
-
-		// Vertical cross hair
-		e = TcSvgEdit.createSvgElement("line");
-		e.setAttribute("x1", s);
-		e.setAttribute("y1", s - TcSvgEdit.node_cross_radius);
-		e.setAttribute("x2", s);
-		e.setAttribute("y2", s + TcSvgEdit.node_cross_radius);
-		node.append(e);
-
-		node.setAttribute("transform", "translate(-"+s+", -"+s+")");
-		defs.append(node);
-		return node;
-	}
-	
 	
 	//
 	// Event Listeners
@@ -332,11 +229,114 @@ TcSvgEdit.Svg = class {
 	idDrawing()	{ return	this.id() + '-symbol-drawing'; }
 	idNode()	{ return	this.id() + '-symbol-node'; }
 
+	//
+	// Getters
+	//
+	
+	getDefs() {
+		let defs = this._svg.querySelector("defs");
+		if (!defs) {
+			defs = this.initDefs();
+		}
+		return defs;
+	}
+
+	getDrawing() {
+		let drawing = document.getElementById(this.idDrawing());
+		if (!drawing) {
+			drawing = this.initDrawing();
+		}
+		return drawing;
+	}
+
+	getNode(svg) {
+		let node = document.getElementById(this.idNode());
+		if (!node) {
+			node = this.initNode();
+		} 
+		////console.log(node);
+		return node;
+	}
+
+
+	//
+	// Initialisers
+	//
+
+	initDefs() {
+		console.log('initDefs');
+		let defs = TcSvgEdit.createSvgElement("defs");
+		this._svg.append(defs);
+		return defs;
+	}
+		
+	initDrawing() {
+		console.log('initDrawing');
+		let defs = this.getDefs();
+		let drawing = TcSvgEdit.createSvgElement("symbol");
+		drawing.setAttribute("id", this.idDrawing());
+		defs.append(drawing);
+		this._svg.append(
+			TcSvgEdit.createSvgUseElement(
+				"#" + this.idDrawing()
+			)
+		);
+		return drawing;
+	}
+	
+	initNode() {
+		console.log('initNode');
+		let defs = this.getDefs();
+		let node = TcSvgEdit.createSvgElement("symbol");
+		node.setAttribute("id", this.idNode());
+		node.classList.add("node");
+		node.setAttribute("fill", TcSvgEdit.node_fill);
+		node.setAttribute("stroke", TcSvgEdit.node_stroke);
+		node.setAttribute("stroke-width", TcSvgEdit.node_stroke_width);
+		
+
+		// The size of the node
+		let s = Math.max(
+			TcSvgEdit.node_cross_radius,
+			TcSvgEdit.node_circle_radius
+		);
+
+		// inatialise element
+		let e = null; 
+
+		// Circle
+		e = TcSvgEdit.createSvgElement("circle");
+		e.setAttribute("cx", s);
+		e.setAttribute("cy", s);
+		e.setAttribute("r", TcSvgEdit.node_circle_radius);
+		node.append(e);
+		
+		// Horizontal cross hair
+		e = TcSvgEdit.createSvgElement("line");
+		e.setAttribute("x1", s - TcSvgEdit.node_cross_radius);
+		e.setAttribute("y1", s);
+		e.setAttribute("x2", s + TcSvgEdit.node_cross_radius);
+		e.setAttribute("y2", s);
+		node.append(e);
+
+		// Vertical cross hair
+		e = TcSvgEdit.createSvgElement("line");
+		e.setAttribute("x1", s);
+		e.setAttribute("y1", s - TcSvgEdit.node_cross_radius);
+		e.setAttribute("x2", s);
+		e.setAttribute("y2", s + TcSvgEdit.node_cross_radius);
+		node.append(e);
+
+		node.setAttribute("transform", "translate(-"+s+", -"+s+")");
+		defs.append(node);
+		return node;
+	}
+	
 	
 	
 	addNode(x, y) {
 		console.log("Svg.addNode("+x+", "+y+")");
-		let node = TcSvgEdit.getNode(this._svg);
+		let node = this.getNode();
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + this.idNode(), x, y
 		);
