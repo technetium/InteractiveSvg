@@ -137,12 +137,11 @@ class TcSvgEdit {
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (null === svg) { return; }
 		let node = event.target.closest(".node");
-		if (null !== node) {
-			////console.log(node);
-			svg.setNodeSelected(node);
-			return;
+		if (!node) {
+			node = svg.addNode(svg.getCoordinates(event));
 		}
-		svg.addNode(svg.getCoordinates(event));
+		console.log(node);
+		svg.setNodeSelected(node);
 	}
 
 	static svgOnMouseMove(event) {
@@ -327,7 +326,7 @@ TcSvgEdit.Svg = class {
 		);
 		u.classList.add("node");
 		this._svg.append(u);
-		return this;
+		return u;
 	}
 
 	getNodeSelected() {
