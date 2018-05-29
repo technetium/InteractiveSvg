@@ -135,7 +135,7 @@ class TcSvgEdit {
 	static svgOnMouseDown(event) {
 		let svg = event.target.closest("svg.tc_svg_edit");
 		if (null === svg) { return; }
-		
+		let _svg = TcSvgEdit.getSvg(svg);
 		let node = event.target.closest(".node");
 		if (null !== node) {
 			////console.log(node);
@@ -145,15 +145,17 @@ class TcSvgEdit {
 			return;
 		}
 		////console.log(svg);
-		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
+		let pos = _svg.getCoordinates(event);
 		////console.log(pos);
-		TcSvgEdit.getSvg(svg).addNode(pos.x, pos.y);
+		_svg.addNode(pos.x, pos.y);
 	}
 
 	static svgOnMouseMove(event) {
 		let svg = event.target.closest("svg.tc_svg_edit");
 		if (null === svg) { return; }
-		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
+		let _svg = TcSvgEdit.getSvg(svg);
+
+		let pos = _svg.getCoordinates(event);
 		////console.log(pos);
 
 		TcSvgEdit.documentPositionIndicator("x", pos.x);
@@ -182,18 +184,6 @@ class TcSvgEdit {
 		return u;
 	}
 	
-	static utilGetSvgCoordinates(svg, event) {
-		///console.log("utilGetSvgCoordinates()");
-		// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
-		let pt = svg.createSVGPoint();
-		pt.x = event.clientX;
-		pt.y = event.clientY;
-
-		// The cursor point, translated into svg coordinates
-		let cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
-		///console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
-		return cursorpt;
-	}
 }
 
 //
@@ -203,6 +193,7 @@ TcSvgEdit.Svg = class {
 	constructor(svg) {
 		console.log('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
+		this._node_selected = null;
 		console.log(this);
 	}
 
@@ -249,7 +240,7 @@ TcSvgEdit.Svg = class {
 		return drawing;
 	}
 
-	getNode(svg) {
+	getNode() {
 		let node = document.getElementById(this.idNode());
 		if (!node) {
 			node = this.initNode();
@@ -344,6 +335,21 @@ TcSvgEdit.Svg = class {
 		this._svg.append(u);
 		return this;
 	}
+	
+	getCoordinates(event) {
+		///console.log("getCoordinates()");
+		// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
+		let pt = this._svg.createSVGPoint();
+		pt.x = event.clientX;
+		pt.y = event.clientY;
+
+		// The cursor point, translated into svg coordinates
+		let cursorpt =  pt.matrixTransform(this._svg.getScreenCTM().inverse());
+		///console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+		return cursorpt;
+	}
+	
+	
 }
 
 
