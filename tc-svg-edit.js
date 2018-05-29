@@ -34,6 +34,7 @@ class TcSvgEdit {
 
 	static getSvg(svg) {
 		console.log('TcSvgEdit.getSvg');
+		if (!svg) { return; }
 		let id = TcSvgEdit.Svg.getId(svg);
 		if ("undefined" === typeof TcSvgEdit._svgs[id]) {
 			TcSvgEdit._svgs[id] = new TcSvgEdit.Svg(svg);
@@ -139,9 +140,7 @@ class TcSvgEdit {
 		let node = event.target.closest(".node");
 		if (null !== node) {
 			////console.log(node);
-			svg[TcSvgEdit.prefix + "_selected"] = node;
-			console.log("selected");
-			console.log(svg[TcSvgEdit.prefix + "_selected"]);
+			_svg.setNodeSelected(node);
 			return;
 		}
 		////console.log(svg);
@@ -161,15 +160,15 @@ class TcSvgEdit {
 		TcSvgEdit.documentPositionIndicator("x", pos.x);
 		TcSvgEdit.documentPositionIndicator("y", pos.y);
 		
-		if (!svg[TcSvgEdit.prefix + "_selected"]) {	return; }
+		if (!_svg.getNodeSelected()) { return; }
 
-		TcSvgEdit.nodeOnMouseDrag(svg[TcSvgEdit.prefix + "_selected"], pos);
+		TcSvgEdit.nodeOnMouseDrag(_svg.getNodeSelected(), pos);
 	}
 
 	static svgOnMouseUp(event) {
-		let svg = event.target.closest("svg.tc_svg_edit");
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (null === svg) { return; }
-		svg[TcSvgEdit.prefix + "_selected"] = null;
+		svg.setNodeSelected(null);
 	}
 	
 	// Because I"m to lazy to type the namespace
@@ -333,6 +332,19 @@ TcSvgEdit.Svg = class {
 		);
 		u.classList.add("node");
 		this._svg.append(u);
+		return this;
+	}
+
+	getNodeSelected() {
+		console.log("getNodeSelected");
+		console.log(this._svg._node_selected);
+		return this._svg._node_selected;
+	}
+	
+	setNodeSelected(node=null) { 
+		console.log("setNodeSelected");
+		this._svg._node_selected = node;
+		console.log(this._svg._node_selected);
 		return this;
 	}
 	
