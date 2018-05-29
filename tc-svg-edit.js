@@ -63,14 +63,6 @@ class TcSvgEdit {
 		return drawing;
 	}
 
-/* * /	
-	static getId(svg) {
-		if (!svg.hasAttribute("id")) {
-			TcSvgEdit.initSvgId(svg);
-		}
-		return svg.getAttribute("id");
-	}
-/* */	
 	static getNode(svg) {
 		let node = document.getElementById(TcSvgEdit.idNode(svg));
 		if (!node)	{
@@ -159,14 +151,6 @@ class TcSvgEdit {
 		return node;
 	}
 	
-	static initSvgId(svg) {
-		svg.setAttribute(
-			"id",
-			TcSvgEdit.prefix + '_id_' +
-			//@see https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-			Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)
-		);
-	}
 	
 	//
 	// Event Listeners
@@ -342,9 +326,18 @@ TcSvgEdit.Svg = class {
 
 	static getId(svg) {
 		if (!svg.hasAttribute("id")) {
-			TcSvgEdit.initSvgId(svg);
+			TcSvgEdit.Svg.initId(svg);
 		}
 		return svg.getAttribute("id");
+	}
+
+	static initId(svg) {
+		svg.setAttribute(
+			"id",
+			TcSvgEdit.prefix + '_id_' +
+			//@see https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+			Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)
+		);
 	}
 
 	addNode(x, y) {
