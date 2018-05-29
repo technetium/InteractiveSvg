@@ -245,8 +245,6 @@ class TcSvgEdit {
 		let svg = event.target.closest("svg.tc_svg_edit");
 		if (null === svg) { return; }
 		
-		TcSvgEdit.getSvg(svg);
-		
 		let node = event.target.closest(".node");
 		if (null !== node) {
 			////console.log(node);
@@ -281,16 +279,6 @@ class TcSvgEdit {
 		svg[TcSvgEdit.prefix + "_selected"] = null;
 	}
 	
-	static svgAddNode(svg, x, y) {
-		console.log("!!!!!!!!!!!!svgAddNode("+x+", "+y+")");
-		let node = TcSvgEdit.getNode(svg);
-		let u = TcSvgEdit.createSvgUseElement(
-			"#" + TcSvgEdit.idNode(svg), x, y
-		);
-		u.classList.add("node");
-		svg.append(u);
-	}
-
 	// Because I"m to lazy to type the namespace
 	static createSvgElement(name) {
 		return document.createElementNS(TcSvgEdit.namespace_svg, name);
@@ -317,6 +305,9 @@ class TcSvgEdit {
 	}
 }
 
+//
+// SVG WRAPPER CLASS
+//
 TcSvgEdit.Svg = class {
 	constructor(svg) {
 		console.log('TcSvgEdit.Svg.constructor');
