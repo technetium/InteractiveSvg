@@ -92,5 +92,18 @@ http://perfectionkills.com/whats-wrong-with-extending-the-dom/
 http://erik.eae.net/archives/2005/06/06/22.13.54/
 
 
+Object.defineProperty(
+	Object.prototype,
+	'newProperty',
+	{
+		enumerable:false,
+		value:function(){ return true; }
+	}
+);
+
+
+https://stackoverflow.com/questions/18524652/how-to-use-javascript-object-defineproperty
+
+
 </body>
 </html>

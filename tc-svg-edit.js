@@ -259,6 +259,8 @@ class TcSvgEdit {
 		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
 		console.log(pos);
 		TcSvgEdit.svgAddNode(svg, pos.x, pos.y);
+		//svg.TcSvgEdit.svgAddNode(pos.x, pos.y);
+		svg.TcSvgEdit.hello();
 	}
 
 	static svgOnMouseMove(event) {
@@ -314,7 +316,26 @@ class TcSvgEdit {
 		let cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
 		///console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
 		return cursorpt;
-	}		
+	}
 }
 
+
+Object.defineProperty(
+	Object.prototype,
+	'TcSvgEdit',
+	{
+		enumerable:false,
+		value:class {
+			//console.log('Object.TcSvgEdit');
+			
+			static hello(str = 'Foo') {
+				console.log(this);
+				console.log('hello: ' + str);
+			}
+			//return true;
+		}
+	}
+);
+
 new TcSvgEdit("someprefix");
+
