@@ -14,7 +14,9 @@ class TcSvgEdit {
 		TcSvgEdit.prefix = "tc_svg_edit_";
 		TcSvgEdit.namespace_svg = "http://www.w3.org/2000/svg";
 		TcSvgEdit.namespace_xlink = "http://www.w3.org/1999/xlink";
-		
+	
+		TcSvgEdit._svgs = [];
+	
 		if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
 		document.addEventListener("mousedown", function(event){
 			TcSvgEdit.onMouseDown(event);
@@ -30,9 +32,20 @@ class TcSvgEdit {
 		document[TcSvgEdit.prefix + "_element"] = null;
 	}
 
+	static getSvg(svg) {
+		console.log('TcSvgEdit.getSvg');
+		let id = TcSvgEdit.Svg.getId(svg);
+		if ("undefined" === typeof TcSvgEdit._svgs[id]) {
+			TcSvgEdit._svgs[id] = new TcSvgEdit.Svg(svg);
+		}
+		console.log(TcSvgEdit._svgs[id]);
+		return TcSvgEdit._svgs[id];
+	}
+
 	//
 	// Getters
 	//
+	
 	
 	static getDefs(svg) {
 		let defs = svg.querySelector("defs");
@@ -50,27 +63,28 @@ class TcSvgEdit {
 		return drawing;
 	}
 
+/* * /	
 	static getId(svg) {
 		if (!svg.hasAttribute("id")) {
 			TcSvgEdit.initSvgId(svg);
 		}
 		return svg.getAttribute("id");
 	}
-	
+/* */	
 	static getNode(svg) {
 		let node = document.getElementById(TcSvgEdit.idNode(svg));
 		if (!node)	{
 			node = TcSvgEdit.initNode(svg);
-		}
-		console.log(node);
+		} 
+		///console.log(node);
 		return node;
 	}
 
 	//
 	// Id's
 	//
-	static idDrawing(svg) { return	TcSvgEdit.getId(svg) + '-symbol-drawing'; }
-	static idNode(svg) { return	TcSvgEdit.getId(svg) + '-symbol-node'; }
+	static idDrawing(svg) { return	TcSvgEdit.Svg.getId(svg) + '-symbol-drawing'; }
+	static idNode(svg) { return	TcSvgEdit.Svg.getId(svg) + '-symbol-node'; }
 
 	//
 	// Initialisers
@@ -186,7 +200,7 @@ class TcSvgEdit {
 			"[data-tc-svg-edit-position-indicator=\"" + 
 			dimension + "\"]"
 		).forEach(function(elem) {
-			console.log(elem);
+			//console.log(elem);
 			elem.innerHTML = value;
 		});
 	}
@@ -211,7 +225,7 @@ class TcSvgEdit {
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			document[TcSvgEdit.prefix + "_element_type"] + "\"]"
 		).forEach(function(elem) {
-			console.log(elem);
+			//console.log(elem);
 			elem.classList.remove("selected");
 		});
 	}
@@ -247,27 +261,28 @@ class TcSvgEdit {
 		let svg = event.target.closest("svg.tc_svg_edit");
 		if (null === svg) { return; }
 		
+		TcSvgEdit.getSvg(svg);
+		
 		let node = event.target.closest(".node");
 		if (null !== node) {
-			console.log(node);
+			////console.log(node);
 			svg[TcSvgEdit.prefix + "_selected"] = node;
 			console.log("selected");
 			console.log(svg[TcSvgEdit.prefix + "_selected"]);
 			return;
 		}
-		console.log(svg);
+		////console.log(svg);
 		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
-		console.log(pos);
+		////console.log(pos);
 		TcSvgEdit.svgAddNode(svg, pos.x, pos.y);
 		//svg.TcSvgEdit.svgAddNode(pos.x, pos.y);
-		svg.TcSvgEdit.hello();
 	}
 
 	static svgOnMouseMove(event) {
 		let svg = event.target.closest("svg.tc_svg_edit");
 		if (null === svg) { return; }
 		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
-		console.log(pos);
+		////console.log(pos);
 
 		TcSvgEdit.documentPositionIndicator("x", pos.x);
 		TcSvgEdit.documentPositionIndicator("y", pos.y);
@@ -320,22 +335,34 @@ class TcSvgEdit {
 }
 
 
-Object.defineProperty(
-	Object.prototype,
-	'TcSvgEdit',
-	{
-		enumerable:false,
-		value:class {
-			//console.log('Object.TcSvgEdit');
-			
-			static hello(str = 'Foo') {
-				console.log(this);
-				console.log('hello: ' + str);
-			}
-			//return true;
-		}
+
+Element.prototype.SvgEdit = {
+	a: 3,
+	_this: this,
+	constructor: () => console.log('bla.constr'),
+	hello: (str = 'Bar') => {
+		console.log(this);
+		console.log('hello: ' + str);
 	}
-);
+	
+}
+
+TcSvgEdit.Svg = class {
+	constructor(svg) {
+		console.log('TcSvgEdit.Svg.constructor');
+		this.svg = svg;
+		console.log(this);
+	}
+
+	static getId(svg) {
+		if (!svg.hasAttribute("id")) {
+			TcSvgEdit.initSvgId(svg);
+		}
+		return svg.getAttribute("id");
+	}
+}
+
+
 
 new TcSvgEdit("someprefix");
 
