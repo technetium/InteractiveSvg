@@ -134,35 +134,33 @@ class TcSvgEdit {
 	//
 	
 	static svgOnMouseDown(event) {
-		let svg = event.target.closest("svg.tc_svg_edit");
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (null === svg) { return; }
-		let _svg = TcSvgEdit.getSvg(svg);
 		let node = event.target.closest(".node");
 		if (null !== node) {
 			////console.log(node);
-			_svg.setNodeSelected(node);
+			svg.setNodeSelected(node);
 			return;
 		}
 		////console.log(svg);
-		let pos = _svg.getCoordinates(event);
+		let pos = svg.getCoordinates(event);
 		////console.log(pos);
-		_svg.addNode(pos.x, pos.y);
+		svg.addNode(pos.x, pos.y);
 	}
 
 	static svgOnMouseMove(event) {
-		let svg = event.target.closest("svg.tc_svg_edit");
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (null === svg) { return; }
-		let _svg = TcSvgEdit.getSvg(svg);
 
-		let pos = _svg.getCoordinates(event);
+		let pos = svg.getCoordinates(event);
 		////console.log(pos);
 
 		TcSvgEdit.documentPositionIndicator("x", pos.x);
 		TcSvgEdit.documentPositionIndicator("y", pos.y);
 		
-		if (!_svg.getNodeSelected()) { return; }
+		if (!svg.getNodeSelected()) { return; }
 
-		TcSvgEdit.nodeOnMouseDrag(_svg.getNodeSelected(), pos);
+		TcSvgEdit.nodeOnMouseDrag(svg.getNodeSelected(), pos);
 	}
 
 	static svgOnMouseUp(event) {
