@@ -142,10 +142,7 @@ class TcSvgEdit {
 			svg.setNodeSelected(node);
 			return;
 		}
-		////console.log(svg);
-		let pos = svg.getCoordinates(event);
-		////console.log(pos);
-		svg.addNode(pos.x, pos.y);
+		svg.addNode(svg.getCoordinates(event));
 	}
 
 	static svgOnMouseMove(event) {
@@ -322,11 +319,11 @@ TcSvgEdit.Svg = class {
 	
 	
 	
-	addNode(x, y) {
-		console.log("Svg.addNode("+x+", "+y+")");
+	addNode(pos) {
+		console.log("Svg.addNode("+pos.x+", "+pos.y+")");
 		let node = this.getNode();
 		let u = TcSvgEdit.createSvgUseElement(
-			"#" + this.idNode(), x, y
+			"#" + this.idNode(), pos.x, pos.y
 		);
 		u.classList.add("node");
 		this._svg.append(u);
