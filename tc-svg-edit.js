@@ -274,8 +274,7 @@ class TcSvgEdit {
 		////console.log(svg);
 		let pos = TcSvgEdit.utilGetSvgCoordinates(svg, event);
 		////console.log(pos);
-		TcSvgEdit.svgAddNode(svg, pos.x, pos.y);
-		//svg.TcSvgEdit.svgAddNode(pos.x, pos.y);
+		TcSvgEdit.getSvg(svg).addNode(pos.x, pos.y);
 	}
 
 	static svgOnMouseMove(event) {
@@ -299,7 +298,7 @@ class TcSvgEdit {
 	}
 	
 	static svgAddNode(svg, x, y) {
-		console.log("svgAddNode("+x+", "+y+")");
+		console.log("!!!!!!!!!!!!svgAddNode("+x+", "+y+")");
 		let node = TcSvgEdit.getNode(svg);
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + TcSvgEdit.idNode(svg), x, y
@@ -334,23 +333,10 @@ class TcSvgEdit {
 	}
 }
 
-
-
-Element.prototype.SvgEdit = {
-	a: 3,
-	_this: this,
-	constructor: () => console.log('bla.constr'),
-	hello: (str = 'Bar') => {
-		console.log(this);
-		console.log('hello: ' + str);
-	}
-	
-}
-
 TcSvgEdit.Svg = class {
 	constructor(svg) {
 		console.log('TcSvgEdit.Svg.constructor');
-		this.svg = svg;
+		this._svg = svg;
 		console.log(this);
 	}
 
@@ -359,6 +345,17 @@ TcSvgEdit.Svg = class {
 			TcSvgEdit.initSvgId(svg);
 		}
 		return svg.getAttribute("id");
+	}
+
+	addNode(x, y) {
+		console.log("Svg.addNode("+x+", "+y+")");
+		let node = TcSvgEdit.getNode(this._svg);
+		let u = TcSvgEdit.createSvgUseElement(
+			"#" + TcSvgEdit.idNode(this._svg), x, y
+		);
+		u.classList.add("node");
+		this._svg.append(u);
+		return this;
 	}
 }
 
