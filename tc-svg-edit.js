@@ -141,7 +141,7 @@ class TcSvgEdit {
 			node = svg.addNode(svg.getCoordinates(event));
 		}
 		console.log(node);
-		svg.setNodeSelected(node);
+		svg.setNodeSelected(node._node);
 	}
 
 	static svgOnMouseMove(event) {
@@ -316,17 +316,15 @@ TcSvgEdit.Svg = class {
 		return node;
 	}
 	
-	
-	
 	addNode(pos) {
 		console.log("Svg.addNode("+pos.x+", "+pos.y+")");
-		let node = this.getNode();
+		let node = this.getNode(); // Make sure we have a node
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + this.idNode(), pos.x, pos.y
 		);
 		u.classList.add("node");
 		this._svg.append(u);
-		return u;
+		return new TcSvgEdit.Node(u, svg);
 	}
 
 	getNodeSelected() {
@@ -359,6 +357,15 @@ TcSvgEdit.Svg = class {
 }
 
 
+//
+// NODE WRAPPER CLASS
+//
+TcSvgEdit.Node = class {
+	constructor(node, svg) {
+		this._node = node;
+		this._svg = svg;
+	}
+}
 
 new TcSvgEdit("someprefix");
 
