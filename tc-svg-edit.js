@@ -135,18 +135,18 @@ class TcSvgEdit {
 	
 	static svgOnMouseDown(event) {
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (null === svg) { return; }
-		let node = event.target.closest(".node");
+		if (!svg) { return; }
+		let node = this.getNode(event.target.closest(".node"));
 		if (!node) {
 			node = svg.addNode(svg.getCoordinates(event));
 		}
 		console.log(node);
-		svg.setNodeSelected(node._node);
+		svg.setNodeSelected(node);
 	}
 
 	static svgOnMouseMove(event) {
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (null === svg) { return; }
+		if (!svg) { return; }
 
 		let pos = svg.getCoordinates(event);
 		////console.log(pos);
@@ -186,6 +186,7 @@ TcSvgEdit.Svg = class {
 	constructor(svg) {
 		console.log('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
+		this._nodes = [];
 		this._node_selected = null;
 		console.log(this);
 	}
@@ -233,6 +234,12 @@ TcSvgEdit.Svg = class {
 		return drawing;
 	}
 
+	getNode(node) {
+		return this._nodes.find(function(n) {
+			return n._node == node;
+		});
+	}
+	
 	getNodeSymbol() {
 		let node = document.getElementById(this.idNodeSymbol());
 		if (!node) {
@@ -318,13 +325,14 @@ TcSvgEdit.Svg = class {
 	
 	addNode(pos) {
 		console.log("Svg.addNode("+pos.x+", "+pos.y+")");
-		let node = this.getNodeSymbol(); // Make sure we have a node
+		let nodeSymbol = this.getNodeSymbol(); // Make sure we have a node
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + this.idNodeSymbol(), pos.x, pos.y
 		);
 		u.classList.add("node");
 		this._svg.append(u);
-		return new TcSvgEdit.Node(u, this);
+		this._nodes.push(new TcSvgEdit.Node(u, this));
+		return this._nodes.slice(-1)[0]; // Returns the last element, the one we have just added.
 	}
 
 	getNodeSelected() {
