@@ -211,7 +211,7 @@ TcSvgEdit.Svg = class {
 	//
 	id()	{ return this._svg.getAttribute("id"); }
 	idDrawing()	{ return	this.id() + '-symbol-drawing'; }
-	idNode()	{ return	this.id() + '-symbol-node'; }
+	idNodeSymbol()	{ return	this.id() + '-symbol-node'; }
 
 	//
 	// Getters
@@ -233,10 +233,10 @@ TcSvgEdit.Svg = class {
 		return drawing;
 	}
 
-	getNode() {
-		let node = document.getElementById(this.idNode());
+	getNodeSymbol() {
+		let node = document.getElementById(this.idNodeSymbol());
 		if (!node) {
-			node = this.initNode();
+			node = this.initNodeSymbol();
 		} 
 		////console.log(node);
 		return node;
@@ -268,11 +268,11 @@ TcSvgEdit.Svg = class {
 		return drawing;
 	}
 	
-	initNode() {
+	initNodeSymbol() {
 		console.log('initNode');
 		let defs = this.getDefs();
 		let node = TcSvgEdit.createSvgElement("symbol");
-		node.setAttribute("id", this.idNode());
+		node.setAttribute("id", this.idNodeSymbol());
 		node.classList.add("node");
 		node.setAttribute("fill", TcSvgEdit.node_fill);
 		node.setAttribute("stroke", TcSvgEdit.node_stroke);
@@ -318,13 +318,13 @@ TcSvgEdit.Svg = class {
 	
 	addNode(pos) {
 		console.log("Svg.addNode("+pos.x+", "+pos.y+")");
-		let node = this.getNode(); // Make sure we have a node
+		let node = this.getNodeSymbol(); // Make sure we have a node
 		let u = TcSvgEdit.createSvgUseElement(
-			"#" + this.idNode(), pos.x, pos.y
+			"#" + this.idNodeSymbol(), pos.x, pos.y
 		);
 		u.classList.add("node");
 		this._svg.append(u);
-		return new TcSvgEdit.Node(u, svg);
+		return new TcSvgEdit.Node(u, this);
 	}
 
 	getNodeSelected() {
