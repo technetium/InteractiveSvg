@@ -118,18 +118,6 @@ class TcSvgEdit {
 	}
 
 	//
-	// node
-	//
-	
-	static nodeOnMouseDrag(node, pos) {
-		///console.log("nodeOnMouseDrag");
-		///console.log(typeof node);
-		///console.log(pos);
-		node._node.setAttribute("x", pos.x); 
-		node._node.setAttribute("y", pos.y); 
-	}
-	
-	//
 	// svg
 	//
 	
@@ -145,18 +133,19 @@ class TcSvgEdit {
 	}
 
 	static svgOnMouseMove(event) {
+		///console.log("svgOnMouseMove");
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (!svg) { return; }
 
 		let pos = svg.getCoordinates(event);
-		////console.log(pos);
 
 		TcSvgEdit.documentPositionIndicator("x", pos.x);
 		TcSvgEdit.documentPositionIndicator("y", pos.y);
 		
-		if (!svg.getNodeSelected()) { return; }
-
-		TcSvgEdit.nodeOnMouseDrag(svg.getNodeSelected(), pos);
+		let node = svg.getNodeSelected();
+		if (node) {
+			node.onMouseDrag(pos);
+		}
 	}
 
 	static svgOnMouseUp(event) {
@@ -373,6 +362,15 @@ TcSvgEdit.Node = class {
 		this._node = node;
 		this._svg = svg;
 	}
+	
+	onMouseDrag(pos) {
+		///console.log("Node.onMouseDrag");
+		///console.log(typeof node);
+		///console.log(pos);
+		this._node.setAttribute("x", pos.x); 
+		this._node.setAttribute("y", pos.y); 
+	}
+	
 }
 
 new TcSvgEdit("someprefix");
