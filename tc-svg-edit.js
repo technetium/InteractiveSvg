@@ -52,19 +52,22 @@ class TcSvgEdit {
 		console.log("TcSvgEdit.onMouseDown");
 		console.log(event);
 		TcSvgEdit.elementTypeSelect(event);
-		TcSvgEdit.svgOnMouseDown(event);
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
+		if (svg) { svg.onMouseDown(event); }
 	}
 	
 	static onMouseMove(event) {
 		///console.log("TcSvgEdit.onMouseMove");
 		///console.log(event);
-		TcSvgEdit.svgOnMouseMove(event);
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
+		if (svg) { svg.onMouseMove(event); }
 	}
 
 	static onMouseUp(event) {
 		//console.log("TcSvgEdit.onMouseUp");
 		//console.log(event);
-		TcSvgEdit.svgOnMouseUp(event);
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
+		if (svg) { svg.onMouseUp(event); }
 	}
 
 	//
@@ -121,38 +124,6 @@ class TcSvgEdit {
 	// svg
 	//
 	
-	static svgOnMouseDown(event) {
-		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (!svg) { return; }
-		let node = svg.getNode(event.target.closest(".node"));
-		if (!node) {
-			node = svg.addNode(svg.getCoordinates(event));
-		}
-		console.log(node);
-		svg.setNodeSelected(node);
-	}
-
-	static svgOnMouseMove(event) {
-		///console.log("svgOnMouseMove");
-		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (!svg) { return; }
-
-		let pos = svg.getCoordinates(event);
-
-		TcSvgEdit.documentPositionIndicator("x", pos.x);
-		TcSvgEdit.documentPositionIndicator("y", pos.y);
-		
-		let node = svg.getNodeSelected();
-		if (node) {
-			node.onMouseDrag(pos);
-		}
-	}
-
-	static svgOnMouseUp(event) {
-		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (!svg) { return; }
-		svg.setNodeSelected(null);
-	}
 	
 	// Because I"m to lazy to type the namespace
 	static createSvgElement(name) {
@@ -203,6 +174,36 @@ TcSvgEdit.Svg = class {
 	idDrawing()	{ return	this.id() + '-symbol-drawing'; }
 	idNodeSymbol()	{ return	this.id() + '-symbol-node'; }
 
+	//
+	// Event handlers
+	//
+	
+	onMouseDown(event) {
+		///console.log("Svg.onMouseDown");
+		let node = this.getNode(event.target.closest(".node"));
+		if (!node) { node = this.addNode(this.getCoordinates(event)); }
+		////console.log(node);
+		this.setNodeSelected(node);
+	}
+
+	onMouseMove(event) {
+		////console.log("Svg.onMouseMove");
+		let pos = this.getCoordinates(event);
+
+		TcSvgEdit.documentPositionIndicator("x", pos.x);
+		TcSvgEdit.documentPositionIndicator("y", pos.y);
+		
+		let node = this.getNodeSelected();
+		if (node) { node.onMouseDrag(pos); }
+	}
+
+	onMouseUp(event) {
+		////console.log("Svg.onMouseUp");
+		this.setNodeSelected(null);
+	}
+	
+	
+	
 	//
 	// Getters
 	//
@@ -327,13 +328,13 @@ TcSvgEdit.Svg = class {
 	getNodeSelected() {
 		console.log("getNodeSelected");
 		console.log(this._svg._node_selected);
-		return this._svg._node_selected;
+		return this._node_selected;
 	}
 	
 	setNodeSelected(node=null) { 
 		console.log("setNodeSelected");
-		this._svg._node_selected = node;
-		console.log(this._svg._node_selected);
+		this._node_selected = node;
+		console.log(this._node_selected);
 		return this;
 	}
 	
