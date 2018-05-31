@@ -136,7 +136,7 @@ class TcSvgEdit {
 	static svgOnMouseDown(event) {
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (!svg) { return; }
-		let node = this.getNode(event.target.closest(".node"));
+		let node = svg.getNode(event.target.closest(".node"));
 		if (!node) {
 			node = svg.addNode(svg.getCoordinates(event));
 		}
