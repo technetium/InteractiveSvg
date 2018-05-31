@@ -88,7 +88,7 @@ class TcSvgEdit {
 	static elementTypeSelect(event) {
 		console.log('elementSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
-		if (null === elem) { return }
+		if (!elem) { return }
 		console.log(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
 		console.log(type);
@@ -161,7 +161,7 @@ class TcSvgEdit {
 
 	static svgOnMouseUp(event) {
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (null === svg) { return; }
+		if (!svg) { return; }
 		svg.setNodeSelected(null);
 	}
 	
