@@ -374,5 +374,35 @@ TcSvgEdit.Node = class {
 	
 }
 
+
+//
+// ELEMENT WRAPPER CLASS
+//
+TcSvgEdit.Element = class {
+}
+
+
+//
+// ELEMENT LINE WRAPPER CLASS
+//
+TcSvgEdit.ElementLine = class Line extends TcSvgEdit.Element {
+} 
+
+
+// http://exploringjs.com/es6/ch_classes.html
+/*
+const MyClass = class Me {
+    getClassName() {
+        return Me.name;
+    }
+};
+const inst = new MyClass();
+
+console.log(inst.getClassName()); // Me
+console.log(Me.name); // ReferenceError: Me is not defined
+*/
+
+
+
 new TcSvgEdit("someprefix");
 
