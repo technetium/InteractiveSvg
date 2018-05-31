@@ -125,8 +125,8 @@ class TcSvgEdit {
 		///console.log("nodeOnMouseDrag");
 		///console.log(typeof node);
 		///console.log(pos);
-		node.setAttribute("x", pos.x); 
-		node.setAttribute("y", pos.y); 
+		node._node.setAttribute("x", pos.x); 
+		node._node.setAttribute("y", pos.y); 
 	}
 	
 	//
