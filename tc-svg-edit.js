@@ -321,8 +321,9 @@ TcSvgEdit.Svg = class {
 		);
 		u.classList.add("node");
 		this._svg.append(u);
-		this._nodes.push(new TcSvgEdit.Node(u, this));
-		return this._nodes.slice(-1)[0]; // Returns the last element, the one we have just added.
+		let node = new TcSvgEdit.Node(u, this);
+		this._nodes.push(node);
+		return node;
 	}
 
 	getNodeSelected() {
@@ -362,6 +363,7 @@ TcSvgEdit.Node = class {
 	constructor(node, svg) {
 		this._node = node;
 		this._svg = svg;
+		this.elements = [];
 	}
 	
 	onMouseDrag(pos) {
@@ -372,6 +374,9 @@ TcSvgEdit.Node = class {
 		this._node.setAttribute("y", pos.y); 
 	}
 	
+	addElement(element) {
+		this.elements.push(element);
+	}
 }
 
 
@@ -379,6 +384,10 @@ TcSvgEdit.Node = class {
 // ELEMENT WRAPPER CLASS
 //
 TcSvgEdit.Element = class {
+	constructor(element, svg) {
+		this._element = element;
+		this._svg = svg;
+	}
 }
 
 
@@ -386,7 +395,10 @@ TcSvgEdit.Element = class {
 // ELEMENT LINE WRAPPER CLASS
 //
 TcSvgEdit.ElementLine = class Line extends TcSvgEdit.Element {
-} 
+	constructor(element, svg) {
+		super(element, svg);
+	}
+}
 
 
 // http://exploringjs.com/es6/ch_classes.html
