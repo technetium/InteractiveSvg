@@ -55,7 +55,7 @@ class TcSvgEdit {
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
-		TcSvgEdit.elementTypeUnset();
+		TcSvgEdit._svg_current.setElementType();
 	}
 	
 	static onMouseMove(event) {
@@ -79,9 +79,11 @@ class TcSvgEdit {
 	static svgCurrentSet(svg) {
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
+		TcSvgEdit.elementTypeSet();
 	}
 	
 	static svgCurrentUnset(svg) {
+		TcSvgEdit.elementTypeUnset();
 		TcSvgEdit._svg_current = null;
 	}
 	
@@ -103,7 +105,7 @@ class TcSvgEdit {
 	//
 	// element
 	//
-	
+/*	
 	static elementCurrentSet(element) {
 		TcSvgEdit._element_current = element;
 	}
@@ -112,7 +114,7 @@ class TcSvgEdit {
 		// Cleanup unfinished mess
 		TcSvgEdit._element_current = null;
 	}
-	
+*/	
 	static elementTypeSelect(event) {
 		console.log('elementSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
@@ -120,30 +122,31 @@ class TcSvgEdit {
 		console.log(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
 		console.log(type);
-		TcSvgEdit.elementTypeUnset();
-		TcSvgEdit.elementTypeSet(type);
+		TcSvgEdit._element_current.setElementType(type=null);
 		return true;
 	}
-
-	static elementTypeUnset() {
+	
+	static elementTypeSet() {
+		console.log('elementTypeSet');
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
-			TcSvgEdit._element_type_selected + "\"]"
-		).forEach(function(elem) {
-			//console.log(elem);
-			elem.classList.remove("selected");
-		});
-		TcSvgEdit._element_type_selected = null;
-	}
-	
-	static elementTypeSet(type) {
-		console.log('elementTypeSet');
-		TcSvgEdit._element_type_selected = type;
-		document.querySelectorAll(
-			"[data-tc-svg-edit-element-type-select=\"" + type + "\"]"
+			TcSvgEdit._svg_current.getElementTypeSelected() +
+			"\"]"
 		).forEach(function(elem) {
 			console.log(elem);
 			elem.classList.add("selected");
+		});
+	}
+
+	static elementTypeUnet(type) {
+		console.log('elementTypeUnset');
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-type-select=\"" + 
+			TcSvgEdit._svg_current.getElementTypeSelected() +
+			"\"]"
+		).forEach(function(elem) {
+			console.log(elem);
+			elem.classList.remove("selected");
 		});
 	}
 	
@@ -376,6 +379,17 @@ TcSvgEdit.Svg = class {
 		return node;
 	}
 
+	getElementTypeSelected() {
+		return this._element_type_selected;
+	}
+	
+	setElementTypeSelected(type) {
+		TcSvgEdit.elementTypeSelectedUnset(); 
+		this.element_type_selected = type;
+		if (type) { TcSvgEdit.elementTypeSelectedSet(type); }
+		return this;
+	}
+	
 	getNodeSelected() {
 		////console.log("getNodeSelected");
 		////console.log(this._svg._node_selected);
