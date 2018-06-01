@@ -28,17 +28,18 @@ class TcSvgEdit {
 			TcSvgEdit.onMouseUp(event);
 		});
 		
-		TcSvgEdit._element_selected = "none";
+		TcSvgEdit._element_current = null;
+		TcSvgEdit._element_type_selected = null;
 	}
 
 	static getSvg(svg) {
-		console.log('TcSvgEdit.getSvg');
+		////console.log('TcSvgEdit.getSvg');
 		if (!svg) { return; }
 		let id = TcSvgEdit.Svg.getId(svg);
 		if ("undefined" === typeof TcSvgEdit._svgs[id]) {
 			TcSvgEdit._svgs[id] = new TcSvgEdit.Svg(svg);
 		}
-		console.log(TcSvgEdit._svgs[id]);
+		////console.log(TcSvgEdit._svgs[id]);
 		return TcSvgEdit._svgs[id];
 	}
 
@@ -87,6 +88,14 @@ class TcSvgEdit {
 	//
 	// element
 	//
+	static elementCurrentSet(element) {
+		TcSvgEdit._element_current = element;
+	}
+	
+	static elementCurrentUnset() {
+		// Cleanup unfinished mess
+		TcSvgEdit._element_current = null;
+	}
 	
 	static elementTypeSelect(event) {
 		console.log('elementSelect');
@@ -103,16 +112,17 @@ class TcSvgEdit {
 	static elementTypeUnset() {
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
-			TcSvgEdit._element_selected + "\"]"
+			TcSvgEdit._element_type_selected + "\"]"
 		).forEach(function(elem) {
 			//console.log(elem);
 			elem.classList.remove("selected");
 		});
+		TcSvgEdit._element_type_selected = null;
 	}
 	
 	static elementTypeSet(type) {
 		console.log('elementTypeSet');
-		TcSvgEdit._element_selected = type;
+		TcSvgEdit._element_type_selected = type;
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + type + "\"]"
 		).forEach(function(elem) {
@@ -180,6 +190,15 @@ TcSvgEdit.Svg = class {
 		if (!node) { node = this.addNode(this.getCoordinates(event)); }
 		////console.log(node);
 		this.setNodeSelected(node);
+		if (TcSvgEdit._element_type_selected) {
+			if (!TcSvgEdit._element_current && 
+				TcSvgEdit.ElementObjects[TcSvgEdit._element_type_selected]) {
+				TcSvgEdit.elementCurrentSet(
+					new TcSvgEdit.ElementObjects[TcSvgEdit._element_type_selected](this)
+				);
+				TcSvgEdit._element_current.addNode(node);
+			}
+		}
 		return true;
 	}
 
@@ -324,15 +343,15 @@ TcSvgEdit.Svg = class {
 	}
 
 	getNodeSelected() {
-		console.log("getNodeSelected");
-		console.log(this._svg._node_selected);
+		////console.log("getNodeSelected");
+		////console.log(this._svg._node_selected);
 		return this._node_selected;
 	}
 	
 	setNodeSelected(node=null) { 
-		console.log("setNodeSelected");
+		////console.log("setNodeSelected");
 		this._node_selected = node;
-		console.log(this._node_selected);
+		////console.log(this._node_selected);
 		return this;
 	}
 	
@@ -383,7 +402,37 @@ TcSvgEdit.Node = class {
 TcSvgEdit.Element = class {
 	constructor(element, svg) {
 		this._element = element;
+		this._nodes = [];
 		this._svg = svg;
+
+	}
+	
+	addNode(node) {
+		console.log('Element.addNode')
+		this._nodes.push(node);
+		console.log(this._nodes.length);
+		node.addElement(this);
+		if (this.minNodes() <= this._nodes.length) { this.update(); }
+		if (this.maxNodes() >= this._nodes.length) { TcSvgEdit.elementCurrentUnset(); }
+	}
+	
+	update() { 1/0; } // Needs to be defined in sub class
+}
+
+//
+// ELEMENT CIRCLE WRAPPER CLASS
+//
+TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
+	constructor(element, svg) {
+		console.log('new ElementCircle')
+		super(element, svg);
+	}
+	
+	maxNodes() { return 2; }
+	minNodes() { return 2; }
+	
+	update() {
+		console.log('ElementCircle.update');
 	}
 }
 
@@ -391,12 +440,26 @@ TcSvgEdit.Element = class {
 //
 // ELEMENT LINE WRAPPER CLASS
 //
-TcSvgEdit.ElementLine = class Line extends TcSvgEdit.Element {
+TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	constructor(element, svg) {
+		console.log('new ElementLine')
 		super(element, svg);
+	}
+
+	maxNodes() { return 2; }
+	minNodes() { return 2; }
+	update() {
+		console.log('ElementLine.update');
 	}
 }
 
+
+
+// Register Element Names
+TcSvgEdit.ElementObjects = {
+	circle:	TcSvgEdit.ElementCircle,
+	line:	TcSvgEdit.ElementLine,
+};
 
 // http://exploringjs.com/es6/ch_classes.html
 /*
