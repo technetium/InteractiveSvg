@@ -28,8 +28,7 @@ class TcSvgEdit {
 			TcSvgEdit.onMouseUp(event);
 		});
 		
-		document[TcSvgEdit.prefix + "_element_type"] = "none";
-		document[TcSvgEdit.prefix + "_element"] = null;
+		TcSvgEdit._element = "none";
 	}
 
 	static getSvg(svg) {
@@ -102,7 +101,7 @@ class TcSvgEdit {
 	static elementTypeUnset() {
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
-			document[TcSvgEdit.prefix + "_element_type"] + "\"]"
+			TcSvgEdit._element + "\"]"
 		).forEach(function(elem) {
 			//console.log(elem);
 			elem.classList.remove("selected");
@@ -111,7 +110,7 @@ class TcSvgEdit {
 	
 	static elementTypeSet(type) {
 		console.log('elementTypeSet');
-		document[TcSvgEdit.prefix + "_element_type"] = type;
+		TcSvgEdit._element = type;
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + type + "\"]"
 		).forEach(function(elem) {
