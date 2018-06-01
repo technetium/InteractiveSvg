@@ -142,7 +142,6 @@ class TcSvgEdit {
 		u.setAttribute("y", y);
 		return u;
 	}
-	
 }
 
 //
@@ -154,6 +153,11 @@ TcSvgEdit.Svg = class {
 		this._svg = svg;
 		this._nodes = [];
 		this._node_selected = null;
+		
+		this._svg.addEventListener("mouseenter", this.onMouseEnter);
+		this._svg.addEventListener("mouseleave", this.onMouseLeave);
+		
+
 		console.log(this);
 	}
 
@@ -185,7 +189,7 @@ TcSvgEdit.Svg = class {
 	//
 	
 	onMouseDown(event) {
-		///console.log("Svg.onMouseDown");
+		////console.log("Svg.onMouseDown");
 		let node = this.getNode(event.target.closest(".node"));
 		if (!node) { node = this.addNode(this.getCoordinates(event)); }
 		////console.log(node);
@@ -202,6 +206,18 @@ TcSvgEdit.Svg = class {
 		return true;
 	}
 
+	onMouseEnter(event) {
+		console.log("Svg.onMouseEnter");
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
+		console.log(svg);
+	}
+	
+	onMouseLeave(event) {
+		console.log("Svg.onMouseLeave");
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
+		console.log(svg);
+	}
+	
 	onMouseMove(event) {
 		////console.log("Svg.onMouseMove");
 		let pos = this.getCoordinates(event);
