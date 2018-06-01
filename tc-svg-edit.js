@@ -28,7 +28,7 @@ class TcSvgEdit {
 			TcSvgEdit.onMouseUp(event);
 		});
 		
-		TcSvgEdit._element = "none";
+		TcSvgEdit._element_selected = "none";
 	}
 
 	static getSvg(svg) {
@@ -50,9 +50,10 @@ class TcSvgEdit {
 	static onMouseDown(event) {
 		console.log("TcSvgEdit.onMouseDown");
 		console.log(event);
-		TcSvgEdit.elementTypeSelect(event);
+		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
-		if (svg) { svg.onMouseDown(event); }
+		if (svg && svg.onMouseDown(event)) { return true; }
+		TcSvgEdit.elementTypeUnset();
 	}
 	
 	static onMouseMove(event) {
@@ -90,18 +91,19 @@ class TcSvgEdit {
 	static elementTypeSelect(event) {
 		console.log('elementSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
-		if (!elem) { return }
+		if (!elem) { return false }
 		console.log(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
 		console.log(type);
 		TcSvgEdit.elementTypeUnset();
 		TcSvgEdit.elementTypeSet(type);
+		return true;
 	}
 
 	static elementTypeUnset() {
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
-			TcSvgEdit._element + "\"]"
+			TcSvgEdit._element_selected + "\"]"
 		).forEach(function(elem) {
 			//console.log(elem);
 			elem.classList.remove("selected");
@@ -110,7 +112,7 @@ class TcSvgEdit {
 	
 	static elementTypeSet(type) {
 		console.log('elementTypeSet');
-		TcSvgEdit._element = type;
+		TcSvgEdit._element_selected = type;
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + type + "\"]"
 		).forEach(function(elem) {
@@ -118,11 +120,6 @@ class TcSvgEdit {
 			elem.classList.add("selected");
 		});
 	}
-
-	//
-	// svg
-	//
-	
 	
 	// Because I"m to lazy to type the namespace
 	static createSvgElement(name) {
@@ -183,6 +180,7 @@ TcSvgEdit.Svg = class {
 		if (!node) { node = this.addNode(this.getCoordinates(event)); }
 		////console.log(node);
 		this.setNodeSelected(node);
+		return true;
 	}
 
 	onMouseMove(event) {
