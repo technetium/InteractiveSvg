@@ -30,6 +30,7 @@ class TcSvgEdit {
 		
 		TcSvgEdit._element_current = null;
 		TcSvgEdit._element_type_selected = null;
+		TcSvgEdit._svg_current = null;
 	}
 
 	static getSvg(svg) {
@@ -72,6 +73,19 @@ class TcSvgEdit {
 	}
 
 	//
+	// svg
+	//
+	
+	static svgCurrentSet(svg) {
+		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
+		TcSvgEdit._svg_current = svg;
+	}
+	
+	static svgCurrentUnset(svg) {
+		TcSvgEdit._svg_current = null;
+	}
+	
+	//
 	// document
 	//
 	
@@ -84,10 +98,12 @@ class TcSvgEdit {
 			elem.innerHTML = value;
 		});
 	}
+
 	
 	//
 	// element
 	//
+	
 	static elementCurrentSet(element) {
 		TcSvgEdit._element_current = element;
 	}
@@ -151,13 +167,14 @@ TcSvgEdit.Svg = class {
 	constructor(svg) {
 		console.log('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
+		this._element_type_selected = null;
 		this._nodes = [];
 		this._node_selected = null;
 		
 		this._svg.addEventListener("mouseenter", this.onMouseEnter);
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
 		
-
+		TcSvgEdit.svgCurrentSet(this);
 		console.log(this);
 	}
 
@@ -210,6 +227,7 @@ TcSvgEdit.Svg = class {
 		console.log("Svg.onMouseEnter");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
 		console.log(svg);
+		TcSvgEdit.svgCurrentSet(svg);
 	}
 	
 	onMouseLeave(event) {
