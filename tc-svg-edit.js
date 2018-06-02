@@ -44,7 +44,6 @@ class TcSvgEdit {
 		return TcSvgEdit._svgs[id];
 	}
 
-	
 	//
 	// Event Listeners
 	//
@@ -77,19 +76,34 @@ class TcSvgEdit {
 	//
 	
 	static svgCurrentSet(svg) {
+		console.log('svgCurrentSet');
+		console.log(svg);
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
-		TcSvgEdit.elementTypeSet();
+		TcSvgEdit.elementTypeSelectedSet();
+		TcSvgEdit.documentInfoField("svg_current", svg._svg.getAttribute("id"));
 	}
 	
-	static svgCurrentUnset(svg) {
-		TcSvgEdit.elementTypeUnset();
+	static svgCurrentUnset() {
+		TcSvgEdit.elementTypeSelectedUnset();
+		TcSvgEdit.documentInfoField("svg_current", "");
 		TcSvgEdit._svg_current = null;
 	}
 	
 	//
 	// document
 	//
+	
+	static documentInfoField(name, value) {
+		document.querySelectorAll(
+			"[data-tc-svg-edit-info-field=\"" + 
+			name + "\"]"
+		).forEach(function(elem) {
+			//console.log(elem);
+			elem.innerHTML = value;
+		});
+	}
+	
 	
 	static documentPositionIndicator(dimension, value) {
 		document.querySelectorAll(
@@ -122,12 +136,12 @@ class TcSvgEdit {
 		console.log(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
 		console.log(type);
-		TcSvgEdit._element_current.setElementType(type=null);
+		TcSvgEdit._svg_current.setElementTypeSelected(type=null);
 		return true;
 	}
 	
-	static elementTypeSet() {
-		console.log('elementTypeSet');
+	static elementTypeSelectedSet() {
+		console.log('elementTypeSelectedSet');
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit._svg_current.getElementTypeSelected() +
@@ -138,8 +152,8 @@ class TcSvgEdit {
 		});
 	}
 
-	static elementTypeUnet(type) {
-		console.log('elementTypeUnset');
+	static elementTypeSelectedUnset(type) {
+		console.log('elementTypeSelectedUnset');
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit._svg_current.getElementTypeSelected() +
@@ -245,6 +259,8 @@ TcSvgEdit.Svg = class {
 
 		TcSvgEdit.documentPositionIndicator("x", pos.x);
 		TcSvgEdit.documentPositionIndicator("y", pos.y);
+		TcSvgEdit.documentInfoField("pos_x", pos.x);
+		TcSvgEdit.documentInfoField("pos_y", pos.y);
 		
 		let node = this.getNodeSelected();
 		if (node) { node.onMouseDrag(pos); }
