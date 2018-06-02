@@ -85,6 +85,7 @@ class TcSvgEdit {
 	}
 	
 	static svgCurrentUnset() {
+		console.log('svgCurrentUnset');
 		TcSvgEdit.elementTypeSelectedUnset();
 		TcSvgEdit.documentInfoField("svg_current", "");
 		TcSvgEdit._svg_current = null;
@@ -136,12 +137,13 @@ class TcSvgEdit {
 		console.log(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
 		console.log(type);
-		TcSvgEdit._svg_current.setElementTypeSelected(type=null);
+		TcSvgEdit._svg_current.setElementTypeSelected(type);
 		return true;
 	}
 	
 	static elementTypeSelectedSet() {
 		console.log('elementTypeSelectedSet');
+		console.log(TcSvgEdit._svg_current.getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit._svg_current.getElementTypeSelected() +
@@ -154,6 +156,7 @@ class TcSvgEdit {
 
 	static elementTypeSelectedUnset(type) {
 		console.log('elementTypeSelectedUnset');
+		console.log(TcSvgEdit._svg_current.getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit._svg_current.getElementTypeSelected() +
@@ -257,8 +260,8 @@ TcSvgEdit.Svg = class {
 		////console.log("Svg.onMouseMove");
 		let pos = this.getCoordinates(event);
 
-		TcSvgEdit.documentPositionIndicator("x", pos.x);
-		TcSvgEdit.documentPositionIndicator("y", pos.y);
+		//TcSvgEdit.documentPositionIndicator("x", pos.x);
+		//TcSvgEdit.documentPositionIndicator("y", pos.y);
 		TcSvgEdit.documentInfoField("pos_x", pos.x);
 		TcSvgEdit.documentInfoField("pos_y", pos.y);
 		
@@ -399,9 +402,11 @@ TcSvgEdit.Svg = class {
 		return this._element_type_selected;
 	}
 	
-	setElementTypeSelected(type) {
+	setElementTypeSelected(type=null) {
+		console.log('Svg.setElementTypeSelected');
+		console.log(type);
 		TcSvgEdit.elementTypeSelectedUnset(); 
-		this.element_type_selected = type;
+		this._element_type_selected = type;
 		if (type) { TcSvgEdit.elementTypeSelectedSet(type); }
 		return this;
 	}
