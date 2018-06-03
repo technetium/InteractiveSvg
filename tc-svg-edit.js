@@ -231,20 +231,20 @@ TcSvgEdit.Svg = class {
 		if (!node) { node = this.addNode(this.getCoordinates(event)); }
 		////console.log(node);
 		this.setNodeSelected(node);
-		if (TcSvgEdit._element_type_selected) {
-			if (!TcSvgEdit._element_current && 
-				TcSvgEdit.ElementObjects[TcSvgEdit._element_type_selected]) {
-				TcSvgEdit.elementCurrentSet(
-					new TcSvgEdit.ElementObjects[TcSvgEdit._element_type_selected](this)
+		if (this._element_type_selected) {
+			if (!this._element_current && 
+				TcSvgEdit.ElementObjects[this._element_type_selected]) {
+				this.setElementCurrent(
+					new TcSvgEdit.ElementObjects[this._element_type_selected](this)
 				);
-				TcSvgEdit._element_current.addNode(node);
+				this._element_current.addNode(node);
 			}
 		}
 		return true;
 	}
 
 	onMouseEnter(event) {
-		console.log("Svg.onMouseEnter");
+		console.debug("Svg.onMouseEnter");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
 		console.log(svg);
 		TcSvgEdit.svgCurrentSet(svg);
@@ -398,6 +398,16 @@ TcSvgEdit.Svg = class {
 		return node;
 	}
 
+	getElementCurrent() {
+		return this._element_current;
+	}
+	
+	setElementCurrent(elem=null) {
+		this._element_current = elem;
+		return this;
+	}
+
+
 	getElementTypeSelected() {
 		return this._element_type_selected;
 	}
@@ -470,6 +480,9 @@ TcSvgEdit.Node = class {
 //
 TcSvgEdit.Element = class {
 	constructor(element, svg) {
+		console.debug("TcSvgEdit.Element.constructor");
+		console.debug(element);
+		console.debug(svg);
 		this._element = element;
 		this._nodes = [];
 		this._svg = svg;
@@ -477,12 +490,12 @@ TcSvgEdit.Element = class {
 	}
 	
 	addNode(node) {
-		console.log('Element.addNode')
+		console.debug('Element.addNode')
 		this._nodes.push(node);
 		console.log(this._nodes.length);
 		node.addElement(this);
 		if (this.minNodes() <= this._nodes.length) { this.update(); }
-		if (this.maxNodes() >= this._nodes.length) { TcSvgEdit.elementCurrentUnset(); }
+		if (this.maxNodes() >= this._nodes.length) { this._svg.setElementCurrent(); }
 	}
 	
 	update() { 1/0; } // Needs to be defined in sub class
