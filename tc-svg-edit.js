@@ -74,6 +74,12 @@ class TcSvgEdit {
 	//
 	// svg
 	//
+	static svgCurrentGet() {
+		if (!TcSvgEdit._svg_current) {
+			svgCurrentSet(document.querySelector("svg.tc_svg_edit"));
+		}
+		return _svg_current;
+	}
 	
 	static svgCurrentSet(svg) {
 		console.log('svgCurrentSet');
@@ -434,6 +440,10 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 	
+	append(elem) {
+		this._svg.append(elem._element);
+	}
+	
 	getCoordinates(event) {
 		///console.log("getCoordinates()");
 		// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
@@ -492,8 +502,10 @@ TcSvgEdit.Element = class {
 	addNode(node) {
 		console.debug('Element.addNode')
 		this._nodes.push(node);
-		console.log(this._nodes.length);
+		console.debug(this._nodes.length);
+		console.debug(this);
 		node.addElement(this);
+		if (this.minNodes() === this._nodes.lenght) { this._svg.append(this); }
 		if (this.minNodes() <= this._nodes.length) { this.update(); }
 		if (this.maxNodes() >= this._nodes.length) { this._svg.setElementCurrent(); }
 	}
