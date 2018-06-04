@@ -542,6 +542,9 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	constructor(svg) {
 		console.log('new ElementCircle')
 		super(TcSvgEdit.createSvgElement('circle'), svg);
+
+		this._element.style.fill = "none";
+
 	}
 	
 	maxNodes() { return 2; }
@@ -549,7 +552,16 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	
 	update() {
 		console.log('ElementCircle.update');
-//		this._element.setAttribute();
+		let x1 = this._nodes[0]._node.getAttribute("x");
+		let y1 = this._nodes[0]._node.getAttribute("y");
+		let x2 = this._nodes[1]._node.getAttribute("x");
+		let y2 = this._nodes[1]._node.getAttribute("y");
+		let dx = x2 - x1;
+		let dy = y2 - y1;
+		
+		this._element.setAttribute("cx", x1);
+		this._element.setAttribute("cy", y1);
+		this._element.setAttribute("r", Math.sqrt(dx*dx + dy*dy));
 	}
 }
 
