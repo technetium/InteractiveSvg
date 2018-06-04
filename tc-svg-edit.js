@@ -54,7 +54,7 @@ class TcSvgEdit {
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
-		TcSvgEdit._svg_current.setElementType();
+		TcSvgEdit._svg_current.setElementTypeSelected();
 	}
 	
 	static onMouseMove(event) {
@@ -507,7 +507,7 @@ TcSvgEdit.Element = class {
 TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	constructor(element, svg) {
 		console.log('new ElementCircle')
-		super(element, svg);
+		super(TcSvgEdit.createSvgElement('circle'), svg);
 	}
 	
 	maxNodes() { return 2; }
@@ -523,9 +523,9 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 // ELEMENT LINE WRAPPER CLASS
 //
 TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
-	constructor(element, svg) {
+	constructor(svg) {
 		console.log('new ElementLine')
-		super(element, svg);
+		super(TcSvgEdit.createSvgElement('line'), svg);
 	}
 
 	maxNodes() { return 2; }
