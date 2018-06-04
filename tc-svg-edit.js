@@ -54,7 +54,7 @@ class TcSvgEdit {
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
-		TcSvgEdit._svg_current.setElementTypeSelected();
+		TcSvgEdit.svgCurrentGet().setElementTypeSelected();
 	}
 	
 	static onMouseMove(event) {
@@ -75,14 +75,16 @@ class TcSvgEdit {
 	// svg
 	//
 	static svgCurrentGet() {
+		console.debug("svgCurrentGet()");
 		if (!TcSvgEdit._svg_current) {
-			svgCurrentSet(document.querySelector("svg.tc_svg_edit"));
+			TcSvgEdit.svgCurrentSet(TcSvgEdit.getSvg(document.querySelector("svg.tc_svg_edit")));
 		}
-		return _svg_current;
+		console.debug(TcSvgEdit._svg_current);
+		return TcSvgEdit._svg_current;
 	}
 	
 	static svgCurrentSet(svg) {
-		console.log('svgCurrentSet');
+		console.log('svgCurrentSet()');
 		console.log(svg);
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
@@ -137,22 +139,23 @@ class TcSvgEdit {
 	}
 */	
 	static elementTypeSelect(event) {
-		console.log('elementSelect');
+		console.log('elementTypeSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
 		if (!elem) { return false }
 		console.log(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
 		console.log(type);
-		TcSvgEdit._svg_current.setElementTypeSelected(type);
+		TcSvgEdit.svgCurrentGet().setElementTypeSelected(type);
 		return true;
 	}
 	
 	static elementTypeSelectedSet() {
 		console.log('elementTypeSelectedSet');
-		console.log(TcSvgEdit._svg_current.getElementTypeSelected());
+		console.log(TcSvgEdit.svgCurrentGet());
+		console.log(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
-			TcSvgEdit._svg_current.getElementTypeSelected() +
+			TcSvgEdit.svgCurrentGet().getElementTypeSelected() +
 			"\"]"
 		).forEach(function(elem) {
 			console.log(elem);
@@ -162,10 +165,10 @@ class TcSvgEdit {
 
 	static elementTypeSelectedUnset(type) {
 		console.log('elementTypeSelectedUnset');
-		console.log(TcSvgEdit._svg_current.getElementTypeSelected());
+		console.log(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
-			TcSvgEdit._svg_current.getElementTypeSelected() +
+			TcSvgEdit.svgCurrentGet().getElementTypeSelected() +
 			"\"]"
 		).forEach(function(elem) {
 			console.log(elem);
@@ -191,8 +194,9 @@ class TcSvgEdit {
 //
 TcSvgEdit.Svg = class {
 	constructor(svg) {
-		console.log('TcSvgEdit.Svg.constructor');
+		console.debug('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
+		this._element_current = null;
 		this._element_type_selected = null;
 		this._nodes = [];
 		this._node_selected = null;
@@ -237,14 +241,14 @@ TcSvgEdit.Svg = class {
 		if (!node) { node = this.addNode(this.getCoordinates(event)); }
 		////console.log(node);
 		this.setNodeSelected(node);
-		if (this._element_type_selected) {
-			if (!this._element_current && 
-				TcSvgEdit.ElementObjects[this._element_type_selected]) {
+		if (this.getElementTypeSelected()) {
+			if (!this.getElementCurrent() && 
+				TcSvgEdit.ElementObjects[this.getElementTypeSelected()]) {
 				this.setElementCurrent(
-					new TcSvgEdit.ElementObjects[this._element_type_selected](this)
+					new TcSvgEdit.ElementObjects[this.getElementTypeSelected()](this)
 				);
-				this._element_current.addNode(node);
 			}
+			this.getElementCurrent().addNode(node);
 		}
 		return true;
 	}
@@ -405,16 +409,21 @@ TcSvgEdit.Svg = class {
 	}
 
 	getElementCurrent() {
+		console.debug("Svg.getElementCurrent()");
+		console.debug(this._element_current);
 		return this._element_current;
 	}
 	
 	setElementCurrent(elem=null) {
+		console.debug("Svg.setElementCurrent()");
+		console.debug(elem);
 		this._element_current = elem;
+		TcSvgEdit.documentInfoField("element_current", this._element_current);
 		return this;
 	}
 
-
 	getElementTypeSelected() {
+		console.debug("Svg.getElementSelected()");
 		return this._element_type_selected;
 	}
 	
@@ -436,12 +445,14 @@ TcSvgEdit.Svg = class {
 	setNodeSelected(node=null) { 
 		////console.log("setNodeSelected");
 		this._node_selected = node;
-		////console.log(this._node_selected);
+		////console.log(this._node_selected)
 		return this;
 	}
 	
 	append(elem) {
+		console.debug("Svg.append()");
 		this._svg.append(elem._element);
+		console.debug(this._svg);
 	}
 	
 	getCoordinates(event) {
@@ -496,6 +507,9 @@ TcSvgEdit.Element = class {
 		this._element = element;
 		this._nodes = [];
 		this._svg = svg;
+		
+		this.setStrokeWidth(2);
+		this.setStrokeColour("#CC0000");
 
 	}
 	
@@ -505,9 +519,17 @@ TcSvgEdit.Element = class {
 		console.debug(this._nodes.length);
 		console.debug(this);
 		node.addElement(this);
-		if (this.minNodes() === this._nodes.lenght) { this._svg.append(this); }
+		if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
 		if (this.minNodes() <= this._nodes.length) { this.update(); }
-		if (this.maxNodes() >= this._nodes.length) { this._svg.setElementCurrent(); }
+		if (this.maxNodes() <= this._nodes.length) { this._svg.setElementCurrent(); }
+	}
+	
+	setStrokeWidth(width) {
+		this._element.style.strokeWith = width;
+	}
+	
+	setStrokeColour(colour) {
+		this._element.style.stroke = colour;
 	}
 	
 	update() { 1/0; } // Needs to be defined in sub class
@@ -517,7 +539,7 @@ TcSvgEdit.Element = class {
 // ELEMENT CIRCLE WRAPPER CLASS
 //
 TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
-	constructor(element, svg) {
+	constructor(svg) {
 		console.log('new ElementCircle')
 		super(TcSvgEdit.createSvgElement('circle'), svg);
 	}
@@ -527,9 +549,9 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	
 	update() {
 		console.log('ElementCircle.update');
+//		this._element.setAttribute();
 	}
 }
-
 
 //
 // ELEMENT LINE WRAPPER CLASS
@@ -544,6 +566,10 @@ TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	minNodes() { return 2; }
 	update() {
 		console.log('ElementLine.update');
+		this._element.setAttribute("x1", this._nodes[0]._node.getAttribute("x"));
+		this._element.setAttribute("y1", this._nodes[0]._node.getAttribute("y"));
+		this._element.setAttribute("x2", this._nodes[1]._node.getAttribute("x"));
+		this._element.setAttribute("y2", this._nodes[1]._node.getAttribute("y"));
 	}
 }
 
