@@ -189,6 +189,27 @@ class TcSvgEdit {
 	}
 }
 
+// 
+//	Utilities Class
+//
+TcSvgEdit.Util = class {
+	static diff(p1, p2) {
+		return { 
+			x: p2.x - p1.x,
+			y: p2.y - p1.y,
+		}
+	}
+	static distance(p1, p2) {
+		d = diff(p1, p2);
+		return Math.sqrt(p1.x * p1.x + p2.y * p2.y);
+	}
+	static direction(p1, p2) {
+		d = diff(p1, p2);
+		return Math.atan2(d.x, d.y);
+	}
+}
+
+
 //
 // SVG WRAPPER CLASS
 //
