@@ -200,11 +200,11 @@ TcSvgEdit.Util = class {
 		}
 	}
 	static distance(p1, p2) {
-		d = diff(p1, p2);
-		return Math.sqrt(p1.x * p1.x + p2.y * p2.y);
+		let d = TcSvgEdit.Util.diff(p1, p2);
+		return Math.sqrt(d.x * d.x + d.y * d.y);
 	}
 	static direction(p1, p2) {
-		d = diff(p1, p2);
+		let d = TcSvgEdit.Util.diff(p1, p2);
 		return Math.atan2(d.x, d.y);
 	}
 }
@@ -488,8 +488,6 @@ TcSvgEdit.Svg = class {
 		///console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
 		return cursorpt;
 	}
-	
-	
 }
 
 
@@ -500,19 +498,24 @@ TcSvgEdit.Node = class {
 	constructor(node, svg) {
 		this._node = node;
 		this._svg = svg;
-		this.elements = [];
+		this._elements = [];
 	}
 	
 	onMouseDrag(pos) {
 		///console.log("Node.onMouseDrag");
 		///console.log(typeof node);
 		///console.log(pos);
-		this._node.setAttribute("x", pos.x); 
-		this._node.setAttribute("y", pos.y); 
+		this.setPosition(pos);
+		
+		this._elements.forEach(function(elem) {
+			//console.log(elem);
+			elem.update();
+		});
+
 	}
 	
 	addElement(element) {
-		this.elements.push(element);
+		this._elements.push(element);
 	}
 	
 	getPosition() {
@@ -520,6 +523,10 @@ TcSvgEdit.Node = class {
 			x: this._node.getAttribute("x"),
 			y: this._node.getAttribute("y")
 		}
+	}
+	setPosition(position) {
+		this._node.setAttribute("x", position.x); 
+		this._node.setAttribute("y", position.y); 
 	}
 }
 
@@ -585,7 +592,7 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 		
 		this._element.setAttribute("cx", p1.x);
 		this._element.setAttribute("cy", p1.y);
-		this._element.setAttribute("r", TcSvg.Util.distance(p1, p2));
+		this._element.setAttribute("r", TcSvgEdit.Util.distance(p1, p2));
 	}
 }
 
