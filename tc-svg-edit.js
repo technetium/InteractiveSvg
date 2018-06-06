@@ -514,6 +514,13 @@ TcSvgEdit.Node = class {
 	addElement(element) {
 		this.elements.push(element);
 	}
+	
+	getPosition() {
+		return {
+			x: this._node.getAttribute("x"),
+			y: this._node.getAttribute("y")
+		}
+	}
 }
 
 
@@ -573,16 +580,12 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	
 	update() {
 		console.log('ElementCircle.update');
-		let x1 = this._nodes[0]._node.getAttribute("x");
-		let y1 = this._nodes[0]._node.getAttribute("y");
-		let x2 = this._nodes[1]._node.getAttribute("x");
-		let y2 = this._nodes[1]._node.getAttribute("y");
-		let dx = x2 - x1;
-		let dy = y2 - y1;
+		let p1 = this._nodes[0].getPosition();
+		let p2 = this._nodes[1].getPosition();
 		
-		this._element.setAttribute("cx", x1);
-		this._element.setAttribute("cy", y1);
-		this._element.setAttribute("r", Math.sqrt(dx*dx + dy*dy));
+		this._element.setAttribute("cx", p1.x);
+		this._element.setAttribute("cy", p1.y);
+		this._element.setAttribute("r", TcSvg.Util.distance(p1, p2));
 	}
 }
 
@@ -597,12 +600,16 @@ TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 
 	maxNodes() { return 2; }
 	minNodes() { return 2; }
+	
 	update() {
 		console.log('ElementLine.update');
-		this._element.setAttribute("x1", this._nodes[0]._node.getAttribute("x"));
-		this._element.setAttribute("y1", this._nodes[0]._node.getAttribute("y"));
-		this._element.setAttribute("x2", this._nodes[1]._node.getAttribute("x"));
-		this._element.setAttribute("y2", this._nodes[1]._node.getAttribute("y"));
+		let p1 = this._nodes[0].getPosition();
+		let p2 = this._nodes[1].getPosition();
+		
+		this._element.setAttribute("x1", p1.x);
+		this._element.setAttribute("y1", p1.y);
+		this._element.setAttribute("x2", p2.x);
+		this._element.setAttribute("y2", p2.y);
 	}
 }
 
