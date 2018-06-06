@@ -1,9 +1,9 @@
-console.log("script");
+console.debug("script");
 
 class TcSvgEdit {
 
 	constructor(prefix) {
-		console.log("construct");
+		console.debug("construct");
 		
 		TcSvgEdit.node_circle_radius = 5;
 		TcSvgEdit.node_cross_radius = 11;
@@ -34,23 +34,35 @@ class TcSvgEdit {
 	}
 
 	static getSvg(svg) {
-		////console.log('TcSvgEdit.getSvg');
+		////console.debug('TcSvgEdit.getSvg');
 		if (!svg) { return; }
 		let id = TcSvgEdit.Svg.getId(svg);
 		if ("undefined" === typeof TcSvgEdit._svgs[id]) {
 			TcSvgEdit._svgs[id] = new TcSvgEdit.Svg(svg);
 		}
-		////console.log(TcSvgEdit._svgs[id]);
+		////console.debug(TcSvgEdit._svgs[id]);
 		return TcSvgEdit._svgs[id];
 	}
 
+	static getSvgById(id) {
+		////console.debug('TcSvgEdit.getSvgById');
+		if ("undefined" === typeof TcSvgEdit._svgs[id]) {
+			let svg = document.getElementById(id);
+			if ("undefined" === svg) { return; }
+			TcSvgEdit._svgs[id] = new TcSvgEdit.Svg(svg);
+		}
+		////console.debug(TcSvgEdit._svgs[id]);
+		return TcSvgEdit._svgs[id];
+	}
+
+	
 	//
 	// Event Listeners
 	//
 	
 	static onMouseDown(event) {
-		console.log("TcSvgEdit.onMouseDown");
-		console.log(event);
+		console.debug("TcSvgEdit.onMouseDown");
+		console.debug(event);
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
@@ -58,15 +70,15 @@ class TcSvgEdit {
 	}
 	
 	static onMouseMove(event) {
-		///console.log("TcSvgEdit.onMouseMove");
-		///console.log(event);
+		///console.debug("TcSvgEdit.onMouseMove");
+		///console.debug(event);
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg) { svg.onMouseMove(event); }
 	}
 
 	static onMouseUp(event) {
-		//console.log("TcSvgEdit.onMouseUp");
-		//console.log(event);
+		//console.debug("TcSvgEdit.onMouseUp");
+		//console.debug(event);
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg) { svg.onMouseUp(event); }
 	}
@@ -84,8 +96,8 @@ class TcSvgEdit {
 	}
 	
 	static svgCurrentSet(svg) {
-		console.log('svgCurrentSet()');
-		console.log(svg);
+		console.debug('svgCurrentSet()');
+		console.debug(svg);
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
 		TcSvgEdit.elementTypeSelectedSet();
@@ -93,7 +105,7 @@ class TcSvgEdit {
 	}
 	
 	static svgCurrentUnset() {
-		console.log('svgCurrentUnset');
+		console.debug('svgCurrentUnset');
 		TcSvgEdit.elementTypeSelectedUnset();
 		TcSvgEdit.documentInfoField("svg_current", "");
 		TcSvgEdit._svg_current = null;
@@ -108,7 +120,7 @@ class TcSvgEdit {
 			"[data-tc-svg-edit-info-field=\"" + 
 			name + "\"]"
 		).forEach(function(elem) {
-			//console.log(elem);
+			//console.debug(elem);
 			elem.innerHTML = value;
 		});
 	}
@@ -119,7 +131,7 @@ class TcSvgEdit {
 			"[data-tc-svg-edit-position-indicator=\"" + 
 			dimension + "\"]"
 		).forEach(function(elem) {
-			//console.log(elem);
+			//console.debug(elem);
 			elem.innerHTML = value;
 		});
 	}
@@ -139,39 +151,39 @@ class TcSvgEdit {
 	}
 */	
 	static elementTypeSelect(event) {
-		console.log('elementTypeSelect');
+		console.debug('elementTypeSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
 		if (!elem) { return false }
-		console.log(elem);
+		console.debug(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
-		console.log(type);
+		console.debug(type);
 		TcSvgEdit.svgCurrentGet().setElementTypeSelected(type);
 		return true;
 	}
 	
 	static elementTypeSelectedSet() {
-		console.log('elementTypeSelectedSet');
-		console.log(TcSvgEdit.svgCurrentGet());
-		console.log(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
+		console.debug('elementTypeSelectedSet');
+		console.debug(TcSvgEdit.svgCurrentGet());
+		console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit.svgCurrentGet().getElementTypeSelected() +
 			"\"]"
 		).forEach(function(elem) {
-			console.log(elem);
+			console.debug(elem);
 			elem.classList.add("selected");
 		});
 	}
 
 	static elementTypeSelectedUnset(type) {
-		console.log('elementTypeSelectedUnset');
-		console.log(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
+		console.debug('elementTypeSelectedUnset');
+		console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit.svgCurrentGet().getElementTypeSelected() +
 			"\"]"
 		).forEach(function(elem) {
-			console.log(elem);
+			console.debug(elem);
 			elem.classList.remove("selected");
 		});
 	}
@@ -226,7 +238,7 @@ TcSvgEdit.Svg = class {
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
 		
 		TcSvgEdit.svgCurrentSet(this);
-		console.log(this);
+		console.debug(this);
 	}
 
 	static getId(svg) {
@@ -257,10 +269,10 @@ TcSvgEdit.Svg = class {
 	//
 	
 	onMouseDown(event) {
-		////console.log("Svg.onMouseDown");
+		////console.debug("Svg.onMouseDown");
 		let node = this.getNode(event.target.closest(".node"));
 		if (!node) { node = this.addNode(this.getCoordinates(event)); }
-		////console.log(node);
+		////console.debug(node);
 		this.setNodeSelected(node);
 		if (this.getElementTypeSelected()) {
 			if (!this.getElementCurrent() && 
@@ -277,18 +289,18 @@ TcSvgEdit.Svg = class {
 	onMouseEnter(event) {
 		console.debug("Svg.onMouseEnter");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
-		console.log(svg);
+		console.debug(svg);
 		TcSvgEdit.svgCurrentSet(svg);
 	}
 	
 	onMouseLeave(event) {
-		console.log("Svg.onMouseLeave");
+		console.debug("Svg.onMouseLeave");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
-		console.log(svg);
+		console.debug(svg);
 	}
 	
 	onMouseMove(event) {
-		////console.log("Svg.onMouseMove");
+		////console.debug("Svg.onMouseMove");
 		let pos = this.getCoordinates(event);
 
 		//TcSvgEdit.documentPositionIndicator("x", pos.x);
@@ -301,7 +313,7 @@ TcSvgEdit.Svg = class {
 	}
 
 	onMouseUp(event) {
-		////console.log("Svg.onMouseUp");
+		////console.debug("Svg.onMouseUp");
 		this.setNodeSelected(null);
 	}
 	
@@ -338,7 +350,7 @@ TcSvgEdit.Svg = class {
 		if (!node) {
 			node = this.initNodeSymbol();
 		} 
-		////console.log(node);
+		////console.debug(node);
 		return node;
 	}
 
@@ -348,14 +360,14 @@ TcSvgEdit.Svg = class {
 	//
 
 	initDefs() {
-		console.log('initDefs');
+		console.debug('initDefs');
 		let defs = TcSvgEdit.createSvgElement("defs");
 		this._svg.append(defs);
 		return defs;
 	}
 		
 	initDrawing() {
-		console.log('initDrawing');
+		console.debug('initDrawing');
 		let defs = this.getDefs();
 		let drawing = TcSvgEdit.createSvgElement("symbol");
 		drawing.setAttribute("id", this.idDrawing());
@@ -369,7 +381,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	initNodeSymbol() {
-		console.log('initNode');
+		console.debug('initNode');
 		let defs = this.getDefs();
 		let node = TcSvgEdit.createSvgElement("symbol");
 		node.setAttribute("id", this.idNodeSymbol());
@@ -417,7 +429,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	addNode(pos) {
-		console.log("Svg.addNode("+pos.x+", "+pos.y+")");
+		console.debug("Svg.addNode("+pos.x+", "+pos.y+")");
 		let nodeSymbol = this.getNodeSymbol(); // Make sure we have a node
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + this.idNodeSymbol(), pos.x, pos.y
@@ -449,8 +461,8 @@ TcSvgEdit.Svg = class {
 	}
 	
 	setElementTypeSelected(type=null) {
-		console.log('Svg.setElementTypeSelected');
-		console.log(type);
+		console.debug('Svg.setElementTypeSelected');
+		console.debug(type);
 		TcSvgEdit.elementTypeSelectedUnset(); 
 		this._element_type_selected = type;
 		if (type) { TcSvgEdit.elementTypeSelectedSet(type); }
@@ -458,15 +470,15 @@ TcSvgEdit.Svg = class {
 	}
 	
 	getNodeSelected() {
-		////console.log("getNodeSelected");
-		////console.log(this._svg._node_selected);
+		////console.debug("getNodeSelected");
+		////console.debug(this._svg._node_selected);
 		return this._node_selected;
 	}
 	
 	setNodeSelected(node=null) { 
-		////console.log("setNodeSelected");
+		////console.debug("setNodeSelected");
 		this._node_selected = node;
-		////console.log(this._node_selected)
+		////console.debug(this._node_selected)
 		return this;
 	}
 	
@@ -477,7 +489,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	getCoordinates(event) {
-		///console.log("getCoordinates()");
+		///console.debug("getCoordinates()");
 		// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
 		let pt = this._svg.createSVGPoint();
 		pt.x = event.clientX;
@@ -485,7 +497,7 @@ TcSvgEdit.Svg = class {
 
 		// The cursor point, translated into svg coordinates
 		let cursorpt =  pt.matrixTransform(this._svg.getScreenCTM().inverse());
-		///console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+		///console.debug("(" + cursorpt.x + ", " + cursorpt.y + ")");
 		return cursorpt;
 	}
 }
@@ -502,13 +514,13 @@ TcSvgEdit.Node = class {
 	}
 	
 	onMouseDrag(pos) {
-		///console.log("Node.onMouseDrag");
-		///console.log(typeof node);
-		///console.log(pos);
+		///console.debug("Node.onMouseDrag");
+		///console.debug(typeof node);
+		///console.debug(pos);
 		this.setPosition(pos);
 		
 		this._elements.forEach(function(elem) {
-			//console.log(elem);
+			//console.debug(elem);
 			elem.update();
 		});
 
@@ -557,14 +569,17 @@ TcSvgEdit.Element = class {
 		if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
 		if (this.minNodes() <= this._nodes.length) { this.update(); }
 		if (this.maxNodes() <= this._nodes.length) { this._svg.setElementCurrent(); }
+		return this;
 	}
 	
 	setStrokeWidth(width) {
 		this._element.style.strokeWith = width;
+		return this;
 	}
 	
 	setStrokeColour(colour) {
 		this._element.style.stroke = colour;
+		return this;
 	}
 	
 	update() { 1/0; } // Needs to be defined in sub class
@@ -575,7 +590,7 @@ TcSvgEdit.Element = class {
 //
 TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	constructor(svg) {
-		console.log('new ElementCircle')
+		console.debug('new ElementCircle')
 		super(TcSvgEdit.createSvgElement('circle'), svg);
 
 		this._element.style.fill = "none";
@@ -586,7 +601,7 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	minNodes() { return 2; }
 	
 	update() {
-		console.log('ElementCircle.update');
+		console.debug('ElementCircle.update');
 		let p1 = this._nodes[0].getPosition();
 		let p2 = this._nodes[1].getPosition();
 		
@@ -601,7 +616,7 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 //
 TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	constructor(svg) {
-		console.log('new ElementLine')
+		console.debug('new ElementLine')
 		super(TcSvgEdit.createSvgElement('line'), svg);
 	}
 
@@ -609,7 +624,7 @@ TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	minNodes() { return 2; }
 	
 	update() {
-		console.log('ElementLine.update');
+		console.debug('ElementLine.update');
 		let p1 = this._nodes[0].getPosition();
 		let p2 = this._nodes[1].getPosition();
 		
@@ -637,8 +652,8 @@ const MyClass = class Me {
 };
 const inst = new MyClass();
 
-console.log(inst.getClassName()); // Me
-console.log(Me.name); // ReferenceError: Me is not defined
+console.debug(inst.getClassName()); // Me
+console.debug(Me.name); // ReferenceError: Me is not defined
 */
 
 

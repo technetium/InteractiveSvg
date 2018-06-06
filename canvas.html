@@ -84,7 +84,27 @@ ELEM: <span data-tc-svg-edit-info-field="element_current"></span>
 </svg>
 
 <script>
-
+document.addEventListener("DOMContentLoaded", function(event) { 
+	let svg = TcSvgEdit.getSvgById("scripted");
+	console.log(svg);
+	let node1 = svg.addNode({x: 100, y: 120});
+	let node2 = svg.addNode({x: 150, y: 120});
+	let node3 = svg.addNode({x: 200, y: 120});
+	let node4 = svg.addNode({x: 250, y: 120});
+	let node5 = svg.addNode({x: 300, y: 120});
+	let node6 = svg.addNode({x: 350, y: 120});
+	let noder = svg.addNode({x: 360, y: 100});
+	
+	let circle = null;
+	new TcSvgEdit.ElementCircle(svg).addNode(node1).addNode(noder).setStrokeWidth(2).setStrokeColour("#CC0000");
+	new TcSvgEdit.ElementCircle(svg).addNode(node2).addNode(noder).setStrokeWidth(2).setStrokeColour("#CC6600");
+	new TcSvgEdit.ElementCircle(svg).addNode(node3).addNode(noder).setStrokeWidth(2).setStrokeColour("#CCCC00");
+	new TcSvgEdit.ElementCircle(svg).addNode(node4).addNode(noder).setStrokeWidth(2).setStrokeColour("#00CC00");
+	new TcSvgEdit.ElementCircle(svg).addNode(node5).addNode(noder).setStrokeWidth(2).setStrokeColour("#0000CC");
+	new TcSvgEdit.ElementCircle(svg).addNode(node6).addNode(noder).setStrokeWidth(2).setStrokeColour("#6600CC");
+	//svg.append(circle);
+	
+});
 
 </script>
 
