@@ -232,6 +232,8 @@ TcSvgEdit.Svg = class {
 		this._element_current = null;
 		this._element_type_selected = null;
 		this._nodes = [];
+		
+		this._node_previous = null;
 		this._node_selected = null;
 		
 		this._svg.addEventListener("mouseenter", this.onMouseEnter);
@@ -477,6 +479,15 @@ TcSvgEdit.Svg = class {
 	
 	setNodeSelected(node=null) { 
 		////console.debug("setNodeSelected");
+		if (this._node_selected && node !== this._node_selected) {
+			if (this._node_previous) {
+				this._node_previous.classList.remove("previous");
+			}
+			if (this._node_current) {
+				this._node_previous = this._node_current;
+				this._node_previous.classList.add("previous");
+			}
+		}
 		this._node_selected = node;
 		////console.debug(this._node_selected)
 		return this;

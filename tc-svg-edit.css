@@ -1,6 +1,10 @@
 svg.tc_svg_edit .node { 
 	opacity: 0.1;
 }
+svg.tc_svg_edit .node.previous { 
+	opacity: 0.8;
+}
+
 svg.tc_svg_edit:hover .node { 
 	opacity: 0.5;
 }
