@@ -484,7 +484,7 @@ TcSvgEdit.Svg = class {
 	
 	append(elem) {
 		console.debug("Svg.append()");
-		this._svg.append(elem._element);
+		this.getDrawing().append(elem._element);
 		console.debug(this._svg);
 	}
 	
