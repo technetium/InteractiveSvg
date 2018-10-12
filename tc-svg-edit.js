@@ -1,9 +1,9 @@
-console.debug("script");
+////console.debug("script");
 
 class TcSvgEdit {
 
 	constructor(prefix) {
-		console.debug("construct");
+		////console.debug('construct");
 		
 		TcSvgEdit.node_circle_radius = 5;
 		TcSvgEdit.node_cross_radius = 11;
@@ -87,17 +87,17 @@ class TcSvgEdit {
 	// svg
 	//
 	static svgCurrentGet() {
-		console.debug("svgCurrentGet()");
+		////console.debug("svgCurrentGet()");
 		if (!TcSvgEdit._svg_current) {
 			TcSvgEdit.svgCurrentSet(TcSvgEdit.getSvg(document.querySelector("svg.tc_svg_edit")));
 		}
-		console.debug(TcSvgEdit._svg_current);
+		////console.debug(TcSvgEdit._svg_current);
 		return TcSvgEdit._svg_current;
 	}
 	
 	static svgCurrentSet(svg) {
-		console.debug('svgCurrentSet()');
-		console.debug(svg);
+		////console.debug('svgCurrentSet()');
+		////console.debug(svg);
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
 		TcSvgEdit.elementTypeSelectedSet();
@@ -105,7 +105,7 @@ class TcSvgEdit {
 	}
 	
 	static svgCurrentUnset() {
-		console.debug('svgCurrentUnset');
+		////console.debug('svgCurrentUnset');
 		TcSvgEdit.elementTypeSelectedUnset();
 		TcSvgEdit.documentInfoField("svg_current", "");
 		TcSvgEdit._svg_current = null;
@@ -151,39 +151,37 @@ class TcSvgEdit {
 	}
 */	
 	static elementTypeSelect(event) {
-		console.debug('elementTypeSelect');
+		////console.debug('elementTypeSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
 		if (!elem) { return false }
-		console.debug(elem);
+		////console.debug(elem);
 		let type = elem.getAttribute("data-tc-svg-edit-element-type-select")
-		console.debug(type);
+		////console.debug(type);
 		TcSvgEdit.svgCurrentGet().setElementTypeSelected(type);
 		return true;
 	}
 	
 	static elementTypeSelectedSet() {
-		console.debug('elementTypeSelectedSet');
-		console.debug(TcSvgEdit.svgCurrentGet());
-		console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
+		////console.debug('elementTypeSelectedSet');
+		////console.debug(TcSvgEdit.svgCurrentGet());
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit.svgCurrentGet().getElementTypeSelected() +
 			"\"]"
 		).forEach(function(elem) {
-			console.debug(elem);
 			elem.classList.add("selected");
 		});
 	}
 
 	static elementTypeSelectedUnset(type) {
-		console.debug('elementTypeSelectedUnset');
-		console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
+		////console.debug('elementTypeSelectedUnset');
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
 		document.querySelectorAll(
 			"[data-tc-svg-edit-element-type-select=\"" + 
 			TcSvgEdit.svgCurrentGet().getElementTypeSelected() +
 			"\"]"
 		).forEach(function(elem) {
-			console.debug(elem);
 			elem.classList.remove("selected");
 		});
 	}
@@ -227,7 +225,7 @@ TcSvgEdit.Util = class {
 //
 TcSvgEdit.Svg = class {
 	constructor(svg) {
-		console.debug('TcSvgEdit.Svg.constructor');
+		////console.debug('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
 		this._element_current = null;
 		this._element_type_selected = null;
@@ -240,7 +238,7 @@ TcSvgEdit.Svg = class {
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
 		
 		TcSvgEdit.svgCurrentSet(this);
-		console.debug(this);
+		////console.debug(this);
 	}
 
 	static getId(svg) {
@@ -273,7 +271,12 @@ TcSvgEdit.Svg = class {
 	onMouseDown(event) {
 		////console.debug("Svg.onMouseDown");
 		let node = this.getNode(event.target.closest(".node"));
-		if (!node) { node = this.createNode(this.getCoordinates(event)); }
+		if (!node) { 
+			node = this.createNode(this.getCoordinates(event));
+			if (event.ctrlKey) {
+				node.setRelative(node.getSvg().getNodePrevious());
+			}
+		}
 		////console.debug(node);
 		this.setNodeSelected(node);
 		if (this.getElementTypeSelected()) {
@@ -289,16 +292,16 @@ TcSvgEdit.Svg = class {
 	}
 
 	onMouseEnter(event) {
-		console.debug("Svg.onMouseEnter");
+		////console.debug("Svg.onMouseEnter");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
-		console.debug(svg);
+		////console.debug(svg);
 		TcSvgEdit.svgCurrentSet(svg);
 	}
 	
 	onMouseLeave(event) {
-		console.debug("Svg.onMouseLeave");
+		////console.debug("Svg.onMouseLeave");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
-		console.debug(svg);
+		////console.debug(svg);
 	}
 	
 	onMouseMove(event) {
@@ -362,14 +365,14 @@ TcSvgEdit.Svg = class {
 	//
 
 	initDefs() {
-		console.debug('initDefs');
+		////console.debug('initDefs');
 		let defs = TcSvgEdit.createSvgElement("defs");
 		this._svg.append(defs);
 		return defs;
 	}
 		
 	initDrawing() {
-		console.debug('initDrawing');
+		////console.debug('initDrawing');
 		let defs = this.getDefs();
 		let drawing = TcSvgEdit.createSvgElement("symbol");
 		drawing.setAttribute("id", this.idDrawing());
@@ -383,7 +386,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	initNodeSymbol() {
-		console.debug('initNode');
+		////console.debug('initNode');
 		let defs = this.getDefs();
 		let node = TcSvgEdit.createSvgElement("symbol");
 		node.setAttribute("id", this.idNodeSymbol());
@@ -431,7 +434,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	createNode(pos) {
-		console.debug("Svg.createNode("+pos.x+", "+pos.y+")");
+		////console.debug("Svg.createNode("+pos.x+", "+pos.y+")");
 		let nodeSymbol = this.getNodeSymbol(); // Make sure we have a node
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + this.idNodeSymbol(), pos.x, pos.y
@@ -450,15 +453,15 @@ TcSvgEdit.Svg = class {
 	}
 	
 	setElementCurrent(elem=null) {
-		console.debug("Svg.setElementCurrent()");
-		console.debug(elem);
+		////console.debug("Svg.setElementCurrent()");
+		////console.debug(elem);
 		this._element_current = elem;
 		TcSvgEdit.documentInfoField("element_current", this._element_current);
 		return this;
 	}
 
 	getElementTypeSelected() {
-		console.debug("Svg.getElementSelected()");
+		////console.debug("Svg.getElementSelected()");
 		return this._element_type_selected;
 	}
 	
@@ -503,9 +506,9 @@ TcSvgEdit.Svg = class {
 	}
 	
 	append(elem) {
-		console.debug("Svg.append()");
+		////console.debug("Svg.append()");
 		this.getDrawing().append(elem._element);
-		console.debug(this._svg);
+		////console.debug(this._svg);
 		return this;
 	}
 	
@@ -556,21 +559,16 @@ TcSvgEdit.Node = class {
 	}
 	
 	setPosition(position) {
-		console.log('Node.setPosition');
-		console.log(this);
-		
+		////console.debug('Node.setPosition');
 		let diff = TcSvgEdit.Util.diff(this.getPosition(), position);
-		console.log('diff');
-		console.log(diff);
-		
+	
 		this._node.setAttribute("x", position.x); 
 		this._node.setAttribute("y", position.y); 
 
 		this._relatives.forEach(function(node) {
-			//console.debug(elem);
+			//console.debug(node);
 			node.movePosition(diff);
 		});
-		
 		
 		this._elements.forEach(function(elem) {
 			//console.debug(elem);
@@ -584,7 +582,6 @@ TcSvgEdit.Node = class {
 	}
 	
 	setRelative(node) {
-		// if (node instanceof TcSvgEdit.Node) {
 		this._relative = node; // Do we actually use this relation?
 		if (node) {
 			node.addRelative(this);
@@ -596,6 +593,10 @@ TcSvgEdit.Node = class {
 		this._relatives.push(node);
 		return this;
 	}
+	
+	getSvg() {
+		return this._svg;
+	}
 }
 
 
@@ -604,9 +605,9 @@ TcSvgEdit.Node = class {
 //
 TcSvgEdit.Element = class {
 	constructor(element, svg) {
-		console.debug("TcSvgEdit.Element.constructor");
-		console.debug(element);
-		console.debug(svg);
+		////console.debug("TcSvgEdit.Element.constructor");
+		////console.debug(element);
+		////console.debug(svg);
 		this._element = element;
 		this._nodes = [];
 		this._svg = svg;
@@ -617,10 +618,10 @@ TcSvgEdit.Element = class {
 	}
 	
 	addNode(node) {
-		console.debug('Element.addNode')
+		////console.debug('Element.addNode')
 		this._nodes.push(node);
-		console.debug(this._nodes.length);
-		console.debug(this);
+		////console.debug(this._nodes.length);
+		////console.debug(this);
 		node.addElement(this);
 		if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
 		if (this.minNodes() <= this._nodes.length) { this.update(); }
@@ -646,18 +647,16 @@ TcSvgEdit.Element = class {
 //
 TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	constructor(svg) {
-		console.debug('new ElementCircle')
+		////console.debug('new ElementCircle')
 		super(TcSvgEdit.createSvgElement('circle'), svg);
-
 		this._element.style.fill = "none";
-
 	}
 	
 	maxNodes() { return 2; }
 	minNodes() { return 2; }
 	
 	update() {
-		console.debug('ElementCircle.update');
+		////console.debug('ElementCircle.update');
 		let p1 = this._nodes[0].getPosition();
 		let p2 = this._nodes[1].getPosition();
 		
