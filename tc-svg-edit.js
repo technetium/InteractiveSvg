@@ -207,8 +207,8 @@ class TcSvgEdit {
 TcSvgEdit.Util = class {
 	static diff(p1, p2) {
 		return { 
-			x: p2.x - p1.x,
-			y: p2.y - p1.y,
+			x: p1.x - p2.x,
+			y: p1.y - p2.y,
 		}
 	}
 	static distance(p1, p2) {
@@ -556,7 +556,12 @@ TcSvgEdit.Node = class {
 	}
 	
 	setPosition(position) {
-		let diff = TcSvgEdit.Util.diff(this.getPosition, position);
+		console.log('Node.setPosition');
+		console.log(this);
+		
+		let diff = TcSvgEdit.Util.diff(this.getPosition(), position);
+		console.log('diff');
+		console.log(diff);
 		
 		this._node.setAttribute("x", position.x); 
 		this._node.setAttribute("y", position.y); 
@@ -575,7 +580,7 @@ TcSvgEdit.Node = class {
 	}
 	
 	movePosition(diff) {
-		return this.setPosition(TcSvgEdit.Util.diff(this.getPosition, diff));
+		return this.setPosition(TcSvgEdit.Util.diff(this.getPosition(), diff));
 	}
 	
 	setRelative(node) {
