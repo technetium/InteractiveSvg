@@ -97,13 +97,13 @@ ELEM: <span data-tc-svg-edit-info-field="element_current"></span>
 document.addEventListener("DOMContentLoaded", function(event) { 
 	let svg = TcSvgEdit.getSvgById("scripted");
 	console.log(svg);
-	let node1 = svg.addNode({x: 100, y: 120});
-	let node2 = svg.addNode({x: 150, y: 120});
-	let node3 = svg.addNode({x: 200, y: 120});
-	let node4 = svg.addNode({x: 250, y: 120});
-	let node5 = svg.addNode({x: 300, y: 120});
-	let node6 = svg.addNode({x: 350, y: 120});
-	let noder = svg.addNode({x: 360, y: 100});
+	let node1 = svg.createNode({x: 100, y: 120});
+	let node2 = svg.createNode({x: 150, y: 120});
+	let node3 = svg.createNode({x: 200, y: 120});
+	let node4 = svg.createNode({x: 250, y: 120}).setRelative(node3);
+	let node5 = svg.createNode({x: 300, y: 120});
+	let node6 = svg.createNode({x: 350, y: 120});
+	let noder = svg.createNode({x: 360, y: 100});
 	
 	let circle = null;
 	new TcSvgEdit.ElementCircle(svg).addNode(node1).addNode(noder).setStrokeWidth(2).setStrokeColour("#CC0000");
@@ -119,6 +119,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 </script>
 
 
+Linear gradient
+ https://codepen.io/plava/pen/BjavpN
 
 https://eloquentjavascript.net/15_event.html
 http://tutorials.jenkov.com/svg/svg-and-css.html
