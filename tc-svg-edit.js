@@ -315,7 +315,7 @@ TcSvgEdit.Svg = class {
 	}
 
 	onMouseUp(event) {
-		////console.debug("Svg.onMouseUp");
+		console.debug("Svg.onMouseUp");
 		this.setNodeSelected(null);
 	}
 	
@@ -478,14 +478,14 @@ TcSvgEdit.Svg = class {
 	}
 	
 	setNodeSelected(node=null) { 
-		////console.debug("setNodeSelected");
+		////console.debug("Svg.setNodeSelected");
 		if (this._node_selected && node !== this._node_selected) {
 			if (this._node_previous) {
-				this._node_previous.classList.remove("previous");
+				this._node_previous._node.classList.remove("previous");
 			}
-			if (this._node_current) {
-				this._node_previous = this._node_current;
-				this._node_previous.classList.add("previous");
+			if (this._node_selected) {
+				this._node_previous = this._node_selected;
+				this._node_previous._node.classList.add("previous");
 			}
 		}
 		this._node_selected = node;

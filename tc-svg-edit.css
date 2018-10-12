@@ -1,8 +1,27 @@
+@keyframes pulse {
+    0% {
+        opacity: .5;
+    }
+  
+    50% {
+        opacity: .6;
+    }
+   
+    75% {
+        opacity: .9;
+    }
+   
+    100% {
+        opacity: .6;
+    }
+}
+
+
 svg.tc_svg_edit .node { 
 	opacity: 0.1;
 }
 svg.tc_svg_edit .node.previous { 
-	opacity: 0.8;
+	animation: pulse 1s infinite linear;
 }
 
 svg.tc_svg_edit:hover .node { 
