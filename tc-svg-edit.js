@@ -261,9 +261,10 @@ TcSvgEdit.Svg = class {
 	// Id's
 	//
 	id()	{ return this._svg.getAttribute("id"); }
-	idDrawing()	{ return	this.id() + '-symbol-drawing'; }
-	idNodeSymbol()	{ return	this.id() + '-symbol-node'; }
-
+	idDrawing()	{ return this.id() + '-symbol-drawing'; }
+	idNodeSymbol()	{ return this.id() + '-symbol-node'; }
+	idRelativeGradient()	{ return this.id() + '-gradient-relative'; }
+	
 	//
 	// Event handlers
 	//
@@ -355,11 +356,18 @@ TcSvgEdit.Svg = class {
 		if (!node) {
 			node = this.initNodeSymbol();
 		} 
-		////console.debug(node);
 		return node;
 	}
 
+	getRelativeGradient() {
+		let gradient = document.getElementById(this.idNodeSymbol());
+		if (!gradient) {
+			gradient = this.initRelativeGradient();
+		} 
+		return gradient;
+	}
 
+	
 	//
 	// Initialisers
 	//
@@ -432,6 +440,24 @@ TcSvgEdit.Svg = class {
 		defs.append(node);
 		return node;
 	}
+	
+	initRelativeGradient() {
+		////console.debug('initNode');
+		let defs = this.getDefs();
+		let gradient = TcSvgEdit.createSvgElement("linearGradient");
+		gradient.setAttribute("id", this.idRelativeGradient());
+		gradient.setAttribute("x1", "0%");
+		gradient.setAttribute("y1", "0%");
+		gradient.setAttribute("x2", "0%");
+		gradient.setAttribute("y2", "100%");
+
+		let stop = null;
+		stop = TcSvgEdit.createSvgElement("gradient");
+
+		
+		return gradient;
+	}
+	
 	
 	createNode(pos) {
 		////console.debug("Svg.createNode("+pos.x+", "+pos.y+")");
