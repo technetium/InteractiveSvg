@@ -550,6 +550,10 @@ TcSvgEdit.Svg = class {
 		///console.debug("(" + cursor_pt.x + ", " + cursor_pt.y + ")");
 		return cursor_pt;
 	}
+	
+	getSvg() {
+		return this._svg;
+	}
 }
 
 
@@ -600,7 +604,8 @@ TcSvgEdit.Node = class {
 			//console.debug(elem);
 			elem.update();
 		});
-		return this;
+
+		return this.updateRelativeIndicator();
 	}
 	
 	movePosition(diff) {
@@ -608,21 +613,45 @@ TcSvgEdit.Node = class {
 	}
 	
 	setRelative(node) {
-		this._relative = node; // Do we actually use this relation?
+		// TODO: Remove relative node if node == null and this._relative is set
+
 		if (node) {
+			let indicator = TcSvgEdit.createSvgElement("line");
+			indicator.style.strokeWith = 1;
+			indicator.style.stroke = '#CC9900';
+	
+			this._relative = {
+				indicator: indicator,
+				node: node,
+			}
+			this.updateRelativeIndicator();
+			this.getSvg().getSvg().append(indicator);
 			node.addRelative(this);
 		}
 		return this;
 	}
-	
+
+	updateRelativeIndicator() {
+		if (null !== this._relative) {
+			let p1 = this._relative.node.getPosition();
+			let p2 = this.getPosition();
+			this._relative.indicator.setAttribute("x1", p1.x);
+			this._relative.indicator.setAttribute("y1", p1.y);
+			this._relative.indicator.setAttribute("x2", p2.x);
+			this._relative.indicator.setAttribute("y2", p2.y);
+		}
+		return this;
+	}
+
 	addRelative(node) {
 		this._relatives.push(node);
 		return this;
 	}
-	
+
 	getSvg() {
 		return this._svg;
 	}
+	
 }
 
 
