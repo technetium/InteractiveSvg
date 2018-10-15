@@ -11,6 +11,10 @@ class TcSvgEdit {
 		TcSvgEdit.node_stroke = '#00F';
 		TcSvgEdit.node_stroke_width = 0.3;
 		
+		TcSvgEdit.relative_indicator_stroke = '#C60';
+		TcSvgEdit.relative_indicator_stroke_width = '1';
+		TcSvgEdit.relative_indicator_stroke_dasharray = '2,2';
+		
 		TcSvgEdit.prefix = "tc_svg_edit_";
 		TcSvgEdit.namespace_svg = "http://www.w3.org/2000/svg";
 		TcSvgEdit.namespace_xlink = "http://www.w3.org/1999/xlink";
@@ -666,7 +670,7 @@ TcSvgEdit.Node = class {
 			let indicator = TcSvgEdit.createSvgElement("line");
 			indicator.style.strokeWidth = 1;
 			indicator.style.stroke = '#CC9900';
-			indicator.setAttribute("marker-end", "url=(#"+svg.idRelativeEndMarker() +")");
+			indicator.setAttribute("marker-end", "url(#"+svg.idRelativeEndMarker() +")");
 	
 			this._relative = {
 				indicator: indicator,

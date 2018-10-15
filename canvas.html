@@ -33,12 +33,16 @@ ELEM: <span data-tc-svg-edit-info-field="element_current"></span>
 
 <!-- User defined nodes -->
 <svg version="1.1"
-     xmlns:svg="http://www.w3.org/2000/svg"
-     xmlns="http://www.w3.org/2000/svg"
-     width="500" height="240"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+    width="500" height="240"
 	class="tc_svg_edit"
 	id="foo"
 	style = "border: 1px solid green"
+	
+	data-relative-indicator-stroke = "green"
+	data-relative-indicator-stroke-width = "3"
+	data-relative-indicator-stroke-dasharray = "20,10,5,5,10"
 >
    <defs>
 		<linearGradient id="foo-gradient-relative" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -134,6 +138,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 </script>
+
+ <svg height="80" width="300">
+  <g fill="none" stroke="black" stroke-width="4">
+    <path stroke-dasharray="5,5" d="M5 20 l215 0" />
+    <path stroke-dasharray="10,10" d="M5 40 l215 0" />
+    <path stroke-dasharray="20,10,5,5,5,10" d="M5 60 l215 0" />
+  </g>
+</svg> 
+
 
 Events
 https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
