@@ -264,6 +264,8 @@ TcSvgEdit.Svg = class {
 	idDrawing()	{ return this.id() + '-symbol-drawing'; }
 	idNodeSymbol()	{ return this.id() + '-symbol-node'; }
 	idRelativeGradient()	{ return this.id() + '-gradient-relative'; }
+	idRelativeEndMarker()	{ return this.id() + '-marker-end-relative'; }
+	idRelativeStartMarker()	{ return this.id() + '-marker-start-relative'; }
 	
 	//
 	// Event handlers
@@ -360,11 +362,27 @@ TcSvgEdit.Svg = class {
 	}
 
 	getRelativeGradient() {
-		let gradient = document.getElementById(this.idNodeSymbol());
+		let gradient = document.getElementById(this.idRelativeGradient());
 		if (!gradient) {
 			gradient = this.initRelativeGradient();
 		} 
 		return gradient;
+	}
+
+	getRelativeEndMarker() {
+		let marker = document.getElementById(this.idRelativeEndMarker());
+		if (!marker) {
+			marker = this.initRelativeEndMarker();
+		} 
+		return marker;
+	}
+
+	getRelativeStartMarker() {
+		let marker = document.getElementById(this.idRelativeStartMarker());
+		if (!marker) {
+			marker = this.initRelativeStartMarker();
+		} 
+		return marker;
 	}
 
 	
@@ -442,7 +460,6 @@ TcSvgEdit.Svg = class {
 	}
 	
 	initRelativeGradient() {
-		////console.debug('initNode');
 		let defs = this.getDefs();
 		let gradient = TcSvgEdit.createSvgElement("linearGradient");
 		gradient.setAttribute("id", this.idRelativeGradient());
@@ -458,6 +475,32 @@ TcSvgEdit.Svg = class {
 		return gradient;
 	}
 	
+	
+	initRelativeEndMarker() {
+		let defs = this.getDefs();
+		let marker = TcSvgEdit.createSvgElement("marker");
+		marker.style.strokeWidth = 4;
+		marker.style.stroke = '#CC9900';
+		marker.setAttribute("id", this.idRelativeEndMarker());
+		marker.setAttribute("markerWidth", 10);
+		marker.setAttribute("markerHeight", 7);
+		marker.setAttribute("refX", 10);
+		marker.setAttribute("refY", 3.5);
+		marker.setAttribute("orient", "auto");
+		let shape = TcSvgEdit.createSvgElement("polygon");
+		shape.setAttribute("points", "0 0, 10 3.5, 0 7");
+		marker.append(shape);
+		defs.append(marker);
+		return marker;
+	}
+	
+	initRelativeStartMarker() { 
+		let defs = this.getDefs();
+		let marker = TcSvgEdit.createSvgElement("marker");
+		marker.setAttribute("id", this.idRelativeStartMarker());
+		defs.append(marker);
+		return marker;
+	} 
 	
 	createNode(pos) {
 		////console.debug("Svg.createNode("+pos.x+", "+pos.y+")");
@@ -616,16 +659,21 @@ TcSvgEdit.Node = class {
 		// TODO: Remove relative node if node == null and this._relative is set
 
 		if (node) {
+			let svg = this.getSvg();
+			// make sure we have the markers
+			svg.getRelativeEndMarker();
+			svg.getRelativeStartMarker();
 			let indicator = TcSvgEdit.createSvgElement("line");
-			indicator.style.strokeWith = 1;
+			indicator.style.strokeWidth = 1;
 			indicator.style.stroke = '#CC9900';
+			indicator.setAttribute("marker-end", "url=(#"+svg.idRelativeEndMarker() +")");
 	
 			this._relative = {
 				indicator: indicator,
 				node: node,
 			}
 			this.updateRelativeIndicator();
-			this.getSvg().getSvg().append(indicator);
+			svg.getSvg().append(indicator);
 			node.addRelative(this);
 		}
 		return this;
@@ -685,7 +733,7 @@ TcSvgEdit.Element = class {
 	}
 	
 	setStrokeWidth(width) {
-		this._element.style.strokeWith = width;
+		this._element.style.strokeWidth = width;
 		return this;
 	}
 	
