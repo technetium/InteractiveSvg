@@ -28,6 +28,9 @@ class TcSvgEdit {
 		TcSvgEdit._svgs = [];
 	
 		if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
+		document.addEventListener("keydown", function(event){
+			TcSvgEdit.onKeyDown(event);
+		});
 		document.addEventListener("mousedown", function(event){
 			TcSvgEdit.onMouseDown(event);
 		});
@@ -69,10 +72,16 @@ class TcSvgEdit {
 	//
 	// Event Listeners
 	//
-	
-	static onMouseDown(event) {
-		console.debug("TcSvgEdit.onMouseDown");
+	static onKeyDown(event) {
+		console.debug("TcSvgEdit.onKeyDown");
 		console.debug(event);
+		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
+		if (svg && svg.onKeyDown(event)) { return true; }
+	}
+
+	static onMouseDown(event) {
+		////console.debug("TcSvgEdit.onMouseDown");
+		////console.debug(event);
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
@@ -239,11 +248,12 @@ TcSvgEdit.Svg = class {
 		this._svg = svg;
 		this._element_current = null;
 		this._element_type_selected = null;
+		this._elements = [];
 		this._nodes = [];
 		
 		this._node_previous = null;
 		this._node_selected = null;
-		
+
 		this._svg.addEventListener("mouseenter", this.onMouseEnter);
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
 		
@@ -271,7 +281,7 @@ TcSvgEdit.Svg = class {
 	// Id's
 	//
 	id()	{ return this._svg.getAttribute("id"); }
-	idDrawing()	{ return this.id() + '-symbol-drawing'; }
+	idDrawing()	{ return this.id() + '-drawing'; }
 	idNodeSymbol()	{ return this.id() + '-symbol-node'; }
 	idRelativeGradient()	{ return this.id() + '-gradient-relative'; }
 	idRelativeEndMarker()	{ return this.id() + '-marker-end-relative'; }
@@ -280,6 +290,14 @@ TcSvgEdit.Svg = class {
 	//
 	// Event handlers
 	//
+	onKeyDown(event) {
+		console.debug("Svg.onKeyDown");
+		console.debug(event);
+		switch (event.key) {
+			case "Delete" : return this.doDelete(); break;
+			default: return false;
+		}
+	}
 	
 	onMouseDown(event) {
 		////console.debug("Svg.onMouseDown");
@@ -304,16 +322,24 @@ TcSvgEdit.Svg = class {
 		return true;
 	}
 
+	onKeyDown(event) {
+		console.debug("Svg.onKeyDown");
+		console.debug(event);
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
+		console.debug(svg);
+		//TcSvgEdit.svgCurrentSet(svg);
+	}
+	
 	onMouseEnter(event) {
 		////console.debug("Svg.onMouseEnter");
-		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
 		////console.debug(svg);
 		TcSvgEdit.svgCurrentSet(svg);
 	}
 	
 	onMouseLeave(event) {
 		////console.debug("Svg.onMouseLeave");
-		let svg = TcSvgEdit.getSvg(this); // this is the target, not this oject
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
 		////console.debug(svg);
 	}
 	
@@ -335,7 +361,9 @@ TcSvgEdit.Svg = class {
 		this.setNodeSelected(null);
 	}
 	
-	
+	doDelete() {
+		this.getSelectedElement();
+	}
 	
 	//
 	// Getters
@@ -355,6 +383,12 @@ TcSvgEdit.Svg = class {
 			drawing = this.initDrawing();
 		}
 		return drawing;
+	}
+
+	getElement(elem) {
+		return this._elements.find(function(e) {
+			return e._element == elem;
+		});
 	}
 
 	getNode(node) {
@@ -401,6 +435,11 @@ TcSvgEdit.Svg = class {
 		
 	initDrawing() {
 		////console.debug('initDrawing');
+		
+		let drawing = TcSvgEdit.createSvgElement("g");
+		drawing.setAttribute("id", this.idDrawing());
+		this._svg.append(drawing);
+		/*
 		let defs = this.getDefs();
 		let drawing = TcSvgEdit.createSvgElement("symbol");
 		drawing.setAttribute("id", this.idDrawing());
@@ -410,6 +449,7 @@ TcSvgEdit.Svg = class {
 				"#" + this.idDrawing()
 			)
 		);
+		*/
 		return drawing;
 	}
 	
@@ -728,15 +768,38 @@ TcSvgEdit.Element = class {
 		////console.debug("TcSvgEdit.Element.constructor");
 		////console.debug(element);
 		////console.debug(svg);
+		
+	
 		this._element = element;
 		this._nodes = [];
 		this._svg = svg;
+		svg._elements.push(this);
 		
 		element.classList.add('element');
+		element.addEventListener("mouseenter", this.onMouseEnter);
+		element.addEventListener("mouseleave", this.onMouseLeave);
+		
 		
 		this.setStrokeWidth(2);
 		this.setStrokeColour("#CC0000");
 
+	}
+
+	onMouseEnter() {
+		console.debug('Element.onMouseEnter');
+		console.debug(this);
+
+//				let node = this.getNode(event.target.closest(".node"));
+		//let elem = this.getElement(event.target.closest(".element"));
+
+
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
+		let element = svg.getElement(this); // this is the target, not this object
+		this.classList.add("selected");
+	}
+	
+	onMouseLeave() {
+		this.classList.remove("selected");
 	}
 	
 	addNode(node) {
