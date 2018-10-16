@@ -17,19 +17,27 @@
 }
 
 
-svg.tc_svg_edit .node { 
+svg.tc_svg_edit .node,
+svg.tc_svg_edit .relative { 
 	opacity: 0.1;
 }
-svg.tc_svg_edit .node.previous { 
+svg.tc_svg_edit .element,
+svg.tc_svg_edit .node.previous {
 	animation: pulse 1s infinite linear;
 }
 
-svg.tc_svg_edit:hover .node { 
+svg.tc_svg_edit:hover .node,
+svg.tc_svg_edit:hover .relative { 
 	opacity: 0.5;
 }
+
+svg.tc_svg_edit:hover .node:hover,
+svg.tc_svg_edit:hover .relative:hover { 
+	opacity: 1;
+}
+
 svg.tc_svg_edit:hover .node:hover { 
 	cursor: move;
-	opacity: 1;
 }
 
 [data-tc-svg-edit-element-type-select] {

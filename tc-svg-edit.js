@@ -5,15 +5,21 @@ class TcSvgEdit {
 	constructor(prefix) {
 		////console.debug('construct");
 		
-		TcSvgEdit.node_circle_radius = 5;
-		TcSvgEdit.node_cross_radius = 11;
-		TcSvgEdit.node_fill = '#EEF';
-		TcSvgEdit.node_stroke = '#00F';
-		TcSvgEdit.node_stroke_width = 0.3;
+		TcSvgEdit.nodeCircleRadius = 5;
+		TcSvgEdit.nodeCrossRadius = 11;
+		TcSvgEdit.nodeFill = '#EEF';
+		TcSvgEdit.nodeStroke = '#00F';
+		TcSvgEdit.nodeStrokeWidth = 0.3;
 		
-		TcSvgEdit.relative_indicator_stroke = '#C60';
-		TcSvgEdit.relative_indicator_stroke_width = '1';
-		TcSvgEdit.relative_indicator_stroke_dasharray = '2,2';
+		TcSvgEdit.relativeIndicatorEndMarkerWidth = '10';
+		TcSvgEdit.relativeIndicatorEndMarkerFill = 'none';
+		TcSvgEdit.relativeIndicatorEndMarkerHeight = '7';
+		TcSvgEdit.relativeIndicatorEndMarkerWidth = '10';
+		TcSvgEdit.relativeIndicatorStartMarkerFill = '#F90';
+		TcSvgEdit.relativeIndicatorStartMarkerRadius = '1.5';
+		TcSvgEdit.relativeIndicatorStroke = '#C60';
+		TcSvgEdit.relativeIndicatorStrokeWidth = '1';
+		TcSvgEdit.relativeIndicatorStrokeDasharray = '2,2';
 		
 		TcSvgEdit.prefix = "tc_svg_edit_";
 		TcSvgEdit.namespace_svg = "http://www.w3.org/2000/svg";
@@ -365,14 +371,6 @@ TcSvgEdit.Svg = class {
 		return node;
 	}
 
-	getRelativeGradient() {
-		let gradient = document.getElementById(this.idRelativeGradient());
-		if (!gradient) {
-			gradient = this.initRelativeGradient();
-		} 
-		return gradient;
-	}
-
 	getRelativeEndMarker() {
 		let marker = document.getElementById(this.idRelativeEndMarker());
 		if (!marker) {
@@ -419,18 +417,16 @@ TcSvgEdit.Svg = class {
 		////console.debug('initNode');
 		let defs = this.getDefs();
 		let node = TcSvgEdit.createSvgElement("symbol");
+		let circle_radius = this.getDefaultData('nodeCircleRadius');
+		let cross_radius = this.getDefaultData('nodeCrossRadius');
+		let s = Math.max(circle_radius, cross_radius); // The size of the node
+		
 		node.setAttribute("id", this.idNodeSymbol());
 		node.classList.add("node");
-		node.setAttribute("fill", TcSvgEdit.node_fill);
-		node.setAttribute("stroke", TcSvgEdit.node_stroke);
-		node.setAttribute("stroke-width", TcSvgEdit.node_stroke_width);
+		node.setAttribute("fill", this.getDefaultData("nodeFill"));
+		node.setAttribute("stroke", this.getDefaultData("nodeStroke"));
+		node.setAttribute("stroke-width", this.getDefaultData("nodeStrokeWidth"));
 		
-
-		// The size of the node
-		let s = Math.max(
-			TcSvgEdit.node_cross_radius,
-			TcSvgEdit.node_circle_radius
-		);
 
 		// inatialise element
 		let e = null; 
@@ -439,23 +435,23 @@ TcSvgEdit.Svg = class {
 		e = TcSvgEdit.createSvgElement("circle");
 		e.setAttribute("cx", s);
 		e.setAttribute("cy", s);
-		e.setAttribute("r", TcSvgEdit.node_circle_radius);
+		e.setAttribute("r", circle_radius);
 		node.append(e);
 		
 		// Horizontal cross hair
 		e = TcSvgEdit.createSvgElement("line");
-		e.setAttribute("x1", s - TcSvgEdit.node_cross_radius);
+		e.setAttribute("x1", s - cross_radius);
 		e.setAttribute("y1", s);
-		e.setAttribute("x2", s + TcSvgEdit.node_cross_radius);
+		e.setAttribute("x2", s + cross_radius);
 		e.setAttribute("y2", s);
 		node.append(e);
 
 		// Vertical cross hair
 		e = TcSvgEdit.createSvgElement("line");
 		e.setAttribute("x1", s);
-		e.setAttribute("y1", s - TcSvgEdit.node_cross_radius);
+		e.setAttribute("y1", s - cross_radius);
 		e.setAttribute("x2", s);
-		e.setAttribute("y2", s + TcSvgEdit.node_cross_radius);
+		e.setAttribute("y2", s + cross_radius);
 		node.append(e);
 
 		node.setAttribute("transform", "translate(-"+s+", -"+s+")");
@@ -463,36 +459,27 @@ TcSvgEdit.Svg = class {
 		return node;
 	}
 	
-	initRelativeGradient() {
-		let defs = this.getDefs();
-		let gradient = TcSvgEdit.createSvgElement("linearGradient");
-		gradient.setAttribute("id", this.idRelativeGradient());
-		gradient.setAttribute("x1", "0%");
-		gradient.setAttribute("y1", "0%");
-		gradient.setAttribute("x2", "0%");
-		gradient.setAttribute("y2", "100%");
-
-		let stop = null;
-		stop = TcSvgEdit.createSvgElement("gradient");
-
-		
-		return gradient;
-	}
-	
-	
 	initRelativeEndMarker() {
 		let defs = this.getDefs();
 		let marker = TcSvgEdit.createSvgElement("marker");
-		marker.style.strokeWidth = 4;
-		marker.style.stroke = '#CC9900';
+		let height = this.getDefaultData("relativeIndicatorEndMarkerHeight");
+		let width = this.getDefaultData("relativeIndicatorEndMarkerWidth");
+
+		marker.style.stroke = this.getDefaultData("relativeIndicatorStroke");
+		marker.style.strokeDasharray = this.getDefaultData("relativeIndicatorStrokeDasharray");
+		marker.style.strokeWidth = this.getDefaultData("relativeIndicatorStrokeWidth");
+		marker.style.fill = this.getDefaultData("relativeIndicatorEndMarkerFill");
 		marker.setAttribute("id", this.idRelativeEndMarker());
-		marker.setAttribute("markerWidth", 10);
-		marker.setAttribute("markerHeight", 7);
-		marker.setAttribute("refX", 10);
-		marker.setAttribute("refY", 3.5);
+
+		marker.setAttribute("markerWidth", width);
+		marker.setAttribute("markerHeight", height);
+		marker.setAttribute("refX", width);
+		marker.setAttribute("refY", height/2);
 		marker.setAttribute("orient", "auto");
-		let shape = TcSvgEdit.createSvgElement("polygon");
-		shape.setAttribute("points", "0 0, 10 3.5, 0 7");
+		
+		let shape = TcSvgEdit.createSvgElement("polyline");
+		shape.setAttribute("points", "0 0, "+width+" "+height/2+", 0 "+height);
+		
 		marker.append(shape);
 		defs.append(marker);
 		return marker;
@@ -501,7 +488,26 @@ TcSvgEdit.Svg = class {
 	initRelativeStartMarker() { 
 		let defs = this.getDefs();
 		let marker = TcSvgEdit.createSvgElement("marker");
+		let radius = this.getDefaultData("relativeIndicatorStartMarkerRadius");
+
+		marker.style.stroke = this.getDefaultData("relativeIndicatorStroke");
+		marker.style.strokeDasharray = this.getDefaultData("relativeIndicatorStrokeDasharray");
+		marker.style.strokeWidth = this.getDefaultData("relativeIndicatorStrokeWidth");
+		marker.style.fill = this.getDefaultData("relativeIndicatorStartMarkerFill");
 		marker.setAttribute("id", this.idRelativeStartMarker());
+
+		marker.setAttribute("markerWidth", radius*2);
+		marker.setAttribute("markerHeight", radius*2);
+		marker.setAttribute("refX", radius);
+		marker.setAttribute("refY", radius);
+		marker.setAttribute("orient", "auto");
+		
+		let shape = TcSvgEdit.createSvgElement("circle");
+		shape.setAttribute("cx", radius);
+		shape.setAttribute("cy", radius);
+		shape.setAttribute("r", radius);
+		
+		marker.append(shape);
 		defs.append(marker);
 		return marker;
 	} 
@@ -601,6 +607,11 @@ TcSvgEdit.Svg = class {
 	getSvg() {
 		return this._svg;
 	}
+	
+	getDefaultData(id) {
+		////console.debug('Svg.getDefaultData(' + id + ')');
+		return 'undefined' === typeof this._svg.dataset[id] ? TcSvgEdit[id] : this._svg.dataset[id];
+	}
 }
 
 
@@ -668,10 +679,12 @@ TcSvgEdit.Node = class {
 			svg.getRelativeEndMarker();
 			svg.getRelativeStartMarker();
 			let indicator = TcSvgEdit.createSvgElement("line");
-			indicator.style.strokeWidth = 1;
-			indicator.style.stroke = '#CC9900';
+			indicator.style.stroke = svg.getDefaultData('relativeIndicatorStroke');
+			indicator.style.strokeDasharray = svg.getDefaultData('relativeIndicatorStrokeDasharray');
+			indicator.style.strokeWidth = svg.getDefaultData('relativeIndicatorStrokeWidth');
 			indicator.setAttribute("marker-end", "url(#"+svg.idRelativeEndMarker() +")");
-	
+			indicator.setAttribute("marker-start", "url(#"+svg.idRelativeStartMarker() +")");
+			indicator.classList.add("relative");
 			this._relative = {
 				indicator: indicator,
 				node: node,
@@ -718,6 +731,8 @@ TcSvgEdit.Element = class {
 		this._element = element;
 		this._nodes = [];
 		this._svg = svg;
+		
+		element.classList.add('element');
 		
 		this.setStrokeWidth(2);
 		this.setStrokeColour("#CC0000");
