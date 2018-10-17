@@ -46,6 +46,10 @@ class TcSvgEdit {
 		TcSvgEdit._svg_current = null;
 	}
 
+	static getElement(elem) {
+		return TcSvgEdit.getSvg(elem.closest("svg.tc_svg_edit")).getElement(elem); 
+	}
+	
 	static getSvg(svg) {
 		////console.debug('TcSvgEdit.getSvg');
 		if (!svg) { return; }
@@ -247,6 +251,7 @@ TcSvgEdit.Svg = class {
 		////console.debug('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
 		this._element_current = null;
+		this._element_selected = null;
 		this._element_type_selected = null;
 		this._elements = [];
 		this._nodes = [];
@@ -298,7 +303,15 @@ TcSvgEdit.Svg = class {
 			default: return false;
 		}
 	}
-	
+
+	onKeyDown(event) {
+		console.debug("Svg.onKeyDown");
+		console.debug(event);
+		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
+		console.debug(svg);
+		//TcSvgEdit.svgCurrentSet(svg);
+	}
+		
 	onMouseDown(event) {
 		////console.debug("Svg.onMouseDown");
 		let node = this.getNode(event.target.closest(".node"));
@@ -322,14 +335,6 @@ TcSvgEdit.Svg = class {
 		return true;
 	}
 
-	onKeyDown(event) {
-		console.debug("Svg.onKeyDown");
-		console.debug(event);
-		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
-		console.debug(svg);
-		//TcSvgEdit.svgCurrentSet(svg);
-	}
-	
 	onMouseEnter(event) {
 		////console.debug("Svg.onMouseEnter");
 		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
@@ -358,6 +363,7 @@ TcSvgEdit.Svg = class {
 
 	onMouseUp(event) {
 		console.debug("Svg.onMouseUp");
+		console.debug(this);
 		this.setNodeSelected(null);
 	}
 	
@@ -386,6 +392,7 @@ TcSvgEdit.Svg = class {
 	}
 
 	getElement(elem) {
+		////console.debug('Svg.getElement()');
 		return this._elements.find(function(e) {
 			return e._element == elem;
 		});
@@ -565,6 +572,12 @@ TcSvgEdit.Svg = class {
 		return node;
 	}
 
+	addElement(elem) {
+		////console.debug('Svg.addElement');
+		this._elements.push(elem);
+		return this;
+	}
+	
 	getElementCurrent() {
 		console.debug("Svg.getElementCurrent()");
 		console.debug(this._element_current);
@@ -766,52 +779,50 @@ TcSvgEdit.Node = class {
 TcSvgEdit.Element = class {
 	constructor(element, svg) {
 		////console.debug("TcSvgEdit.Element.constructor");
-		////console.debug(element);
-		////console.debug(svg);
-		
-	
-		this._element = element;
-		this._nodes = [];
-		this._svg = svg;
-		svg._elements.push(this);
-		
+
 		element.classList.add('element');
 		element.addEventListener("mouseenter", this.onMouseEnter);
 		element.addEventListener("mouseleave", this.onMouseLeave);
 		
-		
+		this._element = element;
+		this._nodes = [];
+		this._svg = svg;
+		svg.addElement(this);
+	
 		this.setStrokeWidth(2);
 		this.setStrokeColour("#CC0000");
-
 	}
 
-	onMouseEnter() {
-		console.debug('Element.onMouseEnter');
-		console.debug(this);
-
-//				let node = this.getNode(event.target.closest(".node"));
-		//let elem = this.getElement(event.target.closest(".element"));
-
-
-		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
-		let element = svg.getElement(this); // this is the target, not this object
-		this.classList.add("selected");
+	onMouseEnter(event) {
+		////console.debug('Element.onMouseEnter');
+		return TcSvgEdit.getElement(event.target).select(); 
 	}
 	
-	onMouseLeave() {
-		this.classList.remove("selected");
+	onMouseLeave(event) {
+		////console.debug('Element.onMouseLeave');
+		return TcSvgEdit.getElement(event.target).deselect(); 
 	}
 	
 	addNode(node) {
 		////console.debug('Element.addNode')
 		this._nodes.push(node);
-		////console.debug(this._nodes.length);
-		////console.debug(this);
 		node.addElement(this);
 		if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
 		if (this.minNodes() <= this._nodes.length) { this.update(); }
 		if (this.maxNodes() <= this._nodes.length) { this._svg.setElementCurrent(); }
 		return this;
+	}
+
+	select() {
+		this._element.classList.add("selected");
+		this._svg._element_selected=this;
+	}
+	
+	deselect() {
+		if (this._svg._element_selected === this) {
+			this._svg._element_selected = null;
+		}
+		this._element.classList.remove("selected");
 	}
 	
 	setStrokeWidth(width) {
