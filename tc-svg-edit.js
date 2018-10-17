@@ -740,7 +740,8 @@ TcSvgEdit.Node = class {
 			// make sure we have the markers
 			svg.getRelativeEndMarker();
 			svg.getRelativeStartMarker();
-			let indicator = TcSvgEdit.createSvgElement("line");
+			let indicator = TcSvgEdit.createSvgElement("path");
+			indicator.style.fill = "none";
 			indicator.style.stroke = svg.getDefaultData('relativeIndicatorStroke');
 			indicator.style.strokeDasharray = svg.getDefaultData('relativeIndicatorStrokeDasharray');
 			indicator.style.strokeWidth = svg.getDefaultData('relativeIndicatorStrokeWidth');
@@ -762,10 +763,15 @@ TcSvgEdit.Node = class {
 		if (null !== this._relative) {
 			let p1 = this._relative.node.getPosition();
 			let p2 = this.getPosition();
-			this._relative.indicator.setAttribute("x1", p1.x);
-			this._relative.indicator.setAttribute("y1", p1.y);
-			this._relative.indicator.setAttribute("x2", p2.x);
-			this._relative.indicator.setAttribute("y2", p2.y);
+			
+			this._relative.indicator.setAttribute("d", 
+				//"M"+p1.x+","+p1.y+" Q0,0 "+p2.x+","+p2.y
+				"M"+p1.x+","+p1.y+" L"+p2.x+","+p2.y
+			);
+			//this._relative.indicator.setAttribute("x1", p1.x);
+			//this._relative.indicator.setAttribute("y1", p1.y);
+			//this._relative.indicator.setAttribute("x2", p2.x);
+			//this._relative.indicator.setAttribute("y2", p2.y);
 		}
 		return this;
 	}
@@ -806,7 +812,6 @@ TcSvgEdit.Element = class {
 		////console.debug('Element.destruct');
 		this.deselect();
 		this._nodes.forEach(function(node) {
-			console.debug
 			node.removeElement(this);
 		}, this);
 
