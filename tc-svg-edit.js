@@ -298,8 +298,11 @@ TcSvgEdit.Svg = class {
 		switch (event.key) {
 			case "c" : return this.setElementTypeSelected("circle");
 			case "l" : return this.setElementTypeSelected("line");
-			case "Delete" : return this.doDelete(); break;
-			default: return false;
+			case "Delete" : return this.doDelete();
+			case "Escape" : return this.setElementTypeSelected(null);
+			default: 
+				////console.debug(event.key);
+			return false;
 		}
 	}
 	
