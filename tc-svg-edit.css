@@ -1,21 +1,16 @@
 @keyframes pulse {
-    0% {
-        opacity: .5;
-    }
-  
-    50% {
-        opacity: .6;
-    }
-   
-    75% {
-        opacity: .9;
-    }
-   
-    100% {
-        opacity: .6;
-    }
+      0% { opacity: .5; }
+     50% { opacity: .8; }
+     75% { opacity: .9; }
+    100% { opacity: .8; }
 }
-
+@keyframes turn {
+		  0% { transform: rotate(0deg); }
+		 25% { transform: rotate(-1deg); }
+		 50% { transform: rotate(0deg); }
+		 75% { transform: rotate(+1deg); }
+		100% { transform: rotate(0deg); }
+}
 
 svg.tc_svg_edit .node,
 svg.tc_svg_edit .relative { 
