@@ -77,9 +77,9 @@ class TcSvgEdit {
 	// Event Listeners
 	//
 	static onKeyDown(event) {
-		console.debug("TcSvgEdit.onKeyDown");
-		console.debug(event);
-		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
+		////console.debug("TcSvgEdit.onKeyDown");
+		////console.debug(event);
+		let svg = TcSvgEdit.svgCurrentGet();
 		if (svg && svg.onKeyDown(event)) { return true; }
 	}
 
@@ -161,18 +161,9 @@ class TcSvgEdit {
 
 	
 	//
-	// element
+	// elementType
 	//
-/*	
-	static elementCurrentSet(element) {
-		TcSvgEdit._element_current = element;
-	}
-	
-	static elementCurrentUnset() {
-		// Cleanup unfinished mess
-		TcSvgEdit._element_current = null;
-	}
-*/	
+
 	static elementTypeSelect(event) {
 		////console.debug('elementTypeSelect');
 		let elem = event.target.closest("[data-tc-svg-edit-element-type-select]");
@@ -226,6 +217,12 @@ class TcSvgEdit {
 //	Utilities Class
 //
 TcSvgEdit.Util = class {
+	static arrayRemove(array, item) {
+		// @see https://stackoverflow.com/a/20690490
+		return array.filter(item => item !== value)
+	}
+
+
 	static diff(p1, p2) {
 		return { 
 			x: p1.x - p2.x,
@@ -296,22 +293,14 @@ TcSvgEdit.Svg = class {
 	// Event handlers
 	//
 	onKeyDown(event) {
-		console.debug("Svg.onKeyDown");
-		console.debug(event);
+		////console.debug("Svg.onKeyDown");
+		////console.debug(event);
 		switch (event.key) {
 			case "Delete" : return this.doDelete(); break;
 			default: return false;
 		}
 	}
-
-	onKeyDown(event) {
-		console.debug("Svg.onKeyDown");
-		console.debug(event);
-		let svg = TcSvgEdit.getSvg(this); // this is the target, not this object
-		console.debug(svg);
-		//TcSvgEdit.svgCurrentSet(svg);
-	}
-		
+	
 	onMouseDown(event) {
 		////console.debug("Svg.onMouseDown");
 		let node = this.getNode(event.target.closest(".node"));
@@ -362,13 +351,16 @@ TcSvgEdit.Svg = class {
 	}
 
 	onMouseUp(event) {
-		console.debug("Svg.onMouseUp");
-		console.debug(this);
+		////console.debug("Svg.onMouseUp");
+		////console.debug(this);
 		this.setNodeSelected(null);
 	}
 	
 	doDelete() {
-		this.getSelectedElement();
+		////console.debug('Svg.doDelete');
+		if (this.getElementSelected()) {
+			this.getElementSelected().destruct();
+		}		
 	}
 	
 	//
@@ -578,9 +570,14 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 	
+	removeElement(element) {
+		////console.debug('Svg.removeElement');
+		this._elements = this._elements.filter(item => item !== element);
+		this.getDrawing().removeChild(element.getElement());
+	}
+	
 	getElementCurrent() {
-		console.debug("Svg.getElementCurrent()");
-		console.debug(this._element_current);
+		////console.debug("Svg.getElementCurrent()");
 		return this._element_current;
 	}
 	
@@ -592,14 +589,18 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 
+	getElementSelected() {
+		return this._element_selected;
+	}
+	
 	getElementTypeSelected() {
-		////console.debug("Svg.getElementSelected()");
+		////console.debug("Svg.getElementTypeSelected()");
 		return this._element_type_selected;
 	}
 	
 	setElementTypeSelected(type=null) {
-		console.debug('Svg.setElementTypeSelected');
-		console.debug(type);
+		////onsole.debug('Svg.setElementTypeSelected');
+		////console.debug(type);
 		TcSvgEdit.elementTypeSelectedUnset(); 
 		this._element_type_selected = type;
 		if (type) { TcSvgEdit.elementTypeSelectedSet(type); }
@@ -689,6 +690,12 @@ TcSvgEdit.Node = class {
 	
 	addElement(element) {
 		this._elements.push(element);
+		return this;
+	}
+	
+	removeElement(element) {
+		////console.debug('Node.removeElement');
+		this._elements = this._elements.filter(item => item !== element);
 		return this;
 	}
 	
@@ -793,6 +800,19 @@ TcSvgEdit.Element = class {
 		this.setStrokeColour("#CC0000");
 	}
 
+	destruct() {
+		////console.debug('Element.destruct');
+		this.deselect();
+		this._nodes.forEach(function(node) {
+			console.debug
+			node.removeElement(this);
+		}, this);
+
+		this.getSvg().removeElement(this);
+		this._element = null;
+		this._svg = null;
+	}
+	
 	onMouseEnter(event) {
 		////console.debug('Element.onMouseEnter');
 		return TcSvgEdit.getElement(event.target).select(); 
@@ -825,6 +845,13 @@ TcSvgEdit.Element = class {
 		this._element.classList.remove("selected");
 	}
 	
+	getSvg() {
+		return this._svg;
+	}
+	
+	getElement() {
+		return this._element;
+	}
 	setStrokeWidth(width) {
 		this._element.style.strokeWidth = width;
 		return this;
