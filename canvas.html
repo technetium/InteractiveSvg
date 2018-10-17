@@ -98,21 +98,51 @@ ELEM: <span data-tc-svg-edit-info-field="element_current"></span>
 </svg>
 
 <!-- Add nodes and elements with Pre configured nodes -->
-<svg version="1.1"
-     xmlns:svg="http://www.w3.org/2000/svg"
-     xmlns="http://www.w3.org/2000/svg"
+<svg 
+	version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
 	class="tc_svg_edit"
-     width="500" height="240"
+    width="500" height="240"
 	id="scripted"
 	style = "border: 1px solid blue"
-
 >
+	<g id="scripted-drawing">
         <circle class="control_point" cx="20" cy="220" r="10" />
-        <circle class="point4 invisible" cx="220" cy="120" r="3" />
-		<use xlink:href="#foo-symbol-node" x="100" y="200">
+ 		<use xlink:href="#foo-symbol-node" x="100" y="200">
 		<use xlink:href="#foo-circles" x="20" y="20">
-
+	</g>	
+	<circle class="point4 invisible" cx="220" cy="120" r="3" />
+	
 </svg>
+
+<svg 
+	version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+	class="tc_svg_edit"
+    width="500" height="240"
+	id="dependend"
+	style = "border: 1px solid purple"
+>
+	<g id="dependend-drawing">
+	<use xlink:href="#scripted-drawing" transform="scale(0.5)">
+	</g>
+</svg>
+<svg 
+	version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+	class="tc_svg_edit"
+    width="500" height="240"
+	id="dedependend"
+	style = "border: 1px solid purple"
+>
+	<g id="dedependend-drawing">
+	<use xlink:href="#dependend-drawing" transform="scale(0.5)">
+	</g>
+</svg>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function(event) { 
@@ -138,15 +168,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 </script>
-
- <svg height="80" width="300">
-  <g fill="none" stroke="black" stroke-width="4">
-    <path stroke-dasharray="5,5" d="M5 20 l215 0" />
-    <path stroke-dasharray="10,10" d="M5 40 l215 0" />
-    <path stroke-dasharray="20,10,5,5,5,10" d="M5 60 l215 0" />
-  </g>
-</svg> 
-
 
 Events
 https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events

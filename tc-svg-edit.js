@@ -296,6 +296,8 @@ TcSvgEdit.Svg = class {
 		////console.debug("Svg.onKeyDown");
 		////console.debug(event);
 		switch (event.key) {
+			case "c" : return this.setElementTypeSelected("circle");
+			case "l" : return this.setElementTypeSelected("line");
 			case "Delete" : return this.doDelete(); break;
 			default: return false;
 		}
