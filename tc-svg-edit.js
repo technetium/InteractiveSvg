@@ -4,6 +4,8 @@ class TcSvgEdit {
 
 	constructor(prefix) {
 		////console.debug('construct");
+		TcSvgEdit.looper = 0;
+		
 		
 		TcSvgEdit.nodeCircleRadius = 5;
 		TcSvgEdit.nodeCrossRadius = 11;
@@ -51,7 +53,7 @@ class TcSvgEdit {
 	}
 	
 	static getNodeRelativeIndicator(indicator) {
-		console.debug('getNodeRelativeIndicator');
+		////console.debug('getNodeRelativeIndicator');
 		return TcSvgEdit.getSvg(elem.closest("svg.tc_svg_edit")).getNodeRelativeIndicator(indicator); 
 	}
 	
@@ -562,7 +564,7 @@ TcSvgEdit.Svg = class {
 	} 
 	
 	createNode(pos) {
-		console.debug("Svg.createNode("+pos.x+", "+pos.y+")");
+		////console.debug("Svg.createNode("+pos.x+", "+pos.y+")");
 		this.getNodeSymbol(); // Make sure we have a node
 		let u = TcSvgEdit.createSvgUseElement(
 			"#" + this.idNodeSymbol(), pos.x, pos.y
@@ -571,8 +573,6 @@ TcSvgEdit.Svg = class {
 		this._svg.append(u);
 		let node = new TcSvgEdit.Node(u, this);
 		this._nodes.push(node);
-		console.debug(node);
-		console.debug(this);
 		return node;
 	}
 
@@ -743,20 +743,40 @@ TcSvgEdit.Node = class {
 		return this.setPosition(TcSvgEdit.Util.diff(this.getPosition(), diff));
 	}
 	
+	checkRelative(node) {
+		////console.debug('Node.checkRelative()');
+		////console.debug('node: (' + node.getPosition().x + ', ' + node.getPosition().y + ')');
+		////console.debug('this: (' + this.getPosition().x + ', ' + this.getPosition().y + ')');
+		
+		if (this === node) { 
+			return true;
+		}
+		if (this.getRelative()) {
+			return this.getRelative().getThatNode().checkRelative(node);
+		}
+		return false;
+	}
+
+	getRelative() {
+		return this._relative;
+	}
+	
 	setRelative(node) {
-		console.debug('Node.setRelative()');
+		////console.debug('Node.setRelative()');
+		if (!node || node.checkRelative(this)) {
+			return this;
+		}
 		if (this._relative) {
 			this._relative = this._relative.destruct();
 		}
 		if (node) {
 			this._relative = new TcSvgEdit._NodeRelative(this, node);
 		}
-		console.log('relative set');
 		return this;
 	}
 
 	updateRelativeIndicator() {
-		console.debug('updateRelativeIndicator');
+		////console.debug('updateRelativeIndicator');
 		if (null !== this._relative) {
 			this._relative.update();
 		}
@@ -932,8 +952,7 @@ TcSvgEdit.ElementObjects = {
 
 TcSvgEdit._NodeRelative = class {
 	constructor(this_node, that_node) {
-		console.debug('_NodeRelative.construct()');
-
+		////console.debug('_NodeRelative.construct()');
 		this._this_node = this_node;
 		this._that_node = that_node;
 		this._indicator = null;
@@ -955,11 +974,10 @@ TcSvgEdit._NodeRelative = class {
 			svg.getSvg().append(this._indicator);
 			that_node.addRelative(this_node);
 		}
-		console.debug('constructed');
 	}
 	
 	destruct() {
-		console.debug('_NodeRelative.destruct');
+		////console.debug('_NodeRelative.destruct');
 		////console.debug(this);
 		this._this_node.getSvg().getSvg().removeChild(this._indicator);
 		this._that_node.removeRelative(this._this_node);
@@ -969,9 +987,15 @@ TcSvgEdit._NodeRelative = class {
 		return null;
 	}
 	
+	toString() {
+		return '' + 
+			'This: (' + this.getThisNode().getPosition().x + ', ' + this.getThisNode().getPosition().y + ')' +
+			'That: (' + this.getThatNode().getPosition().x + ', ' + this.getThatNode().getPosition().y + ')' ;
+	}
+	
 	update() {
-		console.debug('_NodeRelative.update()');
-		console.debug(this);
+		////console.debug('_NodeRelative.update()');
+		////console.debug(this);
 		if (null !== this._indicator) {
 			let p1 = this._that_node.getPosition();
 			let p2 = this._this_node.getPosition();
@@ -982,8 +1006,15 @@ TcSvgEdit._NodeRelative = class {
 				"M"+p1.x+","+p1.y+" Q"+d.x+","+d.y+" "+p2.x+","+p2.y
 			);
 		}
-		console.debug('updated');
 		return this;
+	}
+	
+	getThatNode() {
+		return this._that_node;
+	}
+
+	getThisNode() {
+		return this._this_node;
 	}
 }
 
