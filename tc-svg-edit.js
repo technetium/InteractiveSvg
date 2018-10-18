@@ -961,7 +961,7 @@ TcSvgEdit._NodeRelative = class {
 	destruct() {
 		console.debug('_NodeRelative.destruct');
 		////console.debug(this);
-		this._this_node.getSvg().getSvg().remove(this._indicator);
+		this._this_node.getSvg().getSvg().removeChild(this._indicator);
 		this._that_node.removeRelative(this._this_node);
 		this._this_node = null;
 		this._that_node = null;
