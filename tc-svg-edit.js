@@ -13,8 +13,8 @@ class TcSvgEdit {
 		
 		TcSvgEdit.relativeIndicatorEndMarkerWidth = '10';
 		TcSvgEdit.relativeIndicatorEndMarkerFill = 'none';
-		TcSvgEdit.relativeIndicatorEndMarkerHeight = '7';
-		TcSvgEdit.relativeIndicatorEndMarkerWidth = '10';
+		TcSvgEdit.relativeIndicatorEndMarkerHeight = '9';
+		TcSvgEdit.relativeIndicatorEndMarkerWidth = '12';
 		TcSvgEdit.relativeIndicatorStartMarkerFill = '#F90';
 		TcSvgEdit.relativeIndicatorStartMarkerRadius = '1.5';
 		TcSvgEdit.relativeIndicatorStroke = '#C60';
@@ -48,6 +48,10 @@ class TcSvgEdit {
 
 	static getElement(elem) {
 		return TcSvgEdit.getSvg(elem.closest("svg.tc_svg_edit")).getElement(elem); 
+	}
+	
+	static getNodeRelativeIndicator(indicator) {
+		return TcSvgEdit.getSvg(elem.closest("svg.tc_svg_edit")).getNodeRelativeIndicator(indicator); 
 	}
 	
 	static getSvg(svg) {
@@ -693,6 +697,13 @@ TcSvgEdit.Node = class {
 		this.setPosition(pos);
 	}
 	
+	onMouseEnterRelativeIndicator() {
+		return TcSvgEdit.getNodeRelativeIndicator(event.target).selectRelativeIndicator(); 
+	}
+	
+	onMouseLeaveRelativeIndicator() {
+	}
+	
 	addElement(element) {
 		this._elements.push(element);
 		return this;
@@ -766,10 +777,14 @@ TcSvgEdit.Node = class {
 		if (null !== this._relative) {
 			let p1 = this._relative.node.getPosition();
 			let p2 = this.getPosition();
+			let d = TcSvgEdit.Util.diff(p2, p1);
+			d = TcSvgEdit.Util.diff(TcSvgEdit.Util.diff(p2, {x: -d.y/4, y: d.x/4}), { x: d.x/2, y: d.y/2 });
 			
 			this._relative.indicator.setAttribute("d", 
 				//"M"+p1.x+","+p1.y+" Q0,0 "+p2.x+","+p2.y
-				"M"+p1.x+","+p1.y+" L"+p2.x+","+p2.y
+				"M"+p1.x+","+p1.y+" Q"+d.x+","+d.y+" "+p2.x+","+p2.y
+				//"M"+p1.x+","+p1.y+" L"+d.x+","+d.y+" "+p2.x+","+p2.y
+				//"M"+p1.x+","+p1.y+" L"+p2.x+","+p2.y
 			);
 			//this._relative.indicator.setAttribute("x1", p1.x);
 			//this._relative.indicator.setAttribute("y1", p1.y);
@@ -784,6 +799,9 @@ TcSvgEdit.Node = class {
 		return this;
 	}
 
+	selectRelativeIndicator() {
+	}
+	
 	getSvg() {
 		return this._svg;
 	}
@@ -838,7 +856,7 @@ TcSvgEdit.Element = class {
 		this._nodes.push(node);
 		node.addElement(this);
 		if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
-		if (this.minNodes() <= this._nodes.length) { this.update(); }
+		this.update();
 		if (this.maxNodes() <= this._nodes.length) { this._svg.setElementCurrent(); }
 		return this;
 	}
@@ -872,7 +890,11 @@ TcSvgEdit.Element = class {
 		return this;
 	}
 	
-	update() { 1/0; } // Needs to be defined in sub class
+	update() {
+		if (this.minNodes() <= this._nodes.length) { this.updateChild(); }
+	}	
+	
+	updateChild() { 1/0; } // Needs to be defined in child class
 }
 
 //
@@ -888,7 +910,7 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	maxNodes() { return 2; }
 	minNodes() { return 2; }
 	
-	update() {
+	updateChild() {
 		////console.debug('ElementCircle.update');
 		let p1 = this._nodes[0].getPosition();
 		let p2 = this._nodes[1].getPosition();
@@ -913,7 +935,7 @@ TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	maxNodes() { return 2; }
 	minNodes() { return 2; }
 	
-	update() {
+	updateChild() {
 		console.debug('ElementLine.update');
 		let p1 = this._nodes[0].getPosition();
 		let p2 = this._nodes[1].getPosition();
