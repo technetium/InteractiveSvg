@@ -52,9 +52,9 @@ class TcSvgEdit {
 		return TcSvgEdit.getSvg(elem.closest("svg.tc_svg_edit")).getElement(elem); 
 	}
 	
-	static getNodeRelativeIndicator(indicator) {
-		////console.debug('getNodeRelativeIndicator');
-		return TcSvgEdit.getSvg(elem.closest("svg.tc_svg_edit")).getNodeRelativeIndicator(indicator); 
+	static getNodeRelative(relative) {
+		console.debug('TcSvgEdit.getNodeRelative');
+		return TcSvgEdit.getSvg(relative.closest("svg.tc_svg_edit")).getNodeRelative(relative); 
 	}
 	
 	static getSvg(svg) {
@@ -261,8 +261,8 @@ TcSvgEdit.Svg = class {
 		this._nodes = [];
 		
 		this._node_previous = null;
+		this._node_relative_selected = null
 		this._node_selected = null;
-		this._node__relation_indicator_selected = null;
 
 		this._svg.addEventListener("mouseenter", this.onMouseEnter);
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
@@ -370,9 +370,15 @@ TcSvgEdit.Svg = class {
 	
 	doDelete() {
 		////console.debug('Svg.doDelete');
+		if (this.getNodeRelativeSelected()) {
+			this.getNodeRelativeSelected().destruct();
+			return true;
+		}
 		if (this.getElementSelected()) {
 			this.getElementSelected().destruct();
-		}		
+			return true;
+		}
+		return false;
 	}
 	
 	//
@@ -408,6 +414,15 @@ TcSvgEdit.Svg = class {
 		});
 	}
 	
+	getNodeRelative(relative) {
+		console.debug('Svg.getNodeRelative()');
+		
+		return this._nodes.find(function(n) {
+			console.debug('Node: '  + n);
+			return n.getRelative() && (n.getRelative().getIndicator() === relative);
+		}).getRelative();
+	}
+
 	getNodeSymbol() {
 		let node = document.getElementById(this.idNodeSymbol());
 		if (!node) {
@@ -635,6 +650,19 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 	
+	getNodeRelativeSelected() {
+		console.debug('Svg.getNodeRelativeSelected()');
+		console.debug(this._node_relative_selected);
+		return this._node_relative_selected;
+	}
+	
+	setNodeRelativeSelected(relative) {
+		console.debug('Svg.setNodeRelativeSelected()');
+		this._node_relative_selected = relative;
+		console.debug(this._node_relative_selected);
+		return this;
+	}
+	
 	getNodeSelected() {
 		////console.debug("getNodeSelected");
 		////console.debug(this._svg._node_selected);
@@ -793,11 +821,11 @@ TcSvgEdit.Node = class {
 		return this;
 	}
 		
-
 	getSvg() {
 		return this._svg;
 	}
 	
+	toString() { return this.getPosition().x + ', ' + this.getPosition().y ; }
 }
 
 
@@ -857,12 +885,12 @@ TcSvgEdit.Element = class {
 
 	select() {
 		this._element.classList.add("selected");
-		this._svg._element_selected=this;
+		this.getSvg()._element_selected=this;
 	}
 	
 	deselect() {
-		if (this._svg._element_selected === this) {
-			this._svg._element_selected = null;
+		if (this.getSvg()._element_selected === this) {
+			this.getSvg()._element_selected = null;
 		}
 		this._element.classList.remove("selected");
 	}
@@ -970,6 +998,9 @@ TcSvgEdit._NodeRelative = class {
 			this._indicator.setAttribute("marker-end", "url(#"+svg.idRelativeEndMarker() +")");
 			this._indicator.setAttribute("marker-start", "url(#"+svg.idRelativeStartMarker() +")");
 			this._indicator.classList.add("relative");
+			this._indicator.addEventListener("mouseenter", this.onMouseEnter);
+			this._indicator.addEventListener("mouseleave", this.onMouseLeave);
+
 			this.update();
 			svg.getSvg().append(this._indicator);
 			that_node.addRelative(this_node);
@@ -977,8 +1008,8 @@ TcSvgEdit._NodeRelative = class {
 	}
 	
 	destruct() {
-		////console.debug('_NodeRelative.destruct');
-		////console.debug(this);
+		console.debug('_NodeRelative.destruct');
+		console.debug(this);
 		this._this_node.getSvg().getSvg().removeChild(this._indicator);
 		this._that_node.removeRelative(this._this_node);
 		this._this_node = null;
@@ -987,12 +1018,49 @@ TcSvgEdit._NodeRelative = class {
 		return null;
 	}
 	
-	toString() {
-		return '' + 
-			'This: (' + this.getThisNode().getPosition().x + ', ' + this.getThisNode().getPosition().y + ')' +
-			'That: (' + this.getThatNode().getPosition().x + ', ' + this.getThatNode().getPosition().y + ')' ;
+	onMouseEnter(event) {
+		console.debug('_NodeRelative.onMouseEnter');
+		console.debug(event.target);
+		return TcSvgEdit.getNodeRelative(event.target).select(); 
 	}
 	
+	onMouseLeave(event) {
+		console.debug('_NodeRelative.onMouseLeave');
+		return TcSvgEdit.getNodeRelative(event.target).deselect(); 
+	}
+	
+	getIndicator() {
+		return this._indicator;
+	}
+
+	getThatNode() {
+		return this._that_node;
+	}
+
+	getThisNode() {
+		return this._this_node;
+	}
+
+	getSvg() {
+		return this.getThisNode().getSvg();
+	}
+	
+	select() {
+		console.debug("_NodeRelative.select()");
+		this._indicator.classList.add("selected");
+		this.getSvg().setNodeRelativeSelected(this);
+		return this;
+	}
+	
+	deselect() {
+		console.debug("_NodeRelative.deselect()");
+		if (this.getSvg().getNodeRelativeSelected() === this) {
+			this.getSvg().setNodeRelativeSelected(null);
+		}
+		this._indicator.classList.remove("selected");
+		return this;
+	}
+
 	update() {
 		////console.debug('_NodeRelative.update()');
 		////console.debug(this);
@@ -1009,13 +1077,8 @@ TcSvgEdit._NodeRelative = class {
 		return this;
 	}
 	
-	getThatNode() {
-		return this._that_node;
-	}
-
-	getThisNode() {
-		return this._this_node;
-	}
+	////toString() { return 'This: (' + this.getThisNode().getPosition().x + ', ' + this.getThisNode().getPosition().y + ')' + 'That: (' + this.getThatNode().getPosition().x + ', ' + this.getThatNode().getPosition().y + ')' ; }
+	////toString() { return 'This: (' + this.getThisNode() + ')' + 'That: (' + this.getThatNode() + ')' ; }
 }
 
 
