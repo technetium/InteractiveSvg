@@ -315,6 +315,7 @@ TcSvgEdit.Svg = class {
 	
 	onMouseDown(event) {
 		console.debug("Svg.onMouseDown");
+		//console.debug(event);
 		let node = this.getNode(event.target.closest(".node"));
 		console.debug(node);
 		if (!node) { 
@@ -371,7 +372,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	doDelete() {
-		////console.debug('Svg.doDelete');
+		console.debug('Svg.doDelete');
 		if (this.getNodeRelativeSelected()) {
 			this.setNodeRelativeSelected(this.getNodeRelativeSelected().destruct());
 			return true;
@@ -382,6 +383,10 @@ TcSvgEdit.Svg = class {
 		}
 		if (this.getNodeSelected()) {
 			this.setNodeSelected(this.getNodeSelected().destruct());
+			console.log('Selected');
+			console.log(this._node_selected);
+			console.log('Previous');
+			console.log(this._node_previous);
 			return true;
 		}
 		return false;
@@ -644,7 +649,7 @@ TcSvgEdit.Svg = class {
 	removeNode(node) {
 		////console.debug('Svg.removeNode');
 		this._nodes = this._nodes.filter(item => item !== node);
-		node.getElement().parentNode.removeChild(node.getElement());
+		node.getNode().parentNode.removeChild(node.getNode());
 		return this;
 	}
 	
@@ -744,8 +749,8 @@ TcSvgEdit.Node = class {
 	
 	destruct() {
 		console.debug("Node.destruct()");
-		if (this._svg.getNodePrevious() === this) { this._svg.setNodePrevious(null); }
 		if (this._svg.getNodeSelected() === this) { this._svg.setNodeSelected(null); }
+		if (this._svg.getNodePrevious() === this) { this._svg.setNodePrevious(null); }
 		if (this._svg.getNodeRelativeSelected() === this) { this._svg.setNodeRelativeSelected(null); }
 
 		if (this._relative) {
@@ -761,7 +766,8 @@ TcSvgEdit.Node = class {
 			// TODO: just remove the node from the element
 			elem.destruct();
 		});
-		this._node.parentNode.removeChild(this._node);
+		
+		this._svg.removeNode(this);
 		this._node = null;
 		this._svg = null;
 		return null;
@@ -784,6 +790,10 @@ TcSvgEdit.Node = class {
 		////console.debug('Node.removeElement');
 		this._elements = this._elements.filter(item => item !== element);
 		return this;
+	}
+	
+	getNode() {
+		return this._node;
 	}
 	
 	getPosition() {
