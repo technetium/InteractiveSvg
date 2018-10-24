@@ -100,8 +100,8 @@ class TcSvgEdit {
 	}
 	
 	static onMouseMove(event) {
-		///console.debug("TcSvgEdit.onMouseMove");
-		///console.debug(event);
+		////console.debug("TcSvgEdit.onMouseMove");
+		////console.debug(event);
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg) { svg.onMouseMove(event); }
 	}
@@ -314,18 +314,16 @@ TcSvgEdit.Svg = class {
 	}
 	
 	onMouseDown(event) {
-		console.debug("Svg.onMouseDown");
+		////console.debug("Svg.onMouseDown");
 		//console.debug(event);
 		let node = this.getNode(event.target.closest(".node"));
-		console.debug(node);
+		////console.debug(node);
 		if (!node) { 
-			console.debug('node not found');
 			node = this.createNode(this.getCoordinates(event));
 		}
 		if (event.ctrlKey) {
 			node.setRelative(node.getSvg().getNodePrevious());
 		}
-		console.debug(node);
 		this.setNodeSelected(node);
 		if (this.getElementTypeSelected()) {
 			if (!this.getElementCurrent() && 
@@ -488,6 +486,24 @@ TcSvgEdit.Svg = class {
 		);
 		*/
 		return drawing;
+	}
+	
+	initNodeRelativeIndicator(indicator) {
+		// make sure we have the markers
+		this.getRelativeEndMarker();
+		this.getRelativeStartMarker();
+		let elem = TcSvgEdit.createSvgElement("path");
+		elem.style.fill = "none";
+		elem.style.stroke = this.getDefaultData('relativeIndicatorStroke');
+		elem.style.strokeDasharray = this.getDefaultData('relativeIndicatorStrokeDasharray');
+		elem.style.strokeWidth = this.getDefaultData('relativeIndicatorStrokeWidth');
+		elem.setAttribute("marker-end", "url(#"+this.idRelativeEndMarker() +")");
+		elem.setAttribute("marker-start", "url(#"+this.idRelativeStartMarker() +")");
+		elem.classList.add("relative");
+		elem.addEventListener("mouseenter", indicator.onMouseEnter);
+		elem.addEventListener("mouseleave", indicator.onMouseLeave);
+		this.getSvg().append(elem);
+		return elem;
 	}
 	
 	initNodeSymbol() {
@@ -659,8 +675,8 @@ TcSvgEdit.Svg = class {
 	}
 	
 	setNodePrevious(node) {
-		console.debug('Svg.setNodePrevious()');
-		console.debug(node);
+		////console.debug('Svg.setNodePrevious()');
+		////console.debug(node);
 		if (this._node_previous) {
 			this._node_previous._node.classList.remove("previous");
 		}
@@ -692,9 +708,9 @@ TcSvgEdit.Svg = class {
 	}
 	
 	setNodeSelected(node=null) { 
-		console.debug("Svg.setNodeSelected");
-		console.debug(node);
-		if (node && !node._node) { console.error('UNFINISHED NODE'); }
+		////console.debug("Svg.setNodeSelected");
+		////console.debug(node);
+		////if (node && !node._node) { console.error('UNFINISHED NODE'); }
 		if (this._node_selected && node !== this._node_selected) {
 			this.setNodePrevious(this._node_selected);
 		}
@@ -753,12 +769,18 @@ TcSvgEdit.Node = class {
 		if (this._svg.getNodePrevious() === this) { this._svg.setNodePrevious(null); }
 		if (this._svg.getNodeRelativeSelected() === this) { this._svg.setNodeRelativeSelected(null); }
 
+		let that = null;
 		if (this._relative) {
+			that = this._relative.getThatNode();
 			this._relative = this._relative.destruct();
 		}
 		this._relatives.forEach(function(node) {
 			//console.debug(node);
-			node.setRelative(node.getRelative().destruct());
+			if (that) {
+				node.getRelative().setThatNode(that);
+			} else {
+				node.setRelative(node.getRelative().destruct());
+			}
 		});
 		
 		this._elements.forEach(function(elem) {
@@ -804,14 +826,14 @@ TcSvgEdit.Node = class {
 	}
 	
 	setPosition(position) {
-		////console.debug('Node.setPosition');
+		console.debug('Node.setPosition');
 		let diff = TcSvgEdit.Util.diff(this.getPosition(), position);
 	
 		this._node.setAttribute("x", position.x); 
 		this._node.setAttribute("y", position.y); 
 
 		this._relatives.forEach(function(node) {
-			//console.debug(node);
+			console.debug(node);
 			node.movePosition(diff);
 		});
 		
@@ -828,7 +850,8 @@ TcSvgEdit.Node = class {
 	}
 	
 	checkRelative(node) {
-		////console.debug('Node.checkRelative()');
+		console.debug('Node.checkRelative()');
+		console.debug(this);
 		////console.debug('node: (' + node.getPosition().x + ', ' + node.getPosition().y + ')');
 		////console.debug('this: (' + this.getPosition().x + ', ' + this.getPosition().y + ')');
 		
@@ -836,6 +859,7 @@ TcSvgEdit.Node = class {
 			return true;
 		}
 		if (this.getRelative()) {
+			
 			return this.getRelative().getThatNode().checkRelative(node);
 		}
 		return false;
@@ -1036,41 +1060,27 @@ TcSvgEdit.ElementObjects = {
 
 TcSvgEdit._NodeRelative = class {
 	constructor(this_node, that_node) {
-		////console.debug('_NodeRelative.construct()');
+		console.debug('_NodeRelative.construct()');
+		console.debug(that_node);
 		this._this_node = this_node;
-		this._that_node = that_node;
+		this._that_node = null;
 		this._indicator = null;
 
 		if (that_node) {
 			let svg = this_node.getSvg();
-			// make sure we have the markers
-			svg.getRelativeEndMarker();
-			svg.getRelativeStartMarker();
-			this._indicator = TcSvgEdit.createSvgElement("path");
-			this._indicator.style.fill = "none";
-			this._indicator.style.stroke = svg.getDefaultData('relativeIndicatorStroke');
-			this._indicator.style.strokeDasharray = svg.getDefaultData('relativeIndicatorStrokeDasharray');
-			this._indicator.style.strokeWidth = svg.getDefaultData('relativeIndicatorStrokeWidth');
-			this._indicator.setAttribute("marker-end", "url(#"+svg.idRelativeEndMarker() +")");
-			this._indicator.setAttribute("marker-start", "url(#"+svg.idRelativeStartMarker() +")");
-			this._indicator.classList.add("relative");
-			this._indicator.addEventListener("mouseenter", this.onMouseEnter);
-			this._indicator.addEventListener("mouseleave", this.onMouseLeave);
-
-			this.update();
-			svg.getSvg().append(this._indicator);
-			that_node.addRelative(this_node);
+			this._indicator = svg.initNodeRelativeIndicator(this);
+			this.setThatNode(that_node);
 		}
+		console.debug(this);
 	}
 	
 	destruct() {
 		console.debug('_NodeRelative.destruct');
 		console.debug(this);
 		this._indicator.parentNode.removeChild(this._indicator);
-		this._that_node.removeRelative(this._this_node);
-		this._this_node = null;
-		this._that_node = null;
 		this._indicator = null;
+		this._this_node = null;
+		this.setThatNode(null);
 		return null;
 	}
 	
@@ -1092,6 +1102,22 @@ TcSvgEdit._NodeRelative = class {
 	getThatNode() {
 		return this._that_node;
 	}
+	
+	setThatNode(node) {
+		console.debug('_NodeRelative.setThatNode()');
+		console.debug(node);
+		if (this.getThatNode()) {
+			this.getThatNode().removeRelative(this.getThisNode());
+		}
+		this._that_node = node;
+		if (node) {
+			node.addRelative(this.getThisNode());
+			this.update();
+		} else {
+			this._this_node.setRelative(this.destruct());
+		}
+		console.debug(this);
+	}	
 
 	getThisNode() {
 		return this._this_node;
