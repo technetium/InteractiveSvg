@@ -689,15 +689,15 @@ TcSvgEdit.Svg = class {
 	}
 	
 	getNodeRelativeSelected() {
-		console.debug('Svg.getNodeRelativeSelected()');
-		console.debug(this._node_relative_selected);
+		////console.debug('Svg.getNodeRelativeSelected()');
+		////console.debug(this._node_relative_selected);
 		return this._node_relative_selected;
 	}
 	
 	setNodeRelativeSelected(relative) {
-		console.debug('Svg.setNodeRelativeSelected()');
+		////console.debug('Svg.setNodeRelativeSelected()');
 		this._node_relative_selected = relative;
-		console.debug(this._node_relative_selected);
+		////console.debug(this._node_relative_selected);
 		return this;
 	}
 	
@@ -765,9 +765,11 @@ TcSvgEdit.Node = class {
 	
 	destruct() {
 		console.debug("Node.destruct()");
-		if (this._svg.getNodeSelected() === this) { this._svg.setNodeSelected(null); }
-		if (this._svg.getNodePrevious() === this) { this._svg.setNodePrevious(null); }
-		if (this._svg.getNodeRelativeSelected() === this) { this._svg.setNodeRelativeSelected(null); }
+		if (this.getSvg().getNodeSelected() === this) { this._svg.setNodeSelected(null); }
+		if (this.getSvg().getNodePrevious() === this) { this._svg.setNodePrevious(null); }
+		
+		// ToDo: Check if we have to destroy the relative
+		//if (this._svg.getNodeRelativeSelected() === this) { this._svg.setNodeRelativeSelected(null); }
 
 		let that = null;
 		if (this._relative) {
@@ -826,14 +828,14 @@ TcSvgEdit.Node = class {
 	}
 	
 	setPosition(position) {
-		console.debug('Node.setPosition');
+		////console.debug('Node.setPosition');
 		let diff = TcSvgEdit.Util.diff(this.getPosition(), position);
 	
 		this._node.setAttribute("x", position.x); 
 		this._node.setAttribute("y", position.y); 
 
 		this._relatives.forEach(function(node) {
-			console.debug(node);
+			////console.debug(node);
 			node.movePosition(diff);
 		});
 		
@@ -891,13 +893,13 @@ TcSvgEdit.Node = class {
 		return this;
 	}
 
-	addRelative(node) {
-		this._relatives.push(node);
+	addRelative(relative) {
+		this._relatives.push(relative);
 		return this;
 	}
 	
-	removeRelative(node) {
-		this._relatives = this._relatives.filter(item => item !== node);
+	removeRelative(relative) {
+		this._relatives = this._relatives.filter(item => item !== relative);
 		return this;
 	}
 		
@@ -1077,10 +1079,10 @@ TcSvgEdit._NodeRelative = class {
 	destruct() {
 		console.debug('_NodeRelative.destruct');
 		console.debug(this);
+		if (this.getSvg().getNodeRelativeSelected() === this) { this.getSvg().setNodeRelativeSelected(null); }
+		this.setThatNode(null);
 		this._indicator.parentNode.removeChild(this._indicator);
 		this._indicator = null;
-		this._this_node = null;
-		this.setThatNode(null);
 		return null;
 	}
 	
@@ -1107,16 +1109,20 @@ TcSvgEdit._NodeRelative = class {
 		console.debug('_NodeRelative.setThatNode()');
 		console.debug(node);
 		if (this.getThatNode()) {
-			this.getThatNode().removeRelative(this.getThisNode());
+			console.debug('thatNode');
+			this.getThatNode().removeRelative(this);
+			console.debug(this.getThatNode());
 		}
 		this._that_node = node;
 		if (node) {
-			node.addRelative(this.getThisNode());
+			node.addRelative(this);
 			this.update();
-		} else {
+		} else if (this._this_node) {
 			this._this_node.setRelative(this.destruct());
+			this._this_node = null;
 		}
 		console.debug(this);
+		return this;
 	}	
 
 	getThisNode() {
