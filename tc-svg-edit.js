@@ -6,6 +6,7 @@ class TcSvgEdit {
 		////console.debug('construct");
 		TcSvgEdit.looper = 0;
 		
+		TcSvgEdit.elementStrokeColor = '#600';
 		
 		TcSvgEdit.nodeCircleRadius = 5;
 		TcSvgEdit.nodeCrossRadius = 11;
@@ -96,6 +97,7 @@ class TcSvgEdit {
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
+		TcSvgEdit.svgCurrentGet().setElementStrokeColor();
 		TcSvgEdit.svgCurrentGet().setElementTypeSelected();
 	}
 	
@@ -130,6 +132,7 @@ class TcSvgEdit {
 		////console.debug(svg);
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
+		TcSvgEdit.elementStrokeColorSet();
 		TcSvgEdit.elementTypeSelectedSet();
 		TcSvgEdit.documentInfoField("svg_current", svg._svg.getAttribute("id"));
 	}
@@ -166,9 +169,37 @@ class TcSvgEdit {
 		});
 	}
 
+
+
+	//
+	// elementStrokeColor
+	//
+
+	static elementStrokeColor(event) {
+		////console.debug('elementStrokeColor'); 
+		let elem = event.target.closest("[data-tc-svg-edit-element-stroke-color]");
+		if (!elem) { return false }
+		////console.debug(elem);
+		let color = elem.value;
+		////console.debug(type);
+		TcSvgEdit.svgCurrentGet().setElementStrokeColor(color);
+		return true;
+	}
+	
+	static elementStrokeColorSet() {
+		////console.debug('elementStrokeColorSet');
+		////console.debug(TcSvgEdit.svgCurrentGet());
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-stroke-color]"
+		).forEach(function(elem) {
+			elem.value = TcSvgEdit.svgCurrentGet().getElementStrokeColor();
+		});
+	}
+
 	
 	//
-	// elementType
+	// elementTypeSelect
 	//
 
 	static elementTypeSelect(event) {
@@ -256,6 +287,7 @@ TcSvgEdit.Svg = class {
 		this._svg = svg;
 		this._element_current = null;
 		this._element_selected = null;
+		this._element_stroke_color = this.getDefaultData("elementStrokeColor");
 		this._element_type_selected = null;
 		this._elements = [];
 		this._nodes = [];
@@ -264,6 +296,8 @@ TcSvgEdit.Svg = class {
 		this._node_relative_selected = null
 		this._node_selected = null;
 
+		this._stroke_color = 
+		
 		this._svg.addEventListener("mouseenter", this.onMouseEnter);
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
 		
@@ -647,7 +681,17 @@ TcSvgEdit.Svg = class {
 	getElementSelected() {
 		return this._element_selected;
 	}
+
+	getElementStrokeColor() {
+		return this._element_stroke_color;
+	}
 	
+	setElementStrokeColor(color) {
+		this._element_stroke_color = color;
+		TcSvgEdit.elementStrokeColorSet(color);
+		return this;
+	}
+
 	getElementTypeSelected() {
 		////console.debug("Svg.getElementTypeSelected()");
 		return this._element_type_selected;
@@ -928,7 +972,7 @@ TcSvgEdit.Element = class {
 		svg.addElement(this);
 	
 		this.setStrokeWidth(2);
-		this.setStrokeColour("#CC0000");
+		this.setStrokeColor(svg.getElementStrokeColor());
 	}
 
 	destruct() {
@@ -989,8 +1033,8 @@ TcSvgEdit.Element = class {
 		return this;
 	}
 	
-	setStrokeColour(colour) {
-		this._element.style.stroke = colour;
+	setStrokeColor(color) {
+		this._element.style.stroke = color;
 		return this;
 	}
 	
@@ -1080,7 +1124,8 @@ TcSvgEdit._NodeRelative = class {
 		console.debug('_NodeRelative.destruct');
 		console.debug(this);
 		if (this.getSvg().getNodeRelativeSelected() === this) { this.getSvg().setNodeRelativeSelected(null); }
-		this.setThatNode(null);
+		this._this_node = null;
+		this._that_node = null;
 		this._indicator.parentNode.removeChild(this._indicator);
 		this._indicator = null;
 		return null;
@@ -1114,13 +1159,8 @@ TcSvgEdit._NodeRelative = class {
 			console.debug(this.getThatNode());
 		}
 		this._that_node = node;
-		if (node) {
-			node.addRelative(this);
-			this.update();
-		} else if (this._this_node) {
-			this._this_node.setRelative(this.destruct());
-			this._this_node = null;
-		}
+		node.addRelative(this); // This goes terrible wrong when the node is null. Handling a null that node is quite complex so let just crash it.
+		this.update();
 		console.debug(this);
 		return this;
 	}	
