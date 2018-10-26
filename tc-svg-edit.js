@@ -1227,6 +1227,20 @@ console.debug(Me.name); // ReferenceError: Me is not defined
 */
 
 
+class TcSvgTessellation {
+	constructor() {
+		
+	}
+	
+	static triangle(group) {
+	}
+}
+
+// Triangle 
+//cos(C) = (a^2 + b^2 - c^2) / 2ab  <= Langste lijn is c
+//sin(C)/c = sin(B)/b
+
+
 
 new TcSvgEdit("someprefix");
 
