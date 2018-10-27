@@ -31,6 +31,9 @@ class TcSvgEdit {
 		TcSvgEdit._svgs = [];
 	
 		if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
+		document.addEventListener("change", function(event){
+			TcSvgEdit.onChangeDown(event);
+		});
 		document.addEventListener("keydown", function(event){
 			TcSvgEdit.onKeyDown(event);
 		});
@@ -84,6 +87,13 @@ class TcSvgEdit {
 	//
 	// Event Listeners
 	//
+	
+	static onChange(event) {
+		console.debug("TcSvgEdit.onKeyDown");
+		console.debug(event);
+		TcSvgEdit.svgCurrentGet().setElementStrokeColor();
+	}
+	
 	static onKeyDown(event) {
 		////console.debug("TcSvgEdit.onKeyDown");
 		////console.debug(event);
@@ -97,7 +107,6 @@ class TcSvgEdit {
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
-		TcSvgEdit.svgCurrentGet().setElementStrokeColor();
 		TcSvgEdit.svgCurrentGet().setElementTypeSelected();
 	}
 	
@@ -260,17 +269,18 @@ TcSvgEdit.Util = class {
 		return array.filter(item => item !== value)
 	}
 
-
 	static diff(p1, p2) {
 		return { 
 			x: p1.x - p2.x,
 			y: p1.y - p2.y,
 		}
 	}
+
 	static distance(p1, p2) {
 		let d = TcSvgEdit.Util.diff(p1, p2);
 		return Math.sqrt(d.x * d.x + d.y * d.y);
 	}
+
 	static direction(p1, p2) {
 		let d = TcSvgEdit.Util.diff(p1, p2);
 		return Math.atan2(d.x, d.y);
@@ -820,12 +830,12 @@ TcSvgEdit.Node = class {
 			that = this._relative.getThatNode();
 			this._relative = this._relative.destruct();
 		}
-		this._relatives.forEach(function(node) {
-			//console.debug(node);
+		this._relatives.forEach(function(relative) {
+			//console.debug(relative);
 			if (that) {
-				node.getRelative().setThatNode(that);
+				relative.setThatNode(that);
 			} else {
-				node.setRelative(node.getRelative().destruct());
+				relative.destruct();
 			}
 		});
 		
@@ -872,15 +882,15 @@ TcSvgEdit.Node = class {
 	}
 	
 	setPosition(position) {
-		////console.debug('Node.setPosition');
+		console.debug('Node.setPosition');
 		let diff = TcSvgEdit.Util.diff(this.getPosition(), position);
 	
 		this._node.setAttribute("x", position.x); 
 		this._node.setAttribute("y", position.y); 
 
-		this._relatives.forEach(function(node) {
-			////console.debug(node);
-			node.movePosition(diff);
+		this._relatives.forEach(function(relative) {
+			console.debug(relative);
+			relative.getThisNode().movePosition(diff);
 		});
 		
 		this._elements.forEach(function(elem) {
@@ -905,7 +915,6 @@ TcSvgEdit.Node = class {
 			return true;
 		}
 		if (this.getRelative()) {
-			
 			return this.getRelative().getThatNode().checkRelative(node);
 		}
 		return false;
@@ -1106,17 +1115,17 @@ TcSvgEdit.ElementObjects = {
 
 TcSvgEdit._NodeRelative = class {
 	constructor(this_node, that_node) {
+		
 		console.debug('_NodeRelative.construct()');
-		console.debug(that_node);
+		if (!this_node || !that_node) { 1/0; }
 		this._this_node = this_node;
 		this._that_node = null;
 		this._indicator = null;
 
-		if (that_node) {
-			let svg = this_node.getSvg();
-			this._indicator = svg.initNodeRelativeIndicator(this);
-			this.setThatNode(that_node);
-		}
+		let svg = this_node.getSvg();
+		this._indicator = svg.initNodeRelativeIndicator(this);
+		this.setThatNode(that_node);
+	
 		console.debug(this);
 	}
 	
@@ -1124,6 +1133,7 @@ TcSvgEdit._NodeRelative = class {
 		console.debug('_NodeRelative.destruct');
 		console.debug(this);
 		if (this.getSvg().getNodeRelativeSelected() === this) { this.getSvg().setNodeRelativeSelected(null); }
+		this.getThatNode().removeRelative(this);
 		this._this_node = null;
 		this._that_node = null;
 		this._indicator.parentNode.removeChild(this._indicator);
@@ -1153,6 +1163,7 @@ TcSvgEdit._NodeRelative = class {
 	setThatNode(node) {
 		console.debug('_NodeRelative.setThatNode()');
 		console.debug(node);
+		if (!node) { 0/1; }
 		if (this.getThatNode()) {
 			console.debug('thatNode');
 			this.getThatNode().removeRelative(this);
