@@ -6,7 +6,7 @@ class TcSvgEdit {
 		////console.debug('construct");
 		TcSvgEdit.looper = 0;
 		
-		TcSvgEdit.elementStrokeColor = '#600';
+		TcSvgEdit.strokeColor = '#600';
 		
 		TcSvgEdit.nodeCircleRadius = 5;
 		TcSvgEdit.nodeCrossRadius = 11;
@@ -32,7 +32,7 @@ class TcSvgEdit {
 	
 		if ("undefined" !== typeof prefix) { TcSvgEdit.prefix = prefix; }
 		document.addEventListener("change", function(event){
-			TcSvgEdit.onChangeDown(event);
+			TcSvgEdit.onChange(event);
 		});
 		document.addEventListener("keydown", function(event){
 			TcSvgEdit.onKeyDown(event);
@@ -57,7 +57,7 @@ class TcSvgEdit {
 	}
 	
 	static getNodeRelative(relative) {
-		console.debug('TcSvgEdit.getNodeRelative');
+		////console.debug('TcSvgEdit.getNodeRelative');
 		return TcSvgEdit.getSvg(relative.closest("svg.tc_svg_edit")).getNodeRelative(relative); 
 	}
 	
@@ -89,9 +89,9 @@ class TcSvgEdit {
 	//
 	
 	static onChange(event) {
-		console.debug("TcSvgEdit.onKeyDown");
+		console.debug("TcSvgEdit.onChange");
 		console.debug(event);
-		TcSvgEdit.svgCurrentGet().setElementStrokeColor();
+		TcSvgEdit.elementStrokeColor(event);
 	}
 	
 	static onKeyDown(event) {
@@ -167,7 +167,6 @@ class TcSvgEdit {
 		});
 	}
 	
-	
 	static documentPositionIndicator(dimension, value) {
 		document.querySelectorAll(
 			"[data-tc-svg-edit-position-indicator=\"" + 
@@ -185,7 +184,7 @@ class TcSvgEdit {
 	//
 
 	static elementStrokeColor(event) {
-		////console.debug('elementStrokeColor'); 
+		console.debug('TcSvgEdit.elementStrokeColor'); 
 		let elem = event.target.closest("[data-tc-svg-edit-element-stroke-color]");
 		if (!elem) { return false }
 		////console.debug(elem);
@@ -269,6 +268,10 @@ TcSvgEdit.Util = class {
 		return array.filter(item => item !== value)
 	}
 
+	static assert(expr) {
+		if (expr) return true;
+		0/1;
+	}
 	static diff(p1, p2) {
 		return { 
 			x: p1.x - p2.x,
@@ -297,7 +300,7 @@ TcSvgEdit.Svg = class {
 		this._svg = svg;
 		this._element_current = null;
 		this._element_selected = null;
-		this._element_stroke_color = this.getDefaultData("elementStrokeColor");
+		this._element_stroke_color = this.getDefaultData("strokeColor");
 		this._element_type_selected = null;
 		this._elements = [];
 		this._nodes = [];
@@ -414,7 +417,7 @@ TcSvgEdit.Svg = class {
 	}
 	
 	doDelete() {
-		console.debug('Svg.doDelete');
+		////console.debug('Svg.doDelete');
 		if (this.getNodeRelativeSelected()) {
 			this.setNodeRelativeSelected(this.getNodeRelativeSelected().destruct());
 			return true;
@@ -425,10 +428,10 @@ TcSvgEdit.Svg = class {
 		}
 		if (this.getNodeSelected()) {
 			this.setNodeSelected(this.getNodeSelected().destruct());
-			console.log('Selected');
-			console.log(this._node_selected);
-			console.log('Previous');
-			console.log(this._node_previous);
+			////console.log('Selected');
+			////console.log(this._node_selected);
+			////console.log('Previous');
+			////console.log(this._node_previous);
 			return true;
 		}
 		return false;
@@ -468,10 +471,10 @@ TcSvgEdit.Svg = class {
 	}
 	
 	getNodeRelative(relative) {
-		console.debug('Svg.getNodeRelative()');
+		////console.debug('Svg.getNodeRelative()');
 		
 		return this._nodes.find(function(n) {
-			console.debug('Node: '  + n);
+			////console.debug('Node: '  + n);
 			return n.getRelative() && (n.getRelative().getIndicator() === relative);
 		}).getRelative();
 	}
@@ -736,7 +739,7 @@ TcSvgEdit.Svg = class {
 		}
 		this._node_previous = node;
 		if (node) {
-			if (!node._node) { console.error('UNFINISHED NODE'); }
+			TcSvgEdit.Util.assert(node._node);
 			this._node_previous._node.classList.add("previous");
 		}
 		return this;
@@ -764,7 +767,7 @@ TcSvgEdit.Svg = class {
 	setNodeSelected(node=null) { 
 		////console.debug("Svg.setNodeSelected");
 		////console.debug(node);
-		////if (node && !node._node) { console.error('UNFINISHED NODE'); }
+		////if (node && !node._node) {console.error('UNFINISHED NODE');}
 		if (this._node_selected && node !== this._node_selected) {
 			this.setNodePrevious(this._node_selected);
 		}
@@ -818,7 +821,7 @@ TcSvgEdit.Node = class {
 	}
 	
 	destruct() {
-		console.debug("Node.destruct()");
+		////console.debug("Node.destruct()");
 		if (this.getSvg().getNodeSelected() === this) { this._svg.setNodeSelected(null); }
 		if (this.getSvg().getNodePrevious() === this) { this._svg.setNodePrevious(null); }
 		
@@ -882,14 +885,14 @@ TcSvgEdit.Node = class {
 	}
 	
 	setPosition(position) {
-		console.debug('Node.setPosition');
+		////console.debug('Node.setPosition');
 		let diff = TcSvgEdit.Util.diff(this.getPosition(), position);
 	
 		this._node.setAttribute("x", position.x); 
 		this._node.setAttribute("y", position.y); 
 
 		this._relatives.forEach(function(relative) {
-			console.debug(relative);
+			////console.debug(relative);
 			relative.getThisNode().movePosition(diff);
 		});
 		
@@ -906,8 +909,8 @@ TcSvgEdit.Node = class {
 	}
 	
 	checkRelative(node) {
-		console.debug('Node.checkRelative()');
-		console.debug(this);
+		////console.debug('Node.checkRelative()');
+		////console.debug(this);
 		////console.debug('node: (' + node.getPosition().x + ', ' + node.getPosition().y + ')');
 		////console.debug('this: (' + this.getPosition().x + ', ' + this.getPosition().y + ')');
 		
@@ -1085,7 +1088,7 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 //
 TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	constructor(svg) {
-		console.debug('new ElementLine')
+		////console.debug('new ElementLine')
 		super(TcSvgEdit.createSvgElement('line'), svg);
 	}
 
@@ -1093,7 +1096,7 @@ TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	minNodes() { return 2; }
 	
 	updateChild() {
-		console.debug('ElementLine.update');
+		////console.debug('ElementLine.update');
 		let p1 = this._nodes[0].getPosition();
 		let p2 = this._nodes[1].getPosition();
 		
@@ -1116,7 +1119,7 @@ TcSvgEdit.ElementObjects = {
 TcSvgEdit._NodeRelative = class {
 	constructor(this_node, that_node) {
 		
-		console.debug('_NodeRelative.construct()');
+		////console.debug('_NodeRelative.construct()');
 		if (!this_node || !that_node) { 1/0; }
 		this._this_node = this_node;
 		this._that_node = null;
@@ -1125,13 +1128,11 @@ TcSvgEdit._NodeRelative = class {
 		let svg = this_node.getSvg();
 		this._indicator = svg.initNodeRelativeIndicator(this);
 		this.setThatNode(that_node);
-	
-		console.debug(this);
 	}
 	
 	destruct() {
-		console.debug('_NodeRelative.destruct');
-		console.debug(this);
+		////console.debug('_NodeRelative.destruct');
+		////console.debug(this);
 		if (this.getSvg().getNodeRelativeSelected() === this) { this.getSvg().setNodeRelativeSelected(null); }
 		this.getThatNode().removeRelative(this);
 		this._this_node = null;
@@ -1142,13 +1143,13 @@ TcSvgEdit._NodeRelative = class {
 	}
 	
 	onMouseEnter(event) {
-		console.debug('_NodeRelative.onMouseEnter');
-		console.debug(event.target);
+		////console.debug('_NodeRelative.onMouseEnter');
+		////console.debug(event.target);
 		return TcSvgEdit.getNodeRelative(event.target).select(); 
 	}
 	
 	onMouseLeave(event) {
-		console.debug('_NodeRelative.onMouseLeave');
+		////console.debug('_NodeRelative.onMouseLeave');
 		return TcSvgEdit.getNodeRelative(event.target).deselect(); 
 	}
 	
@@ -1161,18 +1162,18 @@ TcSvgEdit._NodeRelative = class {
 	}
 	
 	setThatNode(node) {
-		console.debug('_NodeRelative.setThatNode()');
-		console.debug(node);
-		if (!node) { 0/1; }
+		////console.debug('_NodeRelative.setThatNode()');
+		////console.debug(node);
+		TcSvgEdit.Util.assert(!node);
 		if (this.getThatNode()) {
-			console.debug('thatNode');
+			////console.debug('thatNode');
 			this.getThatNode().removeRelative(this);
-			console.debug(this.getThatNode());
+			////console.debug(this.getThatNode());
 		}
 		this._that_node = node;
 		node.addRelative(this); // This goes terrible wrong when the node is null. Handling a null that node is quite complex so let just crash it.
 		this.update();
-		console.debug(this);
+		////console.debug(this);
 		return this;
 	}	
 
@@ -1185,20 +1186,20 @@ TcSvgEdit._NodeRelative = class {
 	}
 	
 	select() {
-		console.debug("_NodeRelative.select()");
+		////console.debug("_NodeRelative.select()");
 		this._indicator.classList.add("selected");
 		this.getSvg().setNodeRelativeSelected(this);
 		return this;
 	}
 	
 	deselect() {
-		console.debug("_NodeRelative.deselect()");
-		console.debug(this);
+		////console.debug("_NodeRelative.deselect()");
+		////console.debug(this);
 		if (this.getSvg().getNodeRelativeSelected() === this) {
 			this.getSvg().setNodeRelativeSelected(null);
 		}
 		this._indicator.classList.remove("selected");
-		console.debug(this);
+		////console.debug(this);
 		return this;
 	}
 
@@ -1225,17 +1226,6 @@ TcSvgEdit._NodeRelative = class {
 
 
 // http://exploringjs.com/es6/ch_classes.html
-/*
-const MyClass = class Me {
-    getClassName() {
-        return Me.name;
-    }
-};
-const inst = new MyClass();
-
-console.debug(inst.getClassName()); // Me
-console.debug(Me.name); // ReferenceError: Me is not defined
-*/
 
 
 class TcSvgTessellation {
