@@ -668,6 +668,7 @@ TcSvgEdit.Svg = class {
 	addElement(elem) {
 		////console.debug('Svg.addElement');
 		this._elements.push(elem);
+		this.getDrawing().append(elem._element);
 		return this;
 	}
 	
@@ -776,13 +777,6 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 	
-	append(elem) {
-		////console.debug("Svg.append()");
-		this.getDrawing().append(elem._element);
-		////console.debug(this._svg);
-		return this;
-	}
-	
 	getCoordinates(event) {
 		///console.debug("getCoordinates()");
 		// @see https://stackoverflow.com/questions/12752519/svg-capturing-mouse-coordinates
@@ -821,13 +815,11 @@ TcSvgEdit.Node = class {
 	}
 	
 	destruct() {
-		////console.debug("Node.destruct()");
+		console.debug("Node.destruct()");
+		console.debug(this);
 		if (this.getSvg().getNodeSelected() === this) { this._svg.setNodeSelected(null); }
 		if (this.getSvg().getNodePrevious() === this) { this._svg.setNodePrevious(null); }
 		
-		// ToDo: Check if we have to destroy the relative
-		//if (this._svg.getNodeRelativeSelected() === this) { this._svg.setNodeRelativeSelected(null); }
-
 		let that = null;
 		if (this._relative) {
 			that = this._relative.getThatNode();
@@ -843,7 +835,7 @@ TcSvgEdit.Node = class {
 		});
 		
 		this._elements.forEach(function(elem) {
-			//console.debug(elem);
+			console.debug(elem);
 			// TODO: just remove the node from the element
 			elem.destruct();
 		});
@@ -856,13 +848,16 @@ TcSvgEdit.Node = class {
 	
 	
 	onMouseDrag(pos) {
-		///console.debug("Node.onMouseDrag");
-		///console.debug(typeof node);
-		///console.debug(pos);
+		////console.debug("Node.onMouseDrag");
+		////console.debug(typeof node);
+		////console.debug(pos);
 		this.setPosition(pos);
 	}
 	
 	addElement(element) {
+		console.debug('Node.addElement()')
+		console.debug(this);
+		console.debug(element)
 		this._elements.push(element);
 		return this;
 	}
@@ -988,7 +983,8 @@ TcSvgEdit.Element = class {
 	}
 
 	destruct() {
-		////console.debug('Element.destruct');
+		console.debug('Element.destruct');
+		console.debug(this);
 		this.deselect();
 		this._nodes.forEach(function(node) {
 			node.removeElement(this);
@@ -1012,10 +1008,12 @@ TcSvgEdit.Element = class {
 	}
 	
 	addNode(node) {
-		////console.debug('Element.addNode')
+		console.debug('Element.addNode');
+		console.debug(this);
+		console.debug(node);
 		this._nodes.push(node);
 		node.addElement(this);
-		if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
+		////if (this.minNodes() === this._nodes.length) { this._svg.append(this); }
 		this.update();
 		if (this.maxNodes() <= this._nodes.length) { this._svg.setElementCurrent(); }
 		return this;
@@ -1054,7 +1052,7 @@ TcSvgEdit.Element = class {
 		if (this.minNodes() <= this._nodes.length) { this.updateChild(); }
 	}	
 	
-	updateChild() { 1/0; } // Needs to be defined in child class
+	updateChild() { TcSvgEdit.Utill.assert(false); } // Needs to be defined in child class
 }
 
 //
