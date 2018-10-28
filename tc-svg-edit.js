@@ -352,6 +352,7 @@ TcSvgEdit.Svg = class {
 		switch (event.key) {
 			case "c" : return this.setElementTypeSelected("circle");
 			case "l" : return this.setElementTypeSelected("line");
+			case "p" : return this.setElementTypeSelected("polyline");
 			case "Delete" : return this.doDelete();
 			case "Escape" : return this.setElementTypeSelected(null);
 			default: 
@@ -1107,10 +1108,38 @@ TcSvgEdit.ElementLine = class extends TcSvgEdit.Element {
 	}
 }
 
+//
+// ELEMENT POLYLINE WRAPPER CLASS
+//
+TcSvgEdit.ElementPolyLine = class extends TcSvgEdit.Element {
+	constructor(svg) {
+		////console.debug('new ElementLine')
+		super(TcSvgEdit.createSvgElement("polyline"), svg);
+		this._element.style.fill = "none";
+	}
+
+	maxNodes() { return Math.maxInt; }
+	minNodes() { return 2; }
+	
+	updateChild() {
+		this._element.setAttribute(
+			"points",
+			this._nodes.reduce((acc, node) => { 
+				//return acc + node.getPosition().x + " "node.getPosition().x + " ";
+				return acc + node.getPosition().x + "," + node.getPosition().y + " ";
+			}, "")
+		);
+		console.log(this._element.getAttribute("points"));
+		return this;
+	}
+}
+
+
 // Register Element Names
 TcSvgEdit.ElementObjects = {
 	circle:	TcSvgEdit.ElementCircle,
 	line:	TcSvgEdit.ElementLine,
+	polyline:	TcSvgEdit.ElementPolyLine,
 }
 
 
