@@ -352,7 +352,7 @@ TcSvgEdit.Svg = class {
 		switch (event.key) {
 			case "c" : return this.setElementTypeSelected("circle");
 			case "l" : return this.setElementTypeSelected("line");
-			case "p" : return this.setElementTypeSelected("polyline");
+			case "y" : return this.setElementTypeSelected("polyline");
 			case "Delete" : return this.doDelete();
 			case "Escape" : return this.setElementTypeSelected(null);
 			default: 
@@ -715,7 +715,8 @@ TcSvgEdit.Svg = class {
 	setElementTypeSelected(type=null) {
 		////onsole.debug('Svg.setElementTypeSelected');
 		////console.debug(type);
-		TcSvgEdit.elementTypeSelectedUnset(); 
+		TcSvgEdit.elementTypeSelectedUnset();
+		this.setElementCurrent(); // Unset the current Element, so a new one is create with this for the new type
 		this._element_type_selected = type;
 		if (type) { TcSvgEdit.elementTypeSelectedSet(type); }
 		return this;
@@ -727,7 +728,6 @@ TcSvgEdit.Svg = class {
 		node.getNode().parentNode.removeChild(node.getNode());
 		return this;
 	}
-	
 	
 	getNodePrevious() {
 		return this._node_previous;
