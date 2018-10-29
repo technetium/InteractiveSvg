@@ -7,6 +7,7 @@ class TcSvgEdit {
 		TcSvgEdit.looper = 0;
 		
 		TcSvgEdit.strokeColor = '#600';
+		TcSvgEdit.strokeWidth = 2;
 		
 		TcSvgEdit.nodeCircleRadius = 5;
 		TcSvgEdit.nodeCrossRadius = 11;
@@ -92,6 +93,7 @@ class TcSvgEdit {
 		console.debug("TcSvgEdit.onChange");
 		console.debug(event);
 		TcSvgEdit.elementStrokeColor(event);
+		TcSvgEdit.elementStrokeWidth(event);
 	}
 	
 	static onKeyDown(event) {
@@ -142,6 +144,7 @@ class TcSvgEdit {
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
 		TcSvgEdit._svg_current = svg;
 		TcSvgEdit.elementStrokeColorSet();
+		TcSvgEdit.elementStrokeWidthSet();
 		TcSvgEdit.elementTypeSelectedSet();
 		TcSvgEdit.documentInfoField("svg_current", svg._svg.getAttribute("id"));
 	}
@@ -202,6 +205,33 @@ class TcSvgEdit {
 			"[data-tc-svg-edit-element-stroke-color]"
 		).forEach(function(elem) {
 			elem.value = TcSvgEdit.svgCurrentGet().getElementStrokeColor();
+		});
+	}
+
+	
+	//
+	// elementStrokeWidth
+	//
+
+	static elementStrokeWidth(event) {
+		console.debug('TcSvgEdit.elementStrokeWidth'); 
+		let elem = event.target.closest("[data-tc-svg-edit-element-stroke-width]");
+		if (!elem) { return false }
+		////console.debug(elem);
+		let width = elem.value;
+		////console.debug(type);
+		TcSvgEdit.svgCurrentGet().setElementStrokeWidth(width);
+		return true;
+	}
+	
+	static elementStrokeWidthSet() {
+		////console.debug('elementStrokeWidthSet');
+		////console.debug(TcSvgEdit.svgCurrentGet());
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementTypeSelected());
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-stroke-width]"
+		).forEach(function(elem) {
+			elem.value = TcSvgEdit.svgCurrentGet().getElementStrokeWidth();
 		});
 	}
 
@@ -301,6 +331,7 @@ TcSvgEdit.Svg = class {
 		this._element_current = null;
 		this._element_selected = null;
 		this._element_stroke_color = this.getDefaultData("strokeColor");
+		this._element_stroke_width = this.getDefaultData("strokeWidth");
 		this._element_type_selected = null;
 		this._elements = [];
 		this._nodes = [];
@@ -707,6 +738,16 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 
+	getElementStrokeWidth() {
+		return this._element_stroke_width;
+	}
+	
+	setElementStrokeWidth(width) {
+		this._element_stroke_width = width;
+		TcSvgEdit.elementStrokeWidthSet(width);
+		return this;
+	}
+
 	getElementTypeSelected() {
 		////console.debug("Svg.getElementTypeSelected()");
 		return this._element_type_selected;
@@ -979,8 +1020,8 @@ TcSvgEdit.Element = class {
 		this._svg = svg;
 		svg.addElement(this);
 	
-		this.setStrokeWidth(2);
 		this.setStrokeColor(svg.getElementStrokeColor());
+		this.setStrokeWidth(svg.getElementStrokeWidth());
 	}
 
 	destruct() {
@@ -1039,13 +1080,13 @@ TcSvgEdit.Element = class {
 	getElement() {
 		return this._element;
 	}
-	setStrokeWidth(width) {
-		this._element.style.strokeWidth = width;
+	setStrokeColor(color) {
+		this._element.style.stroke = color;
 		return this;
 	}
 	
-	setStrokeColor(color) {
-		this._element.style.stroke = color;
+	setStrokeWidth(width) {
+		this._element.style.strokeWidth = width;
 		return this;
 	}
 	
