@@ -61,31 +61,28 @@ svg.tc_svg_edit:hover .node:hover {
 	box-shadow: 0 2px #666;
 	transform: translateY(2px);
 }
-
-
 [data-tc-svg-edit-element-sub-type-select] {
-	bor der: 0px;
+	border: 0px;
 	background-color: #090;
 	border-radius: 6px;
 	box-shadow: 1px 4px #999;
-	col or: white;
-	dis play: none;
-	mar gin-bottom: 5px;
+	color: white;
+	display: none;
+	margin-bottom: 5px;
 }
 
 
 [data-tc-svg-edit-element-sub-type-select]:hover {
-	background-color: #0F0;
+	background-color: #0C0;
 }
 [data-tc-svg-edit-element-sub-type-select].selected {
-	background-color: #0C0;
+	background-color: #0A0;
 	box-shadow: 0 2px #666;
 	transform: translateY(2px);
 }
 
 .selected [data-tc-svg-edit-element-sub-type-select] {
-	disp lay: inline;
-	background-color: #900;
+	display: inline;
 }
 
 

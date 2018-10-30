@@ -261,6 +261,8 @@ class TcSvgEdit {
 			"\"]"
 		).forEach(function(elem) {
 			elem.classList.add("selected");
+			let group = elem.closest('[data-tc-svg-edit-element="select-group"]');
+			if (group) { group.classList.add("selected"); }
 		});
 	}
 
@@ -273,6 +275,8 @@ class TcSvgEdit {
 			"\"]"
 		).forEach(function(elem) {
 			elem.classList.remove("selected");
+			let group = elem.closest('[data-tc-svg-edit-element="select-group"]');
+			if (group) { group.classList.remove("selected"); }
 		});
 	}
 	

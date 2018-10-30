@@ -9,12 +9,14 @@
 <body>
 
 <!-- Element type selectors -->
-<span data-tc-svg-edit-element-type-select="line"><b>L</b>ine</span>
+<button data-tc-svg-edit-element-type-select="line"><b>L</b>ine</button>
 <button data-tc-svg-edit-element-type-select="circle"><b>C</b>ircle</button>
-<span data-tc-svg-edit-element-type-select="path"><b>P</b>ath
-<button data-tc-svg-edit-element-sub-type-select="path_move">M<b>o</b>ve</button>
-<button data-tc-svg-edit-element-sub-type-select="path_line">L<b>i</b>ne</button>
+<span data-tc-svg-edit-element="select-group">
+	<button data-tc-svg-edit-element-type-select="path"><b>P</b>ath</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_move">M<b>o</b>ve</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_line">L<b>i</b>ne</button>
 </span>
+
 <!--
 Move	M10 10
 Line	L 20 20   (H and L will be ignored)
@@ -27,9 +29,6 @@ Arc		A rx ry x-axis rotation larg-arc-flag sweep-flag x y
 -->
 
 <button data-tc-svg-edit-element-type-select="polyline">Pol<b>y</b>line</button>
-
-
-
 <button data-tc-svg-edit-element-type-select="line"><b>L</b></button>
 
 <!-- settings -->
