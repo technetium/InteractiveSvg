@@ -1175,13 +1175,60 @@ TcSvgEdit.ElementPolyLine = class extends TcSvgEdit.Element {
 	}
 }
 
+TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
+	constructor(svg) {
+		////console.debug('new ElementLine')
+		super(TcSvgEdit.createSvgElement("path"), svg);
+		this._element.style.fill = "none";
+		
+		this._sub_element = 'path_move'
+	}
+
+	maxNodes() { return Math.maxInt; }
+	minNodes() { return 2; }
+	
+	updateChild() {
+		this._element.setAttribute(
+			"points",
+			this._nodes.reduce((acc, node) => { 
+				//return acc + node.getPosition().x + " "node.getPosition().x + " ";
+				return acc + node.getPosition().x + "," + node.getPosition().y + " ";
+			}, "")
+		);
+		console.log(this._element.getAttribute("points"));
+		return this;
+	}
+}
+
+TcSvgEdit.ElementSub = class {
+}
+
+TcSvgEdit.ElementPathMove = class extends TcSvgEdit.ElementSub {
+}
 
 // Register Element Names
 TcSvgEdit.ElementObjects = {
 	circle:	TcSvgEdit.ElementCircle,
 	line:	TcSvgEdit.ElementLine,
+	path:	TcSvgEdit.ElementPath,
+	path_love:	TcSvgEdit.ElementPathLine,
+	path_move:	TcSvgEdit.ElementPathMove,
 	polyline:	TcSvgEdit.ElementPolyLine,
 }
+
+/**
+Move	M10 10
+Line	L 20 20   (H and L will be ignored)
+cloZe	Z
+Cubic	C 10 10, 20 20, 30 10
+Cubic S	S 20 20, 30 10
+Quad	Q 10 10, 20 20
+Quad	T 10 10
+Arc		A rx ry x-axis rotation larg-arc-flag sweep-flag x y
+
+
+
+*/
 
 
 TcSvgEdit._NodeRelative = class {
