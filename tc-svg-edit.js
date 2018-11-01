@@ -49,7 +49,9 @@ class TcSvgEdit {
 		});
 		
 		TcSvgEdit._element_current = null;
+		TcSvgEdit._element_sub_current = null;
 		TcSvgEdit._element_type_selected = null;
+		TcSvgEdit._element_sub_type_selected = null;
 		TcSvgEdit._svg_current = null;
 	}
 
@@ -106,9 +108,11 @@ class TcSvgEdit {
 	static onMouseDown(event) {
 		////console.debug("TcSvgEdit.onMouseDown");
 		////console.debug(event);
+		if (TcSvgEdit.elementSubTypeSelect(event)) { return true; }
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
+		TcSvgEdit.svgCurrentGet().setElementSubTypeSelected();
 		TcSvgEdit.svgCurrentGet().setElementTypeSelected();
 	}
 	
@@ -145,12 +149,14 @@ class TcSvgEdit {
 		TcSvgEdit._svg_current = svg;
 		TcSvgEdit.elementStrokeColorSet();
 		TcSvgEdit.elementStrokeWidthSet();
+		TcSvgEdit.elementSubTypeSelectedSet();
 		TcSvgEdit.elementTypeSelectedSet();
 		TcSvgEdit.documentInfoField("svg_current", svg._svg.getAttribute("id"));
 	}
 	
 	static svgCurrentUnset() {
 		////console.debug('svgCurrentUnset');
+		TcSvgEdit.elementSubTypeSelectedUnset();
 		TcSvgEdit.elementTypeSelectedUnset();
 		TcSvgEdit.documentInfoField("svg_current", "");
 		TcSvgEdit._svg_current = null;
@@ -235,6 +241,46 @@ class TcSvgEdit {
 		});
 	}
 
+	
+	//
+	// elementSubTypeSelect
+	//
+
+	static elementSubTypeSelect(event) {
+		////console.debug('elementTypeSelect');
+		let elem = event.target.closest("[data-tc-svg-edit-element-sub-type-select]");
+		if (!elem) { return false }
+		////console.debug(elem);
+		let type = elem.getAttribute("data-tc-svg-edit-element-sub-type-select")
+		////console.debug(type);
+		TcSvgEdit.svgCurrentGet().setElementSubTypeSelected(type);
+		return true;
+	}
+	
+	static elementSubTypeSelectedSet() {
+		////console.debug('elementSubTypeSelectedSet');
+		////console.debug(TcSvgEdit.svgCurrentGet());
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementSubTypeSelected());
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-sub-type-select=\"" + 
+			TcSvgEdit.svgCurrentGet().getElementSubTypeSelected() +
+			"\"]"
+		).forEach(function(elem) {
+			elem.classList.add("selected");
+		});
+	}
+
+	static elementSubTypeSelectedUnset(type) {
+		////console.debug('elementSubTypeSelectedUnset');
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementSubTypeSelected());
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-sub-type-select=\"" + 
+			TcSvgEdit.svgCurrentGet().getElementSubTypeSelected() +
+			"\"]"
+		).forEach(function(elem) {
+			elem.classList.remove("selected");
+		});
+	}
 	
 	//
 	// elementTypeSelect
@@ -333,9 +379,11 @@ TcSvgEdit.Svg = class {
 		////console.debug('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
 		this._element_current = null;
+		this._element_sub_current = null;
 		this._element_selected = null;
 		this._element_stroke_color = this.getDefaultData("strokeColor");
 		this._element_stroke_width = this.getDefaultData("strokeWidth");
+		this._element_sub_type_selected = null;
 		this._element_type_selected = null;
 		this._elements = [];
 		this._nodes = [];
@@ -386,7 +434,10 @@ TcSvgEdit.Svg = class {
 		////console.debug(event);
 		switch (event.key) {
 			case "c" : return this.setElementTypeSelected("circle");
+			case "i" : return this.setElementTypeSelected("path") && this.setElementSubTypeSelected("path_line");
 			case "l" : return this.setElementTypeSelected("line");
+			case "m" : // Fall trough to p 
+			case "p" : return this.setElementTypeSelected("path") && this.setElementSubTypeSelected("path_move");
 			case "y" : return this.setElementTypeSelected("polyline");
 			case "Delete" : return this.doDelete();
 			case "Escape" : return this.setElementTypeSelected(null);
@@ -400,7 +451,7 @@ TcSvgEdit.Svg = class {
 		////console.debug("Svg.onMouseDown");
 		//console.debug(event);
 		let node = this.getNode(event.target.closest(".node"));
-		////console.debug(node);
+		////console.debug(node);11
 		if (!node) { 
 			node = this.createNode(this.getCoordinates(event));
 		}
@@ -728,6 +779,19 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 
+	getElementSubCurrent() {
+		////console.debug("Svg.getElementSubCurrent()");
+		return this._element_sub_current;
+	}
+	
+	setElementSubCurrent(elem=null) {
+		////console.debug("Svg.setElementSubCurrent()");
+		////console.debug(elem);
+		this._element_sub_current = elem;
+		TcSvgEdit.documentInfoField("element_sub_current", this._element_sub_current);
+		return this;
+	}
+
 	getElementSelected() {
 		return this._element_selected;
 	}
@@ -749,6 +813,21 @@ TcSvgEdit.Svg = class {
 	setElementStrokeWidth(width) {
 		this._element_stroke_width = width;
 		TcSvgEdit.elementStrokeWidthSet(width);
+		return this;
+	}
+
+	getElementSubTypeSelected() {
+		////console.debug("Svg.getElementSubTypeSelected()");
+		return this._element_sub_type_selected;
+	}
+	
+	setElementSubTypeSelected(type=null) {
+		////onsole.debug('Svg.setElementSubTypeSelected');
+		////console.debug(type);
+		TcSvgEdit.elementSubTypeSelectedUnset();
+		this.setElementSubCurrent(); // Unset the current Element, so a new one is create with this for the new type
+		this._element_sub_type_selected = type;
+		if (type) { TcSvgEdit.elementSubTypeSelectedSet(type); }
 		return this;
 	}
 
@@ -1124,6 +1203,18 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 		this._element.setAttribute("r", TcSvgEdit.Util.distance(p1, p2));
 		
 		return this;
+	}
+	
+	toString() {
+		let str = 'circle';
+		if (this._nodes.)
+		let p1 = this._nodes[0].getPosition();
+		let p2 = this._nodes[1].getPosition();
+		
+		this._element.setAttribute("cx", p1.x);
+		this._element.setAttribute("cy", p1.y);
+		this._element.setAttribute("r", TcSvgEdit.Util.distance(p1, p2));
+		return 'circle cx="'+p1.x+'" cy="'+p1.y+'" r="'+TcSvgEdit.Util.distance(p1, p2)+'"';
 	}
 }
 
