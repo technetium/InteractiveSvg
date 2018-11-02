@@ -1356,29 +1356,90 @@ class TcSvgTessellation {
 			TcSvgTessellation.onLoad(event);
 		});
 		
-		this._tessellations = null;
+		TcSvgTessellation._tessellations = [];
 	}
 	
 	static onLoad(event) {
-		document.querySelectorAll("data-tc-svg-tessellation-class]").forEach(function(elem) {
-			elem.innerHTML = value;
+		console.debug('TcSvgTessellation.onLoad');
+		document.querySelectorAll("[data-tc-svg-tessellation-type]").forEach(function(elem) {
+			console.debug(elem);
+			let type = TcSvgTessellation.TessellationObjects[elem.dataset["tcSvgTessellationType"]];
+			if(type) {
+				new type(elem);
+			}
 		});
-;
-		data-tc-svg-tessellation-class
 	}
-	
-	
-	static triangle(group) {
+}
+
+//	Utilities Class
+//
+TcSvgTessellation.Util = class {
+	static setObjectField(object, fields, value) {
+		////console.debug("TcSvgTessellation.Util.setObjectField");
+		////console.debug(object);
+		////console.debug(fields);
+		////console.debug(value);
+		let field = fields.shift();
+		if (0 === fields.length) { 
+			object[field] = value;
+			return object;
+		}
+		if ("undefined" === typeof object[field]) {
+			object[field] = {};
+		}
+		return TcSvgTessellation.Util.setObjectField(object[field], fields, value);
 	}
-	
-	
 }
 
 TcSvgTessellation.Tessellation = class {
-	this_elements = {};
+	constructor(elem) {
+		console.debug('Tessellation.constructor');
+		this._elem = elem;
+		TcSvgTessellation._tessellations.push(this);
+		this._elements = {};
+		this._controls = {};
+		for(let key in elem.dataset) {
+			////console.debug("Key: " + key);
+			if (key.startsWith("tcSvgTessellationElement")) {
+				this._elements[key.replace("tcSvgTessellationElement", "")] = document.querySelector(elem.dataset[key]);
+			}
+			if (key.startsWith("tcSvgTessellationControlElement")) {
+				let celem = document.querySelector(elem.dataset[key]);
+				let name = key.replace("tcSvgTessellationControlElement", "");
+				if (name.endsWith("X")) {
+					name = name.slice(0, -1);
+					////this._controls[name].x.elem = celem;
+					TcSvgTessellation.Util.setObjectField(this._controls, [name, "x", "elem"], celem);
+				} else if (name.endsWith("Y")) {
+					name = name.slice(0, -1);
+					////this._controls[name].y.elem = celem;
+					TcSvgTessellation.Util.setObjectField(this._controls, [name, "y", "elem"], celem);
+				} else {
+					////this._controls[name].x.elem = celem;
+					TcSvgTessellation.Util.setObjectField(this._controls, [name, "x", "elem"], celem);
+					////this._controls[name].y.elem = celem;
+					TcSvgTessellation.Util.setObjectField(this._controls, [name, "y", "elem"], celem);
+				}					
+			}
+			if (key.startsWith("tcSvgTessellationControlAttribute")) {
+				let name = key.replace("tcSvgTessellationControlAttribute", "").slice(0, -1);
+				if (key.endsWith("X")) {
+					TcSvgTessellation.Util.setObjectField(this._controls, [name, "x", "attr"], elem.dataset[key]);
+				} else if (key.endsWith("Y")) {
+					TcSvgTessellation.Util.setObjectField(this._controls, [name, "y", "attr"], elem.dataset[key]);
+				}
+			}
+		}
+		////console.debug(this._elements);
+		////console.debug(this._controls);
+	}
 }
 
 TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessellation {
+	constructor(elem) {
+		super(elem);
+	}
+	
 }
 
 // Register Element Names
