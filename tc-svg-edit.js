@@ -1182,6 +1182,9 @@ TcSvgEdit.ElementPolyLine = class extends TcSvgEdit.Element {
 	}
 }
 
+//
+// ELEMENT PATH WRAPPER CLASS
+//
 TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
 	constructor(svg) {
 		////console.debug('new ElementLine')
@@ -1210,6 +1213,15 @@ TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
 TcSvgEdit.ElementSub = class {
 }
 
+
+TcSvgEdit.ElementPathLine = class {
+}
+
+TcSvgEdit.ElementPathMove = class {
+}
+
+
+
 TcSvgEdit.ElementPathMove = class extends TcSvgEdit.ElementSub {
 }
 
@@ -1218,7 +1230,7 @@ TcSvgEdit.ElementObjects = {
 	circle:	TcSvgEdit.ElementCircle,
 	line:	TcSvgEdit.ElementLine,
 	path:	TcSvgEdit.ElementPath,
-	path_love:	TcSvgEdit.ElementPathLine,
+	path_line:	TcSvgEdit.ElementPathLine,
 	path_move:	TcSvgEdit.ElementPathMove,
 	polyline:	TcSvgEdit.ElementPolyLine,
 }
