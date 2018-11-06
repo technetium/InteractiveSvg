@@ -309,6 +309,7 @@ TcSvgEdit.Util = class {
 		if (expr) return true;
 		0/1;
 	}
+
 	static diff(p1, p2) {
 		return { 
 			x: p1.x - p2.x,
@@ -1401,6 +1402,51 @@ TcSvgTessellation.Util = class {
 		}
 		return TcSvgTessellation.Util.setObjectField(object[field], fields, value);
 	}
+
+	static diff(p1, p2) {
+		return { 
+			x: p1.x - p2.x,
+			y: p1.y - p2.y,
+		}
+	}
+	static distance(p1, p2) {
+		let d = TcSvgTessellation.Util.diff(p1, p2);
+		return Math.sqrt(d.x * d.x + d.y * d.y);
+	}
+	static direction(p1, p2) {
+		let d = TcSvgTessellation.Util.diff(p1, p2);
+		return Math.atan2(d.x, d.y);
+	}
+
+	static getId(elem) {
+		////console.debug('Util.getId()');
+		////console.debug(elem);
+		let id = elem.getAttribute('id');
+		if ('undefined' === typeof id) {
+			id = 'id' +	Math.random().toString(36).substr(2);
+			elem.setAttribute('id', id); // elem is an object => by reference, this works!
+		}
+		return id;
+	}
+	
+	static getControlPosition(control) {
+		return {
+			x: control.x.elem.getAttribute(control.x.attr),
+			y: control.y.elem.getAttribute(control.y.attr),
+		}
+	}
+	
+	static createSvgUseElement(elem) {
+		////console.debug('Util.createSvgUseElement()');
+		////console.debug(elem);
+		let u = TcSvgEdit.createSvgElement("use");
+		u.setAttributeNS(TcSvgEdit.namespace_xlink, "href", '#' + TcSvgTessellation.Util.getId(elem));
+		////console.debug(u);
+		return u;
+	}
+	
+	
+	
 }
 
 TcSvgTessellation.Tessellation = class {
@@ -1431,7 +1477,7 @@ TcSvgTessellation.Tessellation = class {
 					TcSvgTessellation.Util.setObjectField(this._controls, [name, "x", "elem"], celem);
 					////this._controls[name].y.elem = celem;
 					TcSvgTessellation.Util.setObjectField(this._controls, [name, "y", "elem"], celem);
-				}					
+				}
 			}
 			if (key.startsWith("tcSvgTessellationControlAttribute")) {
 				let name = key.replace("tcSvgTessellationControlAttribute", "").slice(0, -1);
@@ -1445,19 +1491,47 @@ TcSvgTessellation.Tessellation = class {
 		////console.debug(this._elements);
 		////console.debug(this._controls);
 	}
+	
+	update() {
+		1/0;
+	}
 }
 
 TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessellation {
 	constructor(elem) {
+		console.debug('TessellationTriangle.construct()');
 		super(elem);
+		console.debug(this);
+		this._line = [];
+		this._line[0] = TcSvgTessellation.Util.createSvgUseElement(this._elements.Line1);
+		elem.appendChild(this._line[0]);
+		this.update();
 	}
 	
+	update() {
+		console.debug('TessellationTriangle.update()');
+		//console.debug(this._controls.Line1Start.x.elem);
+		let start = TcSvgTessellation.Util.getControlPosition(this._controls.Line1Start);
+		let end = TcSvgTessellation.Util.getControlPosition(this._controls.Line1End);
+		this._line[0].setAttribute("x", -start.x);
+		this._line[0].setAttribute("y", -start.y);
+		console.debug(this._line[0]);
+
+		console.debug('array');
+		
+		for (let i = 0; i < 3; i++) {
+			console.debug(i);
+		};
+		console.debug('rotate');
+		this._line[0].setAttribute("transform", "rotate(" + (TcSvgTessellation.Util.direction(start, end) * 180 / Math.PI + 90)  + ")");
+	}
 }
 
 // Register Element Names
 TcSvgTessellation.TessellationObjects = {
 	triangle:	TcSvgTessellation.TessellationTriangle,
 }
+
 
 
 // Triangle 
