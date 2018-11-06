@@ -1212,14 +1212,14 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	
 	toString() {
 		let str = 'circle';
-		if (this._nodes.)
+		if (0 === this._nodes.length) { return str; }
 		let p1 = this._nodes[0].getPosition();
+		str += ' cx="' + p1.x + '"';
+		str += ' cy="' + p1.y + '"';
+		if (1 === this._nodes.length) { return str; }
 		let p2 = this._nodes[1].getPosition();
-		
-		this._element.setAttribute("cx", p1.x);
-		this._element.setAttribute("cy", p1.y);
-		this._element.setAttribute("r", TcSvgEdit.Util.distance(p1, p2));
-		return 'circle cx="'+p1.x+'" cy="'+p1.y+'" r="'+TcSvgEdit.Util.distance(p1, p2)+'"';
+		str += ' r="'+TcSvgEdit.Util.distance(p1, p2)+'"';
+		return str;
 	}
 }
 
