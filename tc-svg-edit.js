@@ -112,8 +112,10 @@ class TcSvgEdit {
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
+		if (TcSvgEdit.svgCurrentGet()) {
 		TcSvgEdit.svgCurrentGet().setElementSubTypeSelected();
-		TcSvgEdit.svgCurrentGet().setElementTypeSelected();
+			TcSvgEdit.svgCurrentGet().setElementTypeSelected();
+		}
 	}
 	
 	static onMouseMove(event) {
@@ -143,15 +145,18 @@ class TcSvgEdit {
 	}
 	
 	static svgCurrentSet(svg) {
-		////console.debug('svgCurrentSet()');
+		////console.debug('TcSvgEdit.svgCurrentSet()');
 		////console.debug(svg);
+		
 		if (TcSvgEdit._svg_current) { TcSvgEdit.svgCurrentUnset() }
+		if (svg) {
 		TcSvgEdit._svg_current = svg;
 		TcSvgEdit.elementStrokeColorSet();
 		TcSvgEdit.elementStrokeWidthSet();
 		TcSvgEdit.elementSubTypeSelectedSet();
 		TcSvgEdit.elementTypeSelectedSet();
 		TcSvgEdit.documentInfoField("svg_current", svg._svg.getAttribute("id"));
+		}
 	}
 	
 	static svgCurrentUnset() {
@@ -1440,12 +1445,40 @@ TcSvgEdit._NodeRelative = class {
 
 class TcSvgTessellation {
 	constructor() {
+		window.addEventListener("load", function(event){
+			TcSvgTessellation.onLoad(event);
+		});
 		
+		this._tessellations = null;
 	}
+	
+	static onLoad(event) {
+		document.querySelectorAll("data-tc-svg-tessellation-class]").forEach(function(elem) {
+			elem.innerHTML = value;
+		});
+;
+		data-tc-svg-tessellation-class
+	}
+	
 	
 	static triangle(group) {
 	}
+	
+	
 }
+
+TcSvgTessellation.Tessellation = class {
+	this_elements = {};
+}
+
+TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessellation {
+}
+
+// Register Element Names
+TcSvgTessellation.TessellationObjects = {
+	triangle:	TcSvgTessellation.TessellationTriangle,
+}
+
 
 // Triangle 
 //cos(C) = (a^2 + b^2 - c^2) / 2ab  <= Langste lijn is c
@@ -1454,4 +1487,5 @@ class TcSvgTessellation {
 
 
 new TcSvgEdit("someprefix");
+new TcSvgTessellation();
 
