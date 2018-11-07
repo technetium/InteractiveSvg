@@ -786,6 +786,10 @@ TcSvgEdit.Svg = class {
 	getElementSelected() {
 		return this._element_selected;
 	}
+	setElementSelected(element) {
+		this._element_selected = element;
+		return this;
+	}
 
 	getElementStrokeColor() {
 		return this._element_stroke_color;
@@ -1201,20 +1205,20 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 	}
 	
 	toString() {
-		console.log('ElementCircle.toString');
-		console.log(this);
-		console.log(this._nodes);
+		////console.log('ElementCircle.toString');
+		////console.log(this);
+		////console.log(this._nodes);
 		let str = 'circle';
-		console.log(str);
+		////console.log(str);
 		if (0 === this._nodes.length) { return str; }
 		let p1 = this._nodes[0].getPosition();
 		str += ' cx="' + p1.x + '"';
 		str += ' cy="' + p1.y + '"';
-		console.log(str);
+		////console.log(str);
 		if (1 === this._nodes.length) { return str; }
 		let p2 = this._nodes[1].getPosition();
 		str += ' r="'+TcSvgEdit.Util.distance(p1, p2)+'"';
-		console.log(str);
+		////console.log(str);
 		return str;
 	}
 }
@@ -1266,7 +1270,7 @@ TcSvgEdit.ElementPolyLine = class extends TcSvgEdit.Element {
 				return acc + node.getPosition().x + "," + node.getPosition().y + " ";
 			}, "")
 		);
-		console.log(this._element.getAttribute("points"));
+		////console.log(this._element.getAttribute("points"));
 		return this;
 	}
 }
@@ -1289,7 +1293,7 @@ TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
 	addNode(node) {
 		console.debug('ElementPath.addNode');
 		if (!this._element_sub_current) {
-			this._element_sub_current =	new TcSvgEdit.ElementObjects[this.getSvg().getElementSubTypeSelected()];
+			this._element_sub_current =	new TcSvgEdit.ElementObjects[this.getSvg().getElementSubTypeSelected(this)](this);
 		}
 		this._element_sub_current.addNode(node);
 		console.debug(this);
@@ -1297,9 +1301,7 @@ TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
 		if (this._element_sub_current.getNodes().length == this._element_sub_current.maxNodes()) {
 			this._element_subs.push(this._element_sub_current);
 			this._element_sub_current = null;
-			console.debug("bla");
 			this.update();
-			console.debug("blu");
 		}			
 		return this;
 	}	
@@ -1325,22 +1327,26 @@ TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
 }
 
 TcSvgEdit.ElementSub = class {
-	constructor() {
+	constructor(element) {
 		console.debug('ElementSub.construct');
+		this._element = element;
 		this._nodes = [];
 	}
 	destruct() {
+		this._elem = null;
 		this._nodes = [];
 		return null;
 	}
 
 	addNode(node) {
 		console.debug('ElementSub.addNode()');
+		node.addElement(this.getElement())
 		this._nodes.push(node);
 	}
 	
 	maxNodes() {	1/0; }
 	getD() { 1/0; }
+	getElement() { return this._element; }
 	getNodes() { return this._nodes; }
 }
 
