@@ -438,10 +438,14 @@ TcSvgEdit.Svg = class {
 		////console.debug(event);
 		switch (event.key) {
 			case "c" : return this.setElementTypeSelected("circle");
-			case "i" : return this.setElementTypeSelected("path") && this.setElementSubTypeSelected("path_line");
+			case "i" : return ((path === this.getElementTypeSelected()) || this.setElementTypeSelected("path")) && this.setElementSubTypeSelected("path_line");
 			case "l" : return this.setElementTypeSelected("line");
 			case "m" : // Fall trough to p 
-			case "p" : return this.setElementTypeSelected("path") && this.setElementSubTypeSelected("path_move");
+			case "i" : return ((path === this.getElementTypeSelected()) || this.setElementTypeSelected("path")) && this.setElementSubTypeSelected("path_move");
+			case "s" : return ((path === this.getElementTypeSelected()) || this.setElementTypeSelected("path")) && this.setElementSubTypeSelected("path_cubic-smooth");
+			case "t" : return ((path === this.getElementTypeSelected()) || this.setElementTypeSelected("path")) && this.setElementSubTypeSelected("path_quadratic-smooth");
+			case "u" : return ((path === this.getElementTypeSelected()) || this.setElementTypeSelected("path")) && this.setElementSubTypeSelected("path_cubic");
+			case "q" : return ((path === this.getElementTypeSelected()) || this.setElementTypeSelected("path")) && this.setElementSubTypeSelected("path_quadratic");
 			case "y" : return this.setElementTypeSelected("polyline");
 			case "Delete" : return this.doDelete();
 			case "Escape" : return this.setElementTypeSelected(null);
@@ -1349,24 +1353,53 @@ TcSvgEdit.ElementSub = class {
 	getD() { 1/0; }
 	getElement() { return this._element; }
 	getNodes() { return this._nodes; }
+	getNodesString() {
+		return this.getNodes().reduce((acc, node) => { 
+			//return acc + node.getPosition().x + " "node.getPosition().x + " ";
+			return acc + node.getPosition().x + "," + node.getPosition().y + " ";
+		}, "")
+	}
 }
 
+TcSvgEdit.ElementPathCubic = class extends TcSvgEdit.ElementSub {
+	maxNodes() { return 3; }
+	getD() {
+		return "C" + this.getNodesString();
+	}
+}
+
+TcSvgEdit.ElementPathCubicSmooth = class extends TcSvgEdit.ElementSub {
+	maxNodes() { return 2; }
+	getD() {
+		return "S" + this.getNodesString();
+	}
+}
 
 TcSvgEdit.ElementPathLine = class extends TcSvgEdit.ElementSub {
 	maxNodes() { return 1; }
-	
 	getD() {
-		let pos = this._nodes[0].getPosition();
-		return "L" + pos.x + "," + pos.y + " ";
+		return "L" + this.getNodesString();
 	}
 }
 
 TcSvgEdit.ElementPathMove = class extends TcSvgEdit.ElementSub {
 	maxNodes() { return 1; }
-
 	getD() {
-		let pos = this._nodes[0].getPosition();
-		return "M" + pos.x + "," + pos.y + " ";
+		return "M" + this.getNodesString();
+	}
+}
+
+TcSvgEdit.ElementPathQuadratic = class extends TcSvgEdit.ElementSub {
+	maxNodes() { return 2; }
+	getD() {
+		return "Q" + this.getNodesString();
+	}
+}
+
+TcSvgEdit.ElementPathQuadraticSmooth = class extends TcSvgEdit.ElementSub {
+	maxNodes() { return 1; }
+	getD() {
+		return "T" + this.getNodesString();
 	}
 }
 
@@ -1375,7 +1408,12 @@ TcSvgEdit.ElementObjects = {
 	circle:	TcSvgEdit.ElementCircle,
 	line:	TcSvgEdit.ElementLine,
 	path:	TcSvgEdit.ElementPath,
+	path_cubic:	TcSvgEdit.ElementPathCubic,
+	path_cubicSmooth:	TcSvgEdit.ElementPathCubicSmooth,
 	path_line:	TcSvgEdit.ElementPathLine,
+	path_move:	TcSvgEdit.ElementPathMove,
+	path_quadratic:	TcSvgEdit.ElementPathQuadratic,
+	path_quadraticSmooth:	TcSvgEdit.ElementPathQuadraticSmooth,
 	path_move:	TcSvgEdit.ElementPathMove,
 	polyline:	TcSvgEdit.ElementPolyLine,
 }
@@ -1383,6 +1421,7 @@ TcSvgEdit.ElementObjects = {
 /**
 Move	M10 10
 Line	L 20 20   (H and L will be ignored)
+
 cloZe	Z
 Cubic	C 10 10, 20 20, 30 10
 Cubic S	S 20 20, 30 10
