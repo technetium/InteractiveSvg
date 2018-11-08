@@ -49,7 +49,9 @@ class TcSvgEdit {
 		});
 		
 		TcSvgEdit._element_current = null;
+		TcSvgEdit._element_sub_current = null;
 		TcSvgEdit._element_type_selected = null;
+		TcSvgEdit._element_sub_type_selected = null;
 		TcSvgEdit._svg_current = null;
 	}
 
@@ -106,10 +108,14 @@ class TcSvgEdit {
 	static onMouseDown(event) {
 		////console.debug("TcSvgEdit.onMouseDown");
 		////console.debug(event);
+		if (TcSvgEdit.elementSubTypeSelect(event)) { return true; }
 		if (TcSvgEdit.elementTypeSelect(event)) { return true; }
 		let svg = TcSvgEdit.getSvg(event.target.closest("svg.tc_svg_edit"));
 		if (svg && svg.onMouseDown(event)) { return true; }
-		if (TcSvgEdit.svgCurrentGet()) { TcSvgEdit.svgCurrentGet().setElementTypeSelected(); }
+		if (TcSvgEdit.svgCurrentGet()) {
+		TcSvgEdit.svgCurrentGet().setElementSubTypeSelected();
+			TcSvgEdit.svgCurrentGet().setElementTypeSelected();
+		}
 	}
 	
 	static onMouseMove(event) {
@@ -147,6 +153,7 @@ class TcSvgEdit {
 		TcSvgEdit._svg_current = svg;
 		TcSvgEdit.elementStrokeColorSet();
 		TcSvgEdit.elementStrokeWidthSet();
+		TcSvgEdit.elementSubTypeSelectedSet();
 		TcSvgEdit.elementTypeSelectedSet();
 		TcSvgEdit.documentInfoField("svg_current", svg._svg.getAttribute("id"));
 		}
@@ -154,6 +161,7 @@ class TcSvgEdit {
 	
 	static svgCurrentUnset() {
 		////console.debug('svgCurrentUnset');
+		TcSvgEdit.elementSubTypeSelectedUnset();
 		TcSvgEdit.elementTypeSelectedUnset();
 		TcSvgEdit.documentInfoField("svg_current", "");
 		TcSvgEdit._svg_current = null;
@@ -238,6 +246,46 @@ class TcSvgEdit {
 		});
 	}
 
+	
+	//
+	// elementSubTypeSelect
+	//
+
+	static elementSubTypeSelect(event) {
+		////console.debug('elementTypeSelect');
+		let elem = event.target.closest("[data-tc-svg-edit-element-sub-type-select]");
+		if (!elem) { return false }
+		////console.debug(elem);
+		let type = elem.getAttribute("data-tc-svg-edit-element-sub-type-select")
+		////console.debug(type);
+		TcSvgEdit.svgCurrentGet().setElementSubTypeSelected(type);
+		return true;
+	}
+	
+	static elementSubTypeSelectedSet() {
+		////console.debug('elementSubTypeSelectedSet');
+		////console.debug(TcSvgEdit.svgCurrentGet());
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementSubTypeSelected());
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-sub-type-select=\"" + 
+			TcSvgEdit.svgCurrentGet().getElementSubTypeSelected() +
+			"\"]"
+		).forEach(function(elem) {
+			elem.classList.add("selected");
+		});
+	}
+
+	static elementSubTypeSelectedUnset(type) {
+		////console.debug('elementSubTypeSelectedUnset');
+		////console.debug(TcSvgEdit.svgCurrentGet().getElementSubTypeSelected());
+		document.querySelectorAll(
+			"[data-tc-svg-edit-element-sub-type-select=\"" + 
+			TcSvgEdit.svgCurrentGet().getElementSubTypeSelected() +
+			"\"]"
+		).forEach(function(elem) {
+			elem.classList.remove("selected");
+		});
+	}
 	
 	//
 	// elementTypeSelect
@@ -337,9 +385,11 @@ TcSvgEdit.Svg = class {
 		////console.debug('TcSvgEdit.Svg.constructor');
 		this._svg = svg;
 		this._element_current = null;
+		this._element_sub_current = null;
 		this._element_selected = null;
 		this._element_stroke_color = this.getDefaultData("strokeColor");
 		this._element_stroke_width = this.getDefaultData("strokeWidth");
+		this._element_sub_type_selected = null;
 		this._element_type_selected = null;
 		this._elements = [];
 		this._nodes = [];
@@ -348,8 +398,6 @@ TcSvgEdit.Svg = class {
 		this._node_relative_selected = null
 		this._node_selected = null;
 
-		this._stroke_color = 
-		
 		this._svg.addEventListener("mouseenter", this.onMouseEnter);
 		this._svg.addEventListener("mouseleave", this.onMouseLeave);
 		
@@ -390,7 +438,10 @@ TcSvgEdit.Svg = class {
 		////console.debug(event);
 		switch (event.key) {
 			case "c" : return this.setElementTypeSelected("circle");
+			case "i" : return this.setElementTypeSelected("path") && this.setElementSubTypeSelected("path_line");
 			case "l" : return this.setElementTypeSelected("line");
+			case "m" : // Fall trough to p 
+			case "p" : return this.setElementTypeSelected("path") && this.setElementSubTypeSelected("path_move");
 			case "y" : return this.setElementTypeSelected("polyline");
 			case "Delete" : return this.doDelete();
 			case "Escape" : return this.setElementTypeSelected(null);
@@ -404,7 +455,7 @@ TcSvgEdit.Svg = class {
 		////console.debug("Svg.onMouseDown");
 		//console.debug(event);
 		let node = this.getNode(event.target.closest(".node"));
-		////console.debug(node);
+		////console.debug(node);11
 		if (!node) { 
 			node = this.createNode(this.getCoordinates(event));
 		}
@@ -557,21 +608,9 @@ TcSvgEdit.Svg = class {
 		
 	initDrawing() {
 		////console.debug('initDrawing');
-		
 		let drawing = TcSvgEdit.createSvgElement("g");
 		drawing.setAttribute("id", this.idDrawing());
 		this._svg.append(drawing);
-		/*
-		let defs = this.getDefs();
-		let drawing = TcSvgEdit.createSvgElement("symbol");
-		drawing.setAttribute("id", this.idDrawing());
-		defs.append(drawing);
-		this._svg.append(
-			TcSvgEdit.createSvgUseElement(
-				"#" + this.idDrawing()
-			)
-		);
-		*/
 		return drawing;
 	}
 	
@@ -732,8 +771,25 @@ TcSvgEdit.Svg = class {
 		return this;
 	}
 
+	getElementSubCurrent() {
+		////console.debug("Svg.getElementSubCurrent()");
+		return this._element_sub_current;
+	}
+	
+	setElementSubCurrent(elem=null) {
+		////console.debug("Svg.setElementSubCurrent()");
+		////console.debug(elem);
+		this._element_sub_current = elem;
+		TcSvgEdit.documentInfoField("element_sub_current", this._element_sub_current);
+		return this;
+	}
+
 	getElementSelected() {
 		return this._element_selected;
+	}
+	setElementSelected(element) {
+		this._element_selected = element;
+		return this;
 	}
 
 	getElementStrokeColor() {
@@ -753,6 +809,21 @@ TcSvgEdit.Svg = class {
 	setElementStrokeWidth(width) {
 		this._element_stroke_width = width;
 		TcSvgEdit.elementStrokeWidthSet(width);
+		return this;
+	}
+
+	getElementSubTypeSelected() {
+		////console.debug("Svg.getElementSubTypeSelected()");
+		return this._element_sub_type_selected;
+	}
+	
+	setElementSubTypeSelected(type=null) {
+		////onsole.debug('Svg.setElementSubTypeSelected');
+		////console.debug(type);
+		TcSvgEdit.elementSubTypeSelectedUnset();
+		this.setElementSubCurrent(); // Unset the current Element, so a new one is create with this for the new type
+		this._element_sub_type_selected = type;
+		if (type) { TcSvgEdit.elementSubTypeSelectedSet(type); }
 		return this;
 	}
 
@@ -1036,7 +1107,7 @@ TcSvgEdit.Element = class {
 		console.debug('Element.destruct');
 		console.debug(this);
 		this.deselect();
-		this._nodes.forEach(function(node) {
+		this.getNodes().forEach(function(node) {
 			node.removeElement(this);
 		}, this);
 
@@ -1088,6 +1159,9 @@ TcSvgEdit.Element = class {
 	getElement() {
 		return this._element;
 	}
+	getNodes() {
+		return this._nodes;
+	}
 	setStrokeColor(color) {
 		this._element.style.stroke = color;
 		return this;
@@ -1099,7 +1173,8 @@ TcSvgEdit.Element = class {
 	}
 	
 	update() {
-		if (this.minNodes() <= this._nodes.length) { this.updateChild(); }
+		TcSvgEdit.documentInfoField("element_current", this);
+		if (this.minNodes() <= this.getNodes().length) { this.updateChild(); }
 	}	
 	
 	updateChild() { TcSvgEdit.Utill.assert(false); } // Needs to be defined in child class
@@ -1128,6 +1203,24 @@ TcSvgEdit.ElementCircle = class extends TcSvgEdit.Element {
 		this._element.setAttribute("r", TcSvgEdit.Util.distance(p1, p2));
 		
 		return this;
+	}
+	
+	toString() {
+		////console.log('ElementCircle.toString');
+		////console.log(this);
+		////console.log(this._nodes);
+		let str = 'circle';
+		////console.log(str);
+		if (0 === this._nodes.length) { return str; }
+		let p1 = this._nodes[0].getPosition();
+		str += ' cx="' + p1.x + '"';
+		str += ' cy="' + p1.y + '"';
+		////console.log(str);
+		if (1 === this._nodes.length) { return str; }
+		let p2 = this._nodes[1].getPosition();
+		str += ' r="'+TcSvgEdit.Util.distance(p1, p2)+'"';
+		////console.log(str);
+		return str;
 	}
 }
 
@@ -1173,12 +1266,12 @@ TcSvgEdit.ElementPolyLine = class extends TcSvgEdit.Element {
 	updateChild() {
 		this._element.setAttribute(
 			"points",
-			this._nodes.reduce((acc, node) => { 
+			this.getNodes().reduce((acc, node) => { 
 				//return acc + node.getPosition().x + " "node.getPosition().x + " ";
 				return acc + node.getPosition().x + "," + node.getPosition().y + " ";
 			}, "")
 		);
-		console.log(this._element.getAttribute("points"));
+		////console.log(this._element.getAttribute("points"));
 		return this;
 	}
 }
@@ -1188,42 +1281,93 @@ TcSvgEdit.ElementPolyLine = class extends TcSvgEdit.Element {
 //
 TcSvgEdit.ElementPath = class extends TcSvgEdit.Element {
 	constructor(svg) {
-		////console.debug('new ElementLine')
+		////console.debug('new ElementPath')
 		super(TcSvgEdit.createSvgElement("path"), svg);
 		this._element.style.fill = "none";
-		
-		this._sub_element = 'path_move'
+		this._element_subs = [];
+		this._element_sub_current = null;
 	}
 
 	maxNodes() { return Math.maxInt; }
-	minNodes() { return 2; }
-	
+	minNodes() { return 0; }
+
+	addNode(node) {
+		console.debug('ElementPath.addNode');
+		if (!this._element_sub_current) {
+			this._element_sub_current =	new TcSvgEdit.ElementObjects[this.getSvg().getElementSubTypeSelected(this)](this);
+		}
+		this._element_sub_current.addNode(node);
+		console.debug(this);
+		console.debug(this._element_sub_current.getNodes().length + " = " + this._element_sub_current.maxNodes());
+		if (this._element_sub_current.getNodes().length == this._element_sub_current.maxNodes()) {
+			this._element_subs.push(this._element_sub_current);
+			this._element_sub_current = null;
+			this.update();
+		}			
+		return this;
+	}	
+
 	updateChild() {
+		console.debug('ElementPath.updateChild');
 		this._element.setAttribute(
-			"points",
-			this._nodes.reduce((acc, node) => { 
+			"d",
+			this._element_subs.reduce((acc, element_sub) => { 
 				//return acc + node.getPosition().x + " "node.getPosition().x + " ";
-				return acc + node.getPosition().x + "," + node.getPosition().y + " ";
+				return acc + element_sub.getD();
 			}, "")
 		);
-		console.log(this._element.getAttribute("points"));
+		console.log(this._element.getAttribute("d"));
 		return this;
+	}
+	
+	getNodes() {
+		return this._element_subs.reduce((acc, element_sub) => { 
+			return acc.concat(element_sub.getNodes());
+		}, []);
 	}
 }
 
 TcSvgEdit.ElementSub = class {
+	constructor(element) {
+		console.debug('ElementSub.construct');
+		this._element = element;
+		this._nodes = [];
+	}
+	destruct() {
+		this._elem = null;
+		this._nodes = [];
+		return null;
+	}
+
+	addNode(node) {
+		console.debug('ElementSub.addNode()');
+		node.addElement(this.getElement())
+		this._nodes.push(node);
+	}
+	
+	maxNodes() {	1/0; }
+	getD() { 1/0; }
+	getElement() { return this._element; }
+	getNodes() { return this._nodes; }
 }
 
 
-TcSvgEdit.ElementPathLine = class {
+TcSvgEdit.ElementPathLine = class extends TcSvgEdit.ElementSub {
+	maxNodes() { return 1; }
+	
+	getD() {
+		let pos = this._nodes[0].getPosition();
+		return "L" + pos.x + "," + pos.y + " ";
+	}
 }
-
-TcSvgEdit.ElementPathMove = class {
-}
-
-
 
 TcSvgEdit.ElementPathMove = class extends TcSvgEdit.ElementSub {
+	maxNodes() { return 1; }
+
+	getD() {
+		let pos = this._nodes[0].getPosition();
+		return "M" + pos.x + "," + pos.y + " ";
+	}
 }
 
 // Register Element Names
@@ -1253,7 +1397,6 @@ Arc		A rx ry x-axis rotation larg-arc-flag sweep-flag x y
 
 TcSvgEdit._NodeRelative = class {
 	constructor(this_node, that_node) {
-		
 		////console.debug('_NodeRelative.construct()');
 		if (!this_node || !that_node) { 1/0; }
 		this._this_node = this_node;
@@ -1377,7 +1520,7 @@ class TcSvgTessellation {
 		document.querySelectorAll("[data-tc-svg-tessellation-type]").forEach(function(elem) {
 			console.debug(elem);
 			let type = TcSvgTessellation.TessellationObjects[elem.dataset["tcSvgTessellationType"]];
-			if(type) {
+			if (type) {
 				new type(elem);
 			}
 		});
