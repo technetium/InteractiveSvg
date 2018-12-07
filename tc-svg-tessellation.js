@@ -130,6 +130,32 @@ TcSvgTessellation.Tessellation = class {
 	}
 }
 
+TcSvgTessellation.TessellationLine = class extends TcSvgTessellation.Tessellation {
+	constructor(elem) {
+		console.debug('TessellationLine.construct()');
+		super(elem);
+		console.debug(this);
+		this._line = TcSvgTessellation.Util.createSvgUseElement(this._elements.Line);
+		elem.appendChild(this._line);
+		this.update();
+	}
+	
+	update() {
+		console.debug('TessellationTriangle.update()');
+		//console.debug(this._controls.Line1Start.x.elem);
+		let start = TcSvgTessellation.Util.getControlPosition(this._controls.LineStart);
+		let end = TcSvgTessellation.Util.getControlPosition(this._controls.LineEnd);
+		this._line.setAttribute("x", -start.x);
+		this._line.setAttribute("y", -start.y);
+		console.debug(this._line);
+		
+		console.debug('rotate');
+		this._line[0].setAttribute("transform", "rotate(" + (TcSvgTessellation.Util.direction(start, end) * 180 / Math.PI + 90)  + ")");
+	}
+}
+
+
+
 TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessellation {
 	constructor(elem) {
 		console.debug('TessellationTriangle.construct()');
@@ -162,6 +188,7 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 
 // Register Element Names
 TcSvgTessellation.TessellationObjects = {
+	line:	TcSvgTessellation.TessellationLine,
 	triangle:	TcSvgTessellation.TessellationTriangle,
 }
 
