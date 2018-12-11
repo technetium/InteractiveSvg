@@ -150,7 +150,7 @@ TcSvgTessellation.TessellationLine = class extends TcSvgTessellation.Tessellatio
 		console.debug(this._line);
 		
 		console.debug('rotate');
-		this._line[0].setAttribute("transform", "rotate(" + (TcSvgTessellation.Util.direction(start, end) * 180 / Math.PI + 90)  + ")");
+		this._line.setAttribute("transform", "rotate(" + (TcSvgTessellation.Util.direction(start, end) * 180 / Math.PI + 90)  + ")");
 	}
 }
 
@@ -170,7 +170,7 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 	update() {
 		console.debug('TessellationTriangle.update()');
 		//console.debug(this._controls.Line1Start.x.elem);
-		let start = TcSvgTessellation.Util.getControlPosition(this._controls.Line1Start);
+		let start = TcSvgTessellation.Util.getControlPosition(this._controls['Line' + 1 + 'Start']);
 		let end = TcSvgTessellation.Util.getControlPosition(this._controls.Line1End);
 		this._line[0].setAttribute("x", -start.x);
 		this._line[0].setAttribute("y", -start.y);
@@ -179,6 +179,7 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 		console.debug('array');
 		
 		for (let i = 0; i < 3; i++) {
+			//TcSvgTessellation.Util.direction(start, end);
 			console.debug(i);
 		};
 		console.debug('rotate');

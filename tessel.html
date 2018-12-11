@@ -5,33 +5,38 @@
 	width="500" height="240"
 	style="border: 1px solid white"
 >
-	<line id="line1" x1="50" y1="25" x2="100" y2="30" stroke="#330000" stroke-width="1" />
+	<g id="line1">
+		<path id="path" d="M50,25 C50,30 100,20 100,30" stroke="#000066" stroke-width="1" fill=transparent />
+		<circle id="start1" cx="50" cy="25" r="1" fill="#00CC00" />
+		<circle id="end1" cx="100" cy="30" r="1" fill="#CC0000" />
+	</g>
+	<line id="line1a" x1="50" y1="25" x2="100" y2="30" stroke="#330000" stroke-width="1" />
 	<line id="line2" x1="50" y1="50" x2="150" y2="50" stroke="green" stroke-width=".02" />
 	<line id="line3" x1="50" y1="75" x2="200" y2="75" stroke="blue" stroke-width=".02" />
 	<g transform="translate(100,100) rotate(0)"
 		data-tc-svg-tessellation-type="triangle"
 		data-tc-svg-tessellation-element-line1="#line1"
-		data-tc-svg-tessellation-control-element-line1-start="#line1"
-		data-tc-svg-tessellation-control-attribute-line1-start-x="x1"
-		data-tc-svg-tessellation-control-attribute-line1-start-y="y1"
-		data-tc-svg-tessellation-control-element-line1-end-x="#line1"
-		data-tc-svg-tessellation-control-element-line1-end-y="#line1"
-		data-tc-svg-tessellation-control-attribute-line1-end-x="x2"
-		data-tc-svg-tessellation-control-attribute-line1-end-y="y2"
+		data-tc-svg-tessellation-control-element-line1-start="#start1"
+		data-tc-svg-tessellation-control-attribute-line1-start-x="cx"
+		data-tc-svg-tessellation-control-attribute-line1-start-y="cy"
+		data-tc-svg-tessellation-control-element-line1-end-x="#end1"
+		data-tc-svg-tessellation-control-element-line1-end-y="#end1"
+		data-tc-svg-tessellation-control-attribute-line1-end-x="cx"
+		data-tc-svg-tessellation-control-attribute-line1-end-y="cy"
 	>
-		<circle x="0" y="0" r="2">
+		<circle cx="0" cy="0" r="2" fill="#000066">
 	</g>
-	<g transform="translate(100,150) rotate(100)"
+	<g transform="translate(100,150) rotate(0)"
 		data-tc-svg-tessellation-type="line"
 		data-tc-svg-tessellation-element-line="#line1"
-		data-tc-svg-tessellation-control-element-line-start="#line1"
-		data-tc-svg-tessellation-control-attribute-line-start-x="x1"
-		data-tc-svg-tessellation-control-attribute-line-start-y="y1"
-		data-tc-svg-tessellation-control-element-line-end="#line1"
-		data-tc-svg-tessellation-control-attribute-line-end-x="x1"
-		data-tc-svg-tessellation-control-attribute-line-end-y="y1"
+		data-tc-svg-tessellation-control-element-line-start="#start1"
+		data-tc-svg-tessellation-control-attribute-line-start-x="cx"
+		data-tc-svg-tessellation-control-attribute-line-start-y="cy"
+		data-tc-svg-tessellation-control-element-line-end="#end1"
+		data-tc-svg-tessellation-control-attribute-line-end-x="cx"
+		data-tc-svg-tessellation-control-attribute-line-end-y="cy"
 	>
-		<circle x="0" y="0" r="2">
+		<circle cx="0" cy="0" r="2" fill="#000066">
 	</g>
 
 </svg>
