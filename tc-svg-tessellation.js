@@ -55,8 +55,8 @@ TcSvgTessellation.Util = class {
 	}
 
 	static getId(elem) {
-		////console.debug('Util.getId()');
-		////console.debug(elem);
+		console.debug('Util.getId()');
+		console.debug(elem);
 		let id = elem.getAttribute('id');
 		if ('undefined' === typeof id) {
 			id = 'id' +	Math.random().toString(36).substr(2);
@@ -66,6 +66,8 @@ TcSvgTessellation.Util = class {
 	}
 	
 	static getControlPosition(control) {
+		console.debug('getControlPosition');
+		console.debug(control);
 		return {
 			x: control.x.elem.getAttribute(control.x.attr),
 			y: control.y.elem.getAttribute(control.y.attr),
@@ -162,26 +164,58 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 		super(elem);
 		console.debug(this);
 		this._line = [];
-		this._line[0] = TcSvgTessellation.Util.createSvgUseElement(this._elements.Line1);
-		elem.appendChild(this._line[0]);
+		for (let i = 0; i < 3; i++) {
+			this._line[i] = TcSvgTessellation.Util.createSvgUseElement(this._elements['Line' + (i+1)]);
+			elem.appendChild(this._line[i]);
+		}
 		this.update();
 	}
 	
 	update() {
 		console.debug('TessellationTriangle.update()');
 		//console.debug(this._controls.Line1Start.x.elem);
-		let start = TcSvgTessellation.Util.getControlPosition(this._controls['Line' + 1 + 'Start']);
-		let end = TcSvgTessellation.Util.getControlPosition(this._controls.Line1End);
-		this._line[0].setAttribute("x", -start.x);
-		this._line[0].setAttribute("y", -start.y);
-		console.debug(this._line[0]);
-
-		console.debug('array');
+		let start = [];
+		let end = [];
+		let longest_index = 0;
+		let longest_value = 0;
+		let lengths = [0, 0, Number.MAX_VALUE];
+		let orders = [];
 		
 		for (let i = 0; i < 3; i++) {
+			start[i] = TcSvgTessellation.Util.getControlPosition(this._controls['Line' + (i+1) + 'Start']);
+			end[i] = TcSvgTessellation.Util.getControlPosition(this._controls['Line' + (i+1) + 'End']);
+			lengths[i] = TcSvgTessellation.Util.distance(start[i], end[i]);
+			if (lengths[i] >= lengths[orders[2]]) {
+				orders[2] = i;
+			}
+			if (lengths[i] < lengths[orders[0]]) {
+				orders[0] = i;
+			}
+		}
+
+		orders[1] = 3 - orders[0] - orders[2];
+		
+		let C = Math.asin((
+			lengths[orders[0]] * lengths[orders[0]] +
+			lengths[orders[1]] * lengths[orders[1]] -
+			lengths[orders[2]] * lengths[orders[2]] )
+			/ (2 * lengths[orders[0]] * lengths[orders[1]])
+			);
+		if (isNaN(C)) { return ; }
+		
+		let B = Math.
+		
+		//sin(C)/c = sin(B)/b
+		
+		//sin B = b * sin(C) 
+		
+		
+		this._line[orders[2]].setAttribute("x", -start[orders[2]].x);
+		this._line[orders[2]].setAttribute("y", -start[orders[2]].y);
+
+		console.debug(this._line[0]);
+
 			//TcSvgTessellation.Util.direction(start, end);
-			console.debug(i);
-		};
 		console.debug('rotate');
 		this._line[0].setAttribute("transform", "rotate(" + (TcSvgTessellation.Util.direction(start, end) * 180 / Math.PI + 90)  + ")");
 	}
