@@ -179,6 +179,7 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 		let longest_index = 0;
 		let longest_value = 0;
 		let lengths = [0, 0, Number.MAX_VALUE];
+		let angles = [];
 		let orders = [];
 		
 		for (let i = 0; i < 3; i++) {
@@ -195,19 +196,20 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 
 		orders[1] = 3 - orders[0] - orders[2];
 		
-		let C = Math.asin((
+		angles[orders[2]] = Math.acos((
 			lengths[orders[0]] * lengths[orders[0]] +
 			lengths[orders[1]] * lengths[orders[1]] -
 			lengths[orders[2]] * lengths[orders[2]] )
 			/ (2 * lengths[orders[0]] * lengths[orders[1]])
-			);
+		);
 		if (isNaN(C)) { return ; }
 		
-		let B = Math.
-		
-		//sin(C)/c = sin(B)/b
-		
-		//sin B = b * sin(C) 
+		angles[orders[1]] = Math.asin(
+			lengths[orders[1]] * 
+			Math.sin(angles[orders[2]]) / 
+			lengths[orders[2]]
+		);
+		angles[orders[0]] = Math.PI - angles[orders[1]] - angles[orders[2]];
 		
 		
 		this._line[orders[2]].setAttribute("x", -start[orders[2]].x);
@@ -215,6 +217,9 @@ TcSvgTessellation.TessellationTriangle = class extends TcSvgTessellation.Tessell
 
 		console.debug(this._line[0]);
 
+		34567
+		//https://www.geogebra.org/m/yCk5kZrg		
+		
 			//TcSvgTessellation.Util.direction(start, end);
 		console.debug('rotate');
 		this._line[0].setAttribute("transform", "rotate(" + (TcSvgTessellation.Util.direction(start, end) * 180 / Math.PI + 90)  + ")");

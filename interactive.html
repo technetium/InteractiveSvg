@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<script type="text/javascript" src="./tc-svg-edit.js"></script>
+<script type="text/javascript" src="./tc-svg-tessellation.js"></script>
+<link rel="stylesheet" type="text/css" href="tc-svg-edit.css">
+</head>
+<body>
+
+<!-- Element type selectors -->
+<button data-tc-svg-edit-element-type-select="line"><b>L</b>ine</button>
+<button data-tc-svg-edit-element-type-select="circle"><b>C</b>ircle</button>
+<span data-tc-svg-edit-element="select-group">
+	<button data-tc-svg-edit-element-type-select="path"><b>P</b>ath</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_move">M<b>o</b>ve</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_line">L<b>i</b>ne</button>
+
+	<button data-tc-svg-edit-element-sub-type-select="path_cubic">C<b>u</b>bic</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_cubicSmooth">Cubic <b>s</b>mooth</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_quadratic"><b>Q</b>uadratic</button>
+	<button data-tc-svg-edit-element-sub-type-select="path_quadraticSmooth">Quadra<b>t</b>ic smooth</button>
+</span>
+
+<!--
+	Move	M10 10
+	Line	L 20 20   (H and L will be ignored)
+cloZe	Z
+	Cubic	C 10 10, 20 20, 30 10
+	Cubic S	S 20 20, 30 10
+	Quad	Q 10 10, 20 20
+	Quad	T 10 10
+Arc		A rx ry x-axis rotation larg-arc-flag sweep-flag x y
+-->
+
+<button data-tc-svg-edit-element-type-select="polyline">Pol<b>y</b>line</button>
+<button data-tc-svg-edit-element-type-select="line"><b>L</b></button>
+
+<!-- settings -->
+Colour:  <input data-tc-svg-edit-element-stroke-color type="color">
+Width:  <input data-tc-svg-edit-element-stroke-width type="number">
+
+
+<!-- info fields -->
+X: <span class="right_align_2em" data-tc-svg-edit-info-field="pos_x"></span>
+Y: <span class="right_align_2em" data-tc-svg-edit-info-field="pos_y"></span>
+SVG: <span data-tc-svg-edit-info-field="svg_current"></span>
+ELEM: <span data-tc-svg-edit-info-field="element_current"></span>
+
+
+
+<br />  
+  
+<svg version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+    width="500" height="240"
+	class="tc_svg_edit"
+	style="border: 1px solid red"
+
+>    
+</svg>
+
+
+<!--
+
+<span>
+User defined nodes<br />
+<svg version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+    width="500" height="240"
+	class="tc_svg_edit"
+	id="foo"
+	style = "border: 1px solid green"
+	
+	data-relative-indicator-stroke = "green"
+	data-relative-indicator-stroke-width = "3"
+	data-relative-indicator-stroke-dasharray = "20,10,5,5,10"
+>
+   <defs>
+		<linearGradient id="foo-gradient-relative" x1="0%" y1="0%" x2="0%" y2="100%">
+			<stop offset="0%" stop-color="#00bc9b" />
+			<stop offset="100%" stop-color="#5eaefd" />
+		</linearGradient>
+
+		<marker id="for-marker-end-relative" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth" viewBox="0 0 20 20">
+			<path d="M0,0 L0,6 L9,3 z" fill="#0F0" />
+		</marker>
+		
+		<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="+10" refY="3.5" orient="auto">
+			<polygon points="
+				0 0, 
+				10 3.5,
+				0 7" />
+		</marker>
+		
+
+		<symbol id="foo-symbol-node" class="node" transform="translate(-10, -10)">
+			<line x1="10" y1="10" x2="3" y2="0" stroke="#CCCCCC" />
+			<line x1="10" y1="10" x2="2" y2="2" stroke="#999999" />
+			<line x1="10" y1="10" x2="1" y2="4" stroke="#666666" />
+			<line x1="10" y1="10" x2="0" y2="6" stroke="#333333" />
+			
+			<circle cx="14" cy="14" r="5" fill="#0000CC" />
+			<circle cx="13" cy="13" r="4" fill="#00CC00" />
+			<circle cx="12" cy="12" r="3" fill="#CCCC00" />
+			<circle cx="11" cy="11" r="2" fill="#CC6600" />
+			<circle cx="10" cy="10" r="1" fill="#CC0000" />
+		</symbol>
+   </defs>
+	<g id="foo-circles">
+        <circle class="control_point" cx="230" cy="120" r="10" />
+        <circle class="point4 invisible" cx="120" cy="120" r="3" />
+		<use xlink:href="#foo-symbol-node" x="100" y="200">
+	</g>
+</svg>
+</span>
+
+-->
+<span>
+Add nodes and elements with Pre configured nodes<br />
+<svg 
+	version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+	class="tc_svg_edit"
+    width="500" height="240"
+	id="scripted"
+	style = "border: 1px solid blue"
+	viewBox="100 48 400 192"
+>
+	<g id="scripted-drawing">
+        <circle class="control_point" cx="20" cy="220" r="10" />
+ 		<use xlink:href="#foo-symbol-node" x="100" y="200">
+		<use xlink:href="#foo-circles" x="20" y="20">
+	</g>	
+	<circle class="point4 invisible" cx="220" cy="120" r="3" />
+	
+</svg>
+</span>
+<!-- -- >
+<svg 
+	version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+	class="tc_svg_edit"
+    width="500" height="240"
+	id="dependend"
+	style = "border: 1px solid purple"
+>
+	<g id="dependend-drawing">
+	<use xlink:href="#scripted-drawing" transform="scale(0.75)">
+	</g>
+</svg>
+<svg 
+	version="1.1"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+	class="tc_svg_edit"
+    width="500" height="240"
+	id="dedependend"
+	style = "border: 1px solid purple"
+>
+	<g id="dedependend-drawing">
+	<use xlink:href="#dependend-drawing" transform="scale(0.5) translate(200 100) rotate(60)">
+	</g>
+</svg>
+<!-- -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function(event) { 
+	let svg = TcSvgEdit.getSvgById("scripted");
+	////console.log(svg);
+	let node1 = svg.createNode({x: 100, y: 120});
+	let node2 = svg.createNode({x: 150, y: 120});
+	let node3 = svg.createNode({x: 200, y: 120});
+	let node4 = svg.createNode({x: 250, y: 120}).setRelative(node3);
+	let node5 = svg.createNode({x: 300, y: 120});
+	let node6 = svg.createNode({x: 350, y: 120});
+	let noder = svg.createNode({x: 360, y: 100});
+	
+	let circle = null;
+	new TcSvgEdit.ElementCircle(svg).addNode(node1).addNode(noder).setStrokeWidth(2).setStrokeColour("#CC0000");
+	new TcSvgEdit.ElementCircle(svg).addNode(node2).addNode(noder).setStrokeWidth(2).setStrokeColour("#CC6600");
+	new TcSvgEdit.ElementCircle(svg).addNode(node3).addNode(noder).setStrokeWidth(2).setStrokeColour("#CCCC00");
+	new TcSvgEdit.ElementCircle(svg).addNode(node4).addNode(noder).setStrokeWidth(2).setStrokeColour("#00CC00");
+	new TcSvgEdit.ElementCircle(svg).addNode(node5).addNode(noder).setStrokeWidth(2).setStrokeColour("#0000CC");
+	new TcSvgEdit.ElementCircle(svg).addNode(node6).addNode(noder).setStrokeWidth(2).setStrokeColour("#6600CC");
+	new TcSvgEdit.ElementPath(svg).
+	//svg.append(circle);
+	
+});
+
+</script>
+
+-->
+
+Events
+https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+
+
+Linear gradient
+ https://codepen.io/plava/pen/BjavpN
+
+https://technetium.github.io/InteractiveSvg/canvas.html  
+https://eloquentjavascript.net/15_event.html
+http://tutorials.jenkov.com/svg/svg-and-css.html
+https://help.github.com/articles/what-is-github-pages/
+https://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
+http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
+http://erik.eae.net/archives/2005/06/06/22.13.54/
+
+
+// On attribute change
+https://stackoverflow.com/questions/41424989/javascript-listen-for-attribute-change
+https://blog.sessionstack.com/how-javascript-works-tracking-changes-in-the-dom-using-mutationobserver-86adc7446401
+
+
+tessellations
+wallpapergroup
+http://dschulze.com/blog/articles/4/efficient-redrawing-on-svg-or-why-suspendredraw-is-a-lie
+
+Object.defineProperty(
+	Object.prototype,
+	'newProperty',
+	{
+		enumerable:false,
+		value:function(){ return true; }
+	}
+);
+<feMorphology operator="dilate" radius="4"
+
+
+https://stackoverflow.com/questions/18524652/how-to-use-javascript-object-defineproperty
+
+
+</body>
+</html>
